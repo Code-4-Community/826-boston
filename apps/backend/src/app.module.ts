@@ -3,11 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TaskModule } from './task/task.module';
 import AppDataSource from './data-source';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(AppDataSource.options), TaskModule],
+  imports: [TypeOrmModule.forRoot(AppDataSource.options)],
   controllers: [AppController],
   providers: [AppService],
 })
