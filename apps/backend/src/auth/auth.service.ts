@@ -60,7 +60,7 @@ export class AuthService {
 
   async signup(
     { firstName, lastName, email, password }: SignUpDto,
-    status: Status = Status.STANDARD,
+    status: Status = Status.INTERNAL,
   ): Promise<boolean> {
     // Needs error handling
     const signUpCommand = new SignUpCommand({

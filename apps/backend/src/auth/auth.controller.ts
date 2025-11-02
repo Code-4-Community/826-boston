@@ -31,7 +31,7 @@ export class AuthController {
 
   @Post('/signup')
   async createUser(@Body() signUpDto: SignUpDto): Promise<User> {
-    // By default, creates a standard user
+    // By default, creates an internal user
     try {
       await this.authService.signup(signUpDto);
     } catch (e) {

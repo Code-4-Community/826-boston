@@ -13,7 +13,7 @@ export class UsersService {
     email: string,
     firstName: string,
     lastName: string,
-    status: Status = Status.STANDARD,
+    status: Status = Status.INTERNAL,
   ) {
     const userId = (await this.repo.count()) + 1;
     const user = this.repo.create({
