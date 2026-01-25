@@ -4,8 +4,8 @@ import {
   STATIC_ARCHIVED,
   RECENTLY_EDITED,
   MOCK_LAST_MODIFIED,
-  Anthology,
 } from '@utils/mock-data';
+import { Anthology, AnthologyStatus } from '../../types/anthology';
 
 // Import SVG icons
 import DocumentIcon from '../../assets/icons/document.svg';
@@ -25,7 +25,7 @@ export default function ArchivedPublications() {
       .then((res) => res.json())
       .then((data) => {
         const archivedOnly = (data as Anthology[]).filter(
-          (item) => item.status === 'archived',
+          (item) => item.status === AnthologyStatus.ARCHIVED,
         );
         if (archivedOnly.length > 0) {
           setArchived(archivedOnly);
@@ -39,8 +39,10 @@ export default function ArchivedPublications() {
   const filteredPublications = archived.filter((pub) => {
     const query = searchQuery.toLowerCase();
     const titleMatch = pub.title.toLowerCase().includes(query);
-    const authors = pub.authors || [];
-    const authorMatch = authors.some((a) => a.toLowerCase().includes(query));
+    const authors = pub.getAuthors() || [];
+    const authorMatch = authors.some((a) =>
+      a.name.toLowerCase().includes(query),
+    );
     return titleMatch || authorMatch;
   });
 
@@ -152,7 +154,10 @@ export default function ArchivedPublications() {
                   <div className="publication-card-details">
                     <h3 className="publication-card-title">{pub.title}</h3>
                     <p className="publication-card-author">
-                      {pub.authors?.join(', ') || 'Author Name'}
+                      {pub
+                        .getAuthors()
+                        .map((a) => a.name)
+                        .join(', ') || 'Author Name'}
                     </p>
                     <div className="publication-card-meta">
                       <span className="publication-card-modified">

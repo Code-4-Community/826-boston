@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import apiClient from '../../../api/apiClient';
 import { STATIC_ARCHIVED } from '@utils/mock-data';
-import { Anthology, AnthologyStatus, AnthologyPubLevel } from '../../../types';
+import {
+  Anthology,
+  AnthologyStatus,
+  AnthologyPubLevel,
+} from '../../../types/anthology';
 import './publication-view.css';
 
 import imgFrame69 from '../../../assets/images/frame-69.png';
@@ -159,42 +163,44 @@ const assets = [
   { name: 'name_of_file', type: 'PDF', size: '6.2 MB' },
 ];
 
-const mockAnthology: Anthology = {
-  id: 0,
-  title: 'Untitled Publication (Mock)',
-  subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-  byline: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-  description:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  published_year: 2025,
-  programs: 'YLAB',
-  inventory: 79,
-  status: AnthologyStatus.CAN_BE_SHARED,
-  pub_level: AnthologyPubLevel.PERFECT_BOUND,
-  photo_url: undefined,
-  genre: 'Fantasy, Science Fiction, Mystery',
-  theme: 'Short Stories, Creative Writing',
-  isbn: '979-8-88694-087-9',
-  shopify_url: 'https://example.com',
-  praise_quotes:
-    '"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."',
-  foreword_author: 'Agnes Ugoji',
-  age_category: '9-12',
-  dimensions: '7" x 7"',
-  binding_type: 'Perfect Bound',
-  page_count: 132,
-  print_run: 500,
-  printed_by: 'Marquis',
-  number_of_students: 53,
-  printing_cost: '$2,906.40',
-  weight: '6.2 oz / 176 g',
-  inventory_locations: {
-    'Devs/Comms Office (1865 Columbus)': 79,
-    'The Hub (1989 Columbus)': 400,
-    'Tutoring Center (3035 Office)': 0,
-    Archived: 3,
-  },
-};
+const mockAnthology: Anthology = new Anthology(
+  /* id: */ 0,
+  /* title: */ 'Untitled Publication (Mock)',
+  /* published_year: */ 2025,
+  /* status: */ AnthologyStatus.CAN_BE_SHARED,
+  /* stories: */ [],
+  /* subtitle: */ 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+  /* byline: */ 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+  /* description: */
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+  /* updated_at: */ 'Jan 2, 1960',
+  /* photo_url: */ undefined,
+  /* foreword_author: */ 'Agnes Ugoji',
+  /* praise_quotes: */
+  '"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."',
+  /* age_category: */ '9-12',
+  /* isbn: */ '979-8-88694-087-9',
+  /* shopify_url: */ 'https://example.com',
+  /* binding_type: */ 'Perfect Bound',
+  /* dimensions: */ '7" x 7"',
+  /* printing_cost: */ '$2,906.40',
+  /* print_run: */ 500,
+  /* weight: */ '6.2 oz / 176 g',
+  /* page_count: */ 132,
+  /* printed_by: */ 'Marquis',
+  /* pub_level: */ AnthologyPubLevel.PERFECT_BOUND,
+  /* publishing_permission:*/ 'All',
+  /* programs: */ ['YLAB'],
+  /*sponsors:*/ ['Richard K. Lubin Family Foundation'],
+  /* number_of_students: */ 53,
+  /* total_inventory: */ 79,
+  /* inventory_locations: */ [
+    { id: 1, name: 'Devs/Comms Office (1865 Columbus)', num_copies: 79 },
+    { id: 2, name: 'The Hub (1989 Columbus)', num_copies: 400 },
+    { id: 3, name: 'Tutoring Center (3035 Office)', num_copies: 0 },
+    { id: 4, name: 'Archived', num_copies: 3 },
+  ],
+);
 
 const PublicationView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -271,14 +277,18 @@ const PublicationView: React.FC = () => {
     }
   };
 
-  const genreTags = parseTags(anthology.genre).map((g) => ({
-    label: g,
-    className: getTagClass(g),
-  }));
-  const themeTags = parseTags(anthology.theme).map((t) => ({
-    label: t,
-    className: 'tag-neutral',
-  }));
+  const genreTags = parseTags(anthology.getGenres().map((g) => g.name)).map(
+    (g) => ({
+      label: g,
+      className: getTagClass(g),
+    }),
+  );
+  const themeTags = parseTags(anthology.getThemes().map((t) => t.name)).map(
+    (t) => ({
+      label: t,
+      className: 'tag-neutral',
+    }),
+  );
   const programValue = Array.isArray(anthology.programs)
     ? anthology.programs.join(', ')
     : anthology.programs || 'Empty';
@@ -293,8 +303,12 @@ const PublicationView: React.FC = () => {
       value: anthology.byline || 'Empty',
     },
     {
-      label: 'Theme',
-      value: anthology.theme || 'Empty',
+      label: anthology.getThemes().length === 1 ? 'Theme' : 'Themes',
+      value:
+        anthology
+          .getThemes()
+          .map((t) => t.name)
+          .join(', ') || 'Empty',
     },
     {
       label: 'Praise/Pull Quotes',
@@ -325,13 +339,18 @@ const PublicationView: React.FC = () => {
   ];
 
   const inventoryItems = [
-    { label: 'Total Inventory', value: anthology.inventory?.toString() || '0' },
-    ...Object.entries(anthology.inventory_locations || {}).map(
-      ([location, count]) => ({
-        label: location,
-        value: count.toString(),
-      }),
-    ),
+    {
+      label: 'Total Inventory',
+      value:
+        anthology.inventory_locations
+          ?.map((i) => i.num_copies)
+          .reduce((total, current) => total + current, 0)
+          .toString() || '0',
+    },
+    ...(anthology.inventory_locations ?? []).map((location) => ({
+      label: location.name,
+      value: (location.num_copies ?? 0).toString(),
+    })),
   ];
 
   return (
@@ -360,7 +379,12 @@ const PublicationView: React.FC = () => {
           <div className="publication-info">
             <div className="publication-title-section">
               <h1 className="publication-title">{anthology.title}</h1>
-              <p className="publication-author">Author Name(s)</p>
+              <p className="publication-author">
+                {anthology
+                  .getAuthors()
+                  .map((a) => a.name)
+                  .join(', ') || 'Author Name'}
+              </p>
               <div className="publication-description">
                 <p className="description-text">
                   {isExpanded
