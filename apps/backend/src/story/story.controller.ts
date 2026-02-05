@@ -54,6 +54,23 @@ export class StoryController {
     return this.storyService.remove(storyId);
   }
 
+  @Delete('/library/anthology/story/:storyId')
+  @ApiOperation({ summary: 'Delete a story from a specific anthology' })
+  @ApiResponse({
+    status: 200,
+    description: 'Story deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Story not found',
+  })
+  async removeStoryFromAnthology(
+    @Param('storyId', ParseIntPipe) storyId: number,
+  ): Promise<{ message: string }> {
+    await this.storyService.remove(storyId);
+    return { message: 'Story deleted successfully' };
+  }
+
   @Post('/library/anthology/:anthologyId/story')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new story in a specific anthology' })
