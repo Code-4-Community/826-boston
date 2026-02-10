@@ -44,7 +44,13 @@ export class StoryController {
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
     @Param('storyId', ParseIntPipe) storyId: number,
   ): Promise<Story> {
-    return this.storyService.findOne(storyId);
+    const story = await this.storyService.findOne(storyId);
+
+    if (!story) {
+      throw new NotFoundException(`Story with ID ${storyId} not found`);
+    }
+
+    return story;
   }
 
   @Delete('/:storyId')
