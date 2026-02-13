@@ -255,7 +255,7 @@ const PublicationView: React.FC = () => {
           .catch(() => {
             // Fallback to mock stories on error
             const mockStories = MOCK_STORIES.filter(
-              (s) => s.anthology_id === anthology.id
+              (s) => s.anthology_id === anthology.id,
             );
             const authorNames = [...new Set(mockStories.map((s) => s.author))];
             setAuthors(authorNames);
@@ -263,7 +263,7 @@ const PublicationView: React.FC = () => {
       } else {
         // API method doesn't exist yet, so use mock stories
         const mockStories = MOCK_STORIES.filter(
-          (s) => s.anthology_id === anthology.id
+          (s) => s.anthology_id === anthology.id,
         );
         const authorNames = [...new Set(mockStories.map((s) => s.author))];
         setAuthors(authorNames);
@@ -276,7 +276,7 @@ const PublicationView: React.FC = () => {
   };
 
   const toggleAuthorsExpanded = () => {
-  setIsAuthorsExpanded(!isAuthorsExpanded);
+    setIsAuthorsExpanded(!isAuthorsExpanded);
   };
 
   if (loading) return <div className="publication-view">Loading...</div>;
@@ -394,34 +394,43 @@ const PublicationView: React.FC = () => {
           <div className="publication-info">
             <div className="publication-title-section">
               <h1 className="publication-title">{anthology.title}</h1>
-                <div className="publication-authors">
-                  {authors.length > 0 ? (
-                    <>
-                      <p className="publication-author">
-                        {isAuthorsExpanded
-                          ? authors.join(', ')
-                          : authors.slice(0, 3).join(', ') +
-                            (authors.length > 3 ? '...' : '')}
-                      </p>
-                      {authors.length > 3 && (
-                        <div className="read-more-link" onClick={toggleAuthorsExpanded}>
-                          <p>{isAuthorsExpanded ? 'See Less' : `See All ${authors.length} Authors`}</p>
-                          <div
-                            className="read-more-arrow"
-                            style={{
-                              transform: isAuthorsExpanded ? 'rotate(90deg)' : 'rotate(270deg)',
-                            }}
-                          >
-                            <img src={imgFluentIosArrow24Filled} alt="" />
-                          </div>
+              <div className="publication-authors">
+                {authors.length > 0 ? (
+                  <>
+                    <p className="publication-author">
+                      {isAuthorsExpanded
+                        ? authors.join(', ')
+                        : authors.slice(0, 3).join(', ') +
+                          (authors.length > 3 ? '...' : '')}
+                    </p>
+                    {authors.length > 3 && (
+                      <div
+                        className="read-more-link"
+                        onClick={toggleAuthorsExpanded}
+                      >
+                        <p>
+                          {isAuthorsExpanded
+                            ? 'See Less'
+                            : `See All ${authors.length} Authors`}
+                        </p>
+                        <div
+                          className="read-more-arrow"
+                          style={{
+                            transform: isAuthorsExpanded
+                              ? 'rotate(90deg)'
+                              : 'rotate(270deg)',
+                          }}
+                        >
+                          <img src={imgFluentIosArrow24Filled} alt="" />
                         </div>
-                      )}
-                    </>
-                  ) : (
-                    <p className="publication-author">No authors available</p>
-                  )}
-                </div>              
-                <div className="publication-description">
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="publication-author">No authors available</p>
+                )}
+              </div>
+              <div className="publication-description">
                 <p className="description-text">
                   {isExpanded
                     ? fullDescription

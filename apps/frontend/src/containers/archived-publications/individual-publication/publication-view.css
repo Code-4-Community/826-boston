@@ -5,7 +5,21 @@
   padding: 45px 55px 0;
   max-width: 979px;
   margin: 0 auto;
+  display : flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
+
+.archive-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--neutral-100);
+  box-sizing: border-box;
+}
+
 
 /* Breadcrumb Header */
 .breadcrumb-header {

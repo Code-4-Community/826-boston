@@ -44,3 +44,10 @@ export interface Anthology {
   // Inventory breakdown locations
   inventory_locations?: Record<string, number>;
 }
+
+export interface Story {
+  id: number;
+  title: string;
+  author: string;
+  anthology_id: number;
+}
