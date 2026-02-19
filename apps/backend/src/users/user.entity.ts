@@ -1,13 +1,17 @@
 import { Entity, Column } from 'typeorm';
 
-import type { Status } from './types';
+import { Status } from './types';
 
 @Entity()
 export class User {
   @Column({ primary: true })
   id: number;
 
-  @Column()
+  @Column({
+    type: "enum",
+    enum: Status,
+  }
+  )
   status: Status;
 
   @Column()

@@ -31,10 +31,16 @@ export class Anthology {
   @Column('text', { nullable: true })
   programs?: string[];
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: AnthologyStatus,
+  })
   status: AnthologyStatus;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: AnthologyPubLevel,
+  })
   pub_level: AnthologyPubLevel;
 
   @Column({ nullable: true })
