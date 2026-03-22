@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { passportJwtSecret } from 'jwks-rsa';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import CognitoAuthConfig from '../../../shared/aws-exports';
 
 @Injectable()

@@ -14,7 +14,6 @@ export class AnthologyService {
   async create(
     title: string,
     description: string,
-    publishedDate: string,
     status: AnthologyStatus,
     pubLevel: AnthologyPubLevel,
     programs?: string[],
@@ -22,12 +21,9 @@ export class AnthologyService {
     isbn?: string,
     shopifyUrl?: string,
   ) {
-    const anthologyId = (await this.repo.count()) + 1;
     const anthology = this.repo.create({
-      id: anthologyId,
       title,
       description,
-      publishedDate,
       status,
       pubLevel,
       programs,
@@ -93,6 +89,21 @@ export class AnthologyService {
     }
 
     anthology.status = status;
+    return this.repo.save(anthology);
+  }
+
+  async publish(id: number) {
+    const anthology = await this.findOne(id);
+
+    if (!anthology) {
+      throw new NotFoundException('Anthology not found');
+    }
+
+    if (anthology.publishedDate) {
+      return { message: 'Anthology is already published' };
+    }
+
+    anthology.publishedDate = new Date();
     return this.repo.save(anthology);
   }
 }

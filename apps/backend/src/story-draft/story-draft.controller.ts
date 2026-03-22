@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   Body,
   Post,
+  Patch,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
@@ -15,6 +16,8 @@ import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
 import { UpdateStoryDraftDto } from './dto/update-story-draft.dto';
 import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
+import { Roles } from '../auth/roles.decorator';
+import { OmchaiRole } from 'src/omchai/omchai.entity';
 
 @ApiTags('StoryDrafts')
 @ApiBearerAuth()
@@ -42,6 +45,12 @@ export class StoryDraftController {
   }
 
   @Post('/:storyDraftId')
+  @Roles(
+    OmchaiRole.OWNER,
+    OmchaiRole.MANAGER,
+    OmchaiRole.CONSULTED,
+    OmchaiRole.HELPER,
+  )
   async editStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,
     @Body() updateStoryDraftDto: UpdateStoryDraftDto,

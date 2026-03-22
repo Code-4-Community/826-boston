@@ -25,11 +25,10 @@ import {
 import { AnthologyService } from '../anthology/anthology.service';
 import { AuthorService } from '../author/author.service';
 import { CreateStoryDto } from './dtos/create-story.dto';
-import { create } from 'domain';
 
 @ApiTags('Story')
 @ApiBearerAuth()
-@Controller('story')
+@Controller('stories')
 @UseGuards(AuthGuard('jwt'))
 @UseInterceptors(CurrentUserInterceptor)
 export class StoryController {
