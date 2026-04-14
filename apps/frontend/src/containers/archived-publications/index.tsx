@@ -64,7 +64,7 @@ function applyFiltersAndSort(
 
   if (filters.pubLevels.length > 0) {
     result = result.filter((p) =>
-      filters.pubLevels.some((l) => p.pub_level === l),
+      filters.pubLevels.some((l) => p.pubLevel === l),
     );
   }
 
@@ -155,6 +155,10 @@ export default function ArchivedPublications({
         console.log(err);
       });
   }, []);
+
+  useEffect(() => {
+    console.log(publications)
+  }, [publications]);
 
   const statusFilteredPublications = publications.filter((pub) => {
     const status = String(pub.status);

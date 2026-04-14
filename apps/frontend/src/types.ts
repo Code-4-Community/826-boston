@@ -82,33 +82,19 @@ export const DEFAULT_FILTER_STATE: FilterState = {
 
 export interface Anthology {
   id: number;
-  title: string;
-  description: string;
-  published_year: number;
-  programs?: string[] | string;
-  inventory?: number;
-  status: AnthologyStatus;
-  pub_level: AnthologyPubLevel;
-  photo_url?: string;
-  genres?: string[];
-  themes?: string[];
-  isbn?: string;
-  shopify_url?: string;
-
-  // Missing from backend
-  subtitle?: string;
+  ageCategory?: string;
   byline?: string;
-  praise_quotes?: string;
-  foreword_author?: string;
-  age_category?: string;
-  dimensions?: string;
-  binding_type?: string;
-  page_count?: number;
-  print_run?: number;
-  printed_by?: string;
-  number_of_students?: number;
-  printing_cost?: string;
-  weight?: string;
-  // Inventory breakdown locations
-  inventory_locations?: Record<string, number>;
+  description: string;
+  genres?: string[];
+  isbn?: string;
+  photoUrl?: string;
+  programs?: string[];
+  pubLevel: AnthologyPubLevel;
+  publishedDate: string;
+  shopifyUrl?: string;
+  status: AnthologyStatus;
+  subtitle?: string;
+  themes?: string[];
+  title: string;
+  triggers?: string[];
 }

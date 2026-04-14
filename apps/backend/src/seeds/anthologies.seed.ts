@@ -35,7 +35,8 @@ export const AnthologiesSeed: DeepPartial<Anthology>[] = [
 
     pubLevel: AnthologyPubLevel.CHAPBOOK,
 
-    photoUrl: '',
+    photoUrl:
+      'https://c4c-826boston-dev.s3.us-east-1.amazonaws.com/images/walk_a_mile_in_our_shoes_pub_cover.jpg',
 
     isbn: '979-8-88694-119-7',
   },

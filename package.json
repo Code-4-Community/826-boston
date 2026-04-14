@@ -23,6 +23,7 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^6.15.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.410.0",
+    "@aws-sdk/client-s3": "^3.1024.0",
     "@nestjs/cli": "^10.1.17",
     "@nestjs/common": "^10.0.2",
     "@nestjs/core": "^10.0.2",
