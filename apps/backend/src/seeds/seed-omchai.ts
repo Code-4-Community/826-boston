@@ -5,13 +5,14 @@ import { OmchaiSeed } from './omchai.seed';
 export async function seedOmchais(dataSource: DataSource) {
   const repository = dataSource.getRepository(Omchai);
 
-  console.log('Seeding inventory holdings...');
+  console.log('Seeding omchais...');
 
   for (const data of OmchaiSeed) {
     const exists = await repository.findOne({
       where: {
         userId: data.userId,
         anthologyId: data.anthologyId,
+        role: data.role,
       },
     });
 

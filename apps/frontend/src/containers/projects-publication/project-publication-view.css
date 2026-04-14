@@ -1,0 +1,111 @@
+.ppv-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--neutral-100);
+  padding: 24px 100px 104px;
+  box-sizing: border-box;
+}
+
+.ppv-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--neutral-400);
+  margin-bottom: 24px;
+}
+
+.ppv-breadcrumb-link {
+  color: var(--neutral-400);
+  text-decoration: none;
+}
+
+.ppv-breadcrumb-link:hover { text-decoration: underline; }
+
+.ppv-breadcrumb-sep { color: var(--neutral-400); }
+
+.ppv-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ppv-title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--neutral-600);
+  margin: 0;
+}
+
+.publication-tabs button.publication-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ppv-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 18px;
+}
+
+.document-tracker-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.document-tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.document-tracker-table th,
+.document-tracker-table td {
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--neutral-300);
+  color: var(--neutral-600);
+}
+
+.document-tracker-table th {
+  font-weight: 700;
+  background-color: var(--neutral-200);
+}
+
+.document-tracker-edit-btn {
+  background: none;
+  border: 1px solid #E85100;
+  color: #E85100;
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.document-tracker-edit-btn:hover {
+  background: #E85100;
+  color: #fff;
+}
+
+.archive-modal-content input {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  box-sizing: border-box;
+}

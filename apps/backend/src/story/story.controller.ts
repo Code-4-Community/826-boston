@@ -5,7 +5,6 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
-  UseInterceptors,
   Post,
   Body,
   HttpCode,
@@ -13,9 +12,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { StoryService } from './story.service';
-import { AuthGuard } from '@nestjs/passport';
 import { Story } from './story.entity';
-import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -30,8 +27,6 @@ import { create } from 'domain';
 @ApiTags('Story')
 @ApiBearerAuth()
 @Controller('story')
-@UseGuards(AuthGuard('jwt'))
-@UseInterceptors(CurrentUserInterceptor)
 export class StoryController {
   constructor(
     private storyService: StoryService,

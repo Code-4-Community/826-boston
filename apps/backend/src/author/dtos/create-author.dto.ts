@@ -1,16 +1,28 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateAuthorDto {
   @ApiProperty({ description: 'Name of author' })
   @IsString()
   name: string;
 
-  @ApiProperty({ description: 'Bio of author' })
+  @ApiPropertyOptional({ description: 'Name as it appears in the book' })
   @IsString()
-  bio: string;
+  @IsOptional()
+  nameInBook?: string;
 
-  @ApiProperty({ description: 'Grade of author' })
+  @ApiPropertyOptional({ description: 'Class period of the author' })
+  @IsString()
+  @IsOptional()
+  classPeriod?: string;
+
+  @ApiPropertyOptional({ description: 'Bio of author' })
+  @IsString()
+  @IsOptional()
+  bio?: string;
+
+  @ApiPropertyOptional({ description: 'Grade of author' })
   @IsNumber()
-  grade: number;
+  @IsOptional()
+  grade?: number;
 }

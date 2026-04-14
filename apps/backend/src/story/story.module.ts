@@ -4,7 +4,6 @@ import { StoryController } from './story.controller';
 import { StoryService } from './story.service';
 import { Story } from './story.entity';
 import { AnthologyModule } from '../anthology/anthology.module';
-import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { AuthorModule } from '../author/author.module';
@@ -18,7 +17,7 @@ import { AuthorModule } from '../author/author.module';
     AuthorModule,
   ],
   controllers: [StoryController],
-  providers: [StoryService, CurrentUserInterceptor],
+  providers: [StoryService],
   exports: [StoryService],
 })
 export class StoryModule {}

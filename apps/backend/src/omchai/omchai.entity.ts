@@ -39,10 +39,10 @@ export class Omchai {
   datetimeAssigned: Date;
 
   @ManyToOne(() => User, (user) => user.omchaiAssignments)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'userId' })
   user: Relation<User>;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.omchaiAssignments)
-  @JoinColumn({ name: 'anthology_id' })
+  @JoinColumn({ name: 'anthologyId' })
   anthology: Relation<Anthology>;
 }

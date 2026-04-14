@@ -7,6 +7,16 @@ export class EditAuthorDto {
   @IsOptional()
   name?: string;
 
+  @ApiProperty({ description: 'Name as it appears in the book' })
+  @IsString()
+  @IsOptional()
+  nameInBook?: string;
+
+  @ApiProperty({ description: 'Class period of the author' })
+  @IsString()
+  @IsOptional()
+  classPeriod?: string;
+
   @ApiProperty({ description: 'Bio of author' })
   @IsString()
   @IsOptional()

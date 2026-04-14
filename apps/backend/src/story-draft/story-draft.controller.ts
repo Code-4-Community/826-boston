@@ -1,15 +1,14 @@
 import {
   Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
   UseGuards,
-  UseInterceptors,
   Body,
   Post,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
 import { UpdateStoryDraftDto } from './dto/update-story-draft.dto';
@@ -19,10 +18,13 @@ import { EditRound, SubmissionRound } from './types';
 @ApiTags('StoryDrafts')
 @ApiBearerAuth()
 @Controller('story-drafts')
-@UseGuards(AuthGuard('jwt'))
-@UseInterceptors(CurrentUserInterceptor)
 export class StoryDraftController {
   constructor(private readonly storyDraftService: StoryDraftService) {}
+
+  @Get()
+  async getStoryDrafts() {
+    return this.storyDraftService.findAll();
+  }
 
   @Post()
   async createStoryDraft(
@@ -31,12 +33,13 @@ export class StoryDraftController {
     await this.storyDraftService.create(
       createStoryDraftDto.authorId,
       createStoryDraftDto.docLink,
-      createStoryDraftDto.submissionRound,
-      createStoryDraftDto.studentConsent,
-      createStoryDraftDto.inManuscript,
-      createStoryDraftDto.editRound,
-      createStoryDraftDto.proofread,
-      createStoryDraftDto.notes,
+      createStoryDraftDto.submissionRound ?? SubmissionRound.ONE,
+      createStoryDraftDto.studentConsent ?? false,
+      createStoryDraftDto.inManuscript ?? false,
+      createStoryDraftDto.editRound ?? EditRound.ONE,
+      createStoryDraftDto.proofread ?? false,
+      createStoryDraftDto.notes ?? [],
+      createStoryDraftDto.anthologyId,
     );
     return { message: 'StoryDraft created successfully' };
   }
@@ -68,5 +71,12 @@ export class StoryDraftController {
   ): Promise<{ message: string }> {
     await this.storyDraftService.remove(storyDraftId);
     return { message: 'StoryDraft deleted successfully' };
+  }
+
+  @Get('/anthology/:anthologyId')
+  async getStoryDraftsByAnthology(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+  ) {
+    return this.storyDraftService.findByAnthology(anthologyId);
   }
 }

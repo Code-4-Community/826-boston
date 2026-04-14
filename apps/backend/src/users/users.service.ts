@@ -51,6 +51,13 @@ export class UsersService {
     return this.repo.find({ where: { email } });
   }
 
+  findWithOmchai(email: string) {
+    return this.repo.find({
+      where: { email },
+      relations: { omchaiAssignments: true },
+    });
+  }
+
   async update(id: number, attrs: Partial<User>) {
     const user = await this.findOne(id);
 

@@ -7,7 +7,9 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { JwtStrategy } from './jwt.strategy';
-import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { OmchaiGuard } from './guards/omchai.guard';
+import { UserStatusGuard } from './guards/user-status.guard';
 
 @Module({
   imports: [
@@ -15,7 +17,21 @@ import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UsersService, CurrentUserInterceptor],
-  exports: [AuthService, JwtStrategy, UsersService, CurrentUserInterceptor],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    UsersService,
+    JwtAuthGuard,
+    OmchaiGuard,
+    UserStatusGuard,
+  ],
+  exports: [
+    AuthService,
+    JwtStrategy,
+    UsersService,
+    JwtAuthGuard,
+    OmchaiGuard,
+    UserStatusGuard,
+  ],
 })
 export class AuthModule {}

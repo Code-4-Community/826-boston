@@ -32,9 +32,12 @@ To run both the frontend and backend with one command:
 
 ```
 nx run-many -t serve -p frontend backend
-```
+```git
+
 
 ## Other commands
+
+Test new migrations and seed data with yarn db:reset. You may need to reconnect to the database in pgadmin to see the cahnges
 
 Run `git submodule update --remote` to pull the latest changes from the component library
 

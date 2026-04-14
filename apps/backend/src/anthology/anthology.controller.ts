@@ -4,16 +4,22 @@ import {
   Post,
   Body,
   Delete,
+  Patch,
   Param,
   ParseIntPipe,
-  UseGuards,
   NotFoundException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FilterSortAnthologyDto } from './dtos/filter-anthology.dto';
+import { OmchaiRoles, UserStatus } from '../auth/roles.decorator';
+import { OmchaiRole } from 'src/omchai/omchai.entity';
+import { CreateAnthologyDto } from './dtos/create-anthology.dto';
+import { UpdateAnthologyDto } from './dtos/update-anthology.dto';
+import { Role } from 'src/users/types';
 
 @ApiTags('Anthologies')
 @Controller('anthologies')
@@ -44,12 +50,40 @@ export class AnthologyController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @Delete('/:anthologyId')
   async removeAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
   ): Promise<{ message: string }> {
     await this.anthologyService.remove(anthologyId);
     return { message: 'Anthology deleted successfully' };
+  }
+
+  @ApiBearerAuth()
+  @UserStatus(Role.ADMIN)
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async createAnthology(
+    @Body() createAnthologyDto: CreateAnthologyDto,
+  ): Promise<Anthology> {
+    return this.anthologyService.create(
+      createAnthologyDto.title,
+      createAnthologyDto.description,
+      createAnthologyDto.status,
+      createAnthologyDto.pub_level,
+      createAnthologyDto.programs,
+      createAnthologyDto.photo_url,
+      createAnthologyDto.isbn,
+      createAnthologyDto.shopify_url,
+    );
+  }
+
+  @ApiBearerAuth()
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
+  @Patch(':id')
+  async updateAnthology(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateAnthologyDto: UpdateAnthologyDto,
+  ): Promise<Anthology> {
+    return this.anthologyService.update(id, updateAnthologyDto);
   }
 }

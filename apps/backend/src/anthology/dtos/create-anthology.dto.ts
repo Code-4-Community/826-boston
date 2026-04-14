@@ -8,7 +8,6 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AnthologyStatus, AnthologyPubLevel } from '../types';
 
-//TODO: outdated DTO needs to match the schema
 export class CreateAnthologyDto {
   @ApiProperty({ description: 'Title of the anthology' })
   @IsString()
@@ -17,10 +16,6 @@ export class CreateAnthologyDto {
   @ApiProperty({ description: 'Description of the anthology' })
   @IsString()
   description: string;
-
-  @ApiProperty({ description: 'Year the anthology was published' })
-  @IsNumber()
-  published_year: number;
 
   @ApiProperty({
     description: 'Status of the anthology',

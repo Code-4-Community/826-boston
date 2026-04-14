@@ -7,7 +7,7 @@ export class User {
   @Column({ primary: true })
   id: number;
 
-  @Column({ type: 'enum', enum: Role })
+  @Column({ type: 'enum', enum: Role, default: Role.STANDARD })
   role: Role;
 
   @Column({ name: 'first_name' })

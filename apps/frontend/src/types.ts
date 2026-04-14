@@ -1,10 +1,11 @@
 import { PUB_LEVEL_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
 
 export enum AnthologyStatus {
+  DRAFT = 'Draft',
+  IN_REVISION = 'In Revision',
+  IN_PRODUCTION = 'In Production',
+  PUBLISHED = 'Published',
   ARCHIVED = 'Archived',
-  NOT_STARTED = 'NotStarted',
-  DRAFTING = 'Drafting',
-  CAN_BE_SHARED = 'CanBeShared',
 }
 
 export enum AnthologyPubLevel {
@@ -17,8 +18,33 @@ export enum AnthologyPubLevel {
 export interface Author {
   id: number;
   name: string;
+  nameInBook?: string;
+  classPeriod?: string;
   bio?: string;
   grade?: number;
+}
+
+export enum SubmissionRound {
+  ONE = 0,
+  TWO = 1,
+  THREE = 2,
+}
+
+export enum EditRound {
+  ONE = 0,
+  TWO = 1,
+}
+
+export interface StoryDraft {
+  id: number;
+  authorId: number;
+  docLink: string;
+  submissionRound: SubmissionRound;
+  studentConsent: boolean;
+  inManuscript: boolean;
+  editRound: EditRound;
+  proofread: boolean;
+  notes: string[];
 }
 
 export interface Story {
@@ -79,6 +105,31 @@ export const DEFAULT_FILTER_STATE: FilterState = {
   inventoryMin: '',
   inventoryMax: '',
 };
+
+export enum OmchaiRole {
+  OWNER = 'OWNER',
+  MANAGER = 'MANAGER',
+  CONSULTED = 'CONSULTED',
+  HELPER = 'HELPER',
+  APPROVER = 'APPROVER',
+  INFORMED = 'INFORMED',
+}
+
+export interface OmchaiUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  title?: string;
+}
+
+export interface OmchaiEntry {
+  id: number;
+  anthologyId: number;
+  userId: number;
+  role: OmchaiRole;
+  datetimeAssigned: string;
+  user: OmchaiUser;
+}
 
 export interface Anthology {
   id: number;

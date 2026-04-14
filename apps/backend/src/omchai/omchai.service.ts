@@ -19,7 +19,10 @@ export class OmchaiService {
   }
 
   findByAnthologyId(anthologyId: number) {
-    return this.repo.find({ where: { anthologyId: anthologyId } });
+    return this.repo.find({
+      where: { anthologyId },
+      relations: ['user'],
+    });
   }
 
   async update(id: number, updateOmchaiDto: EditOmchaiDto) {

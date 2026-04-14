@@ -261,27 +261,27 @@ const PublicationView: React.FC = () => {
     },
   ];
 
-  const productionDetails = [
-    { label: 'Foreword Author', value: anthology.foreword_author || 'Empty' },
-    { label: 'Age Category', value: anthology.age_category || 'Empty' },
-    { label: 'Pub Level', value: anthology.pub_level || 'Empty' },
-    {
-      label: 'Pub Date',
-      value: anthology.published_year?.toString() || 'Empty',
-    },
-    { label: 'ISBN', value: anthology.isbn || 'Empty' },
-    { label: 'Dimensions', value: anthology.dimensions || 'Empty' },
-    { label: 'Binding Type', value: anthology.binding_type || 'Empty' },
-    { label: 'Page Count', value: anthology.page_count?.toString() || 'Empty' },
-    { label: 'Print Run', value: anthology.print_run?.toString() || 'Empty' },
-    { label: 'Printed By', value: anthology.printed_by || 'Empty' },
-    {
-      label: 'Number of Students',
-      value: anthology.number_of_students?.toString() || 'Empty',
-    },
-    { label: 'Printing Cost', value: anthology.printing_cost || 'Empty' },
-    { label: 'Weight', value: anthology.weight || 'Empty' },
-  ];
+  // const productionDetails = [
+  //   { label: 'Foreword Author', value: anthology.foreword_author || 'Empty' },
+  //   { label: 'Age Category', value: anthology.age_category || 'Empty' },
+  //   { label: 'Pub Level', value: anthology.pub_level || 'Empty' },
+  //   {
+  //     label: 'Pub Date',
+  //     value: anthology.published_year?.toString() || 'Empty',
+  //   },
+  //   { label: 'ISBN', value: anthology.isbn || 'Empty' },
+  //   { label: 'Dimensions', value: anthology.dimensions || 'Empty' },
+  //   { label: 'Binding Type', value: anthology.binding_type || 'Empty' },
+  //   { label: 'Page Count', value: anthology.page_count?.toString() || 'Empty' },
+  //   { label: 'Print Run', value: anthology.print_run?.toString() || 'Empty' },
+  //   { label: 'Printed By', value: anthology.printed_by || 'Empty' },
+  //   {
+  //     label: 'Number of Students',
+  //     value: anthology.number_of_students?.toString() || 'Empty',
+  //   },
+  //   { label: 'Printing Cost', value: anthology.printing_cost || 'Empty' },
+  //   { label: 'Weight', value: anthology.weight || 'Empty' },
+  // ];
 
   const inventoryItems = [
     { label: 'Total Inventory', value: anthology.inventory?.toString() || '0' },
@@ -420,12 +420,12 @@ const PublicationView: React.FC = () => {
             activeTab={activeTab}
             onClick={setActiveTab}
           />
-          <TabButton
+          {/* <TabButton
             id="production-details"
             label="Production Details"
             activeTab={activeTab}
             onClick={setActiveTab}
-          />
+          /> */}
           <TabButton
             id="inventory"
             label="Inventory"
@@ -482,7 +482,7 @@ const PublicationView: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'production-details' && (
+        {/* {activeTab === 'production-details' && (
           <div className="tab-content">
             <DetailRowStatus />
             <DetailRowSponsors />
@@ -494,7 +494,7 @@ const PublicationView: React.FC = () => {
               />
             ))}
           </div>
-        )}
+        )} */}
 
         {activeTab === 'inventory' && (
           <div className="tab-content">

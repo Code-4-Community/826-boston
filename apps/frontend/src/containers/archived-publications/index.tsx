@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import './styles.css';
 import apiClient from '../../api/apiClient';
+import { type FilterSortAnthologyBody } from '../../api/apiClient';
 import { MOCK_LAST_MODIFIED } from '@utils/mock-data';
 import {
   Anthology,
@@ -31,44 +32,60 @@ interface PublicationsPageProps {
   mode?: PublicationsPageMode;
 }
 
+const SORT_OPTION_TO_BACKEND: Partial<Record<SortOption, string>> = {
+  [SortOption.TITLE_ASC]: 'title-asc',
+  [SortOption.AUTHOR_ASC]: 'title-asc',
+  [SortOption.DATE_NEWEST]: 'date-recent',
+  [SortOption.DATE_OLDEST]: 'date-oldest',
+};
+
+function buildFilterSortBody(filters: FilterState): FilterSortAnthologyBody {
+  const body: FilterSortAnthologyBody = {};
+
+  const backendSort = SORT_OPTION_TO_BACKEND[filters.sortBy];
+  if (backendSort) {
+    body.sortBy = backendSort;
+  }
+
+  if (filters.pubDateStart || filters.pubDateEnd) {
+    body.pubDateRange = {
+      start: filters.pubDateStart
+        ? `${filters.pubDateStart}-01-01`
+        : '1900-01-01',
+      end: filters.pubDateEnd ? `${filters.pubDateEnd}-12-31` : '2100-12-31',
+    };
+  }
+
+  if (filters.pubLevels.length > 0) {
+    body.pubLevels = [...filters.pubLevels];
+  }
+
+  if (filters.programs.length > 0) {
+    body.programs = [...filters.programs];
+  }
+
+  if (filters.genres.length > 0) {
+    body.genres = [...filters.genres];
+  }
+
+  return body;
+}
+
 /**
- * Applies search, filters, and sort to the publication list.
- * Returns a new sorted+filtered array without mutating the original.
+ * Applies search and inventory filters that the backend does not support.
  */
-function applyFiltersAndSort(
+function applyLocalFilters(
   pubs: Anthology[],
   search: string,
   filters: FilterState,
 ): Anthology[] {
   let result = [...pubs];
 
-  // Search by title
   if (search) {
     const q = search.toLowerCase();
     result = result.filter((p) => p.title.toLowerCase().includes(q));
   }
 
-  // Publication date year range
-  if (filters.pubDateStart) {
-    const start = parseInt(filters.pubDateStart, 10);
-    if (!isNaN(start)) {
-      result = result.filter((p) => p.published_year >= start);
-    }
-  }
-  if (filters.pubDateEnd) {
-    const end = parseInt(filters.pubDateEnd, 10);
-    if (!isNaN(end)) {
-      result = result.filter((p) => p.published_year <= end);
-    }
-  }
-
-  if (filters.pubLevels.length > 0) {
-    result = result.filter((p) =>
-      filters.pubLevels.some((l) => p.pubLevel === l),
-    );
-  }
-
-  // Inventory range
   if (filters.inventoryMin) {
     const min = parseInt(filters.inventoryMin, 10);
     if (!isNaN(min)) {
@@ -81,36 +98,6 @@ function applyFiltersAndSort(
       result = result.filter((p) => (p.inventory ?? Infinity) <= max);
     }
   }
-
-  // Program — normalize programs to array for comparison
-  // Note: original entries 1–2 use 'YABP' and will not match any enum value
-  if (filters.programs.length > 0) {
-    result = result.filter((p) =>
-      filters.programs.some((g) => p.programs?.includes(g)),
-    );
-  }
-
-  if (filters.genres.length > 0) {
-    result = result.filter((p) =>
-      filters.genres.some((g) => p.genres?.includes(g)),
-    );
-  }
-
-  // Sort
-  result.sort((a, b) => {
-    switch (filters.sortBy) {
-      case SortOption.TITLE_ASC:
-        return a.title.localeCompare(b.title);
-      case SortOption.AUTHOR_ASC:
-        return a.title.localeCompare(b.title);
-      case SortOption.DATE_NEWEST:
-        return b.published_year - a.published_year;
-      case SortOption.DATE_OLDEST:
-        return a.published_year - b.published_year;
-      default:
-        return 0;
-    }
-  });
 
   return result;
 }
@@ -144,8 +131,9 @@ export default function ArchivedPublications({
   const activeProjectTab: ProjectTab = isProjectTab(tab) ? tab : 'drafts';
 
   useEffect(() => {
+    const body = buildFilterSortBody(appliedFilters);
     apiClient
-      .getAnthologies()
+      .filterSortAnthologies(body)
       .then((data) => {
         if (Array.isArray(data)) {
           setPublications(data as Anthology[]);
@@ -154,31 +142,25 @@ export default function ArchivedPublications({
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-
-  useEffect(() => {
-    console.log(publications)
-  }, [publications]);
+  }, [appliedFilters]);
 
   const statusFilteredPublications = publications.filter((pub) => {
     const status = String(pub.status);
 
     if (mode === 'archive') {
       if (activeArchiveTab === 'published') {
-        return (
-          status === AnthologyStatus.CAN_BE_SHARED || status === 'Published'
-        );
+        return status === AnthologyStatus.PUBLISHED || status === 'Published';
       }
 
       return status === AnthologyStatus.ARCHIVED;
     }
 
     if (activeProjectTab === 'drafts') {
-      return pub.status === AnthologyStatus.NOT_STARTED;
+      return pub.status === AnthologyStatus.DRAFT;
     }
 
     if (activeProjectTab === 'in-revision') {
-      return pub.status === AnthologyStatus.DRAFTING;
+      return pub.status === AnthologyStatus.IN_REVISION;
     }
 
     if (activeProjectTab === 'in-production') {
@@ -186,7 +168,7 @@ export default function ArchivedPublications({
     }
 
     if (activeProjectTab === 'published') {
-      return status === AnthologyStatus.CAN_BE_SHARED || status === 'Published';
+      return status === AnthologyStatus.PUBLISHED || status === 'Published';
     }
 
     if (activeProjectTab === 'archived') {
@@ -196,7 +178,7 @@ export default function ArchivedPublications({
     return false;
   });
 
-  const filteredPublications = applyFiltersAndSort(
+  const filteredPublications = applyLocalFilters(
     statusFilteredPublications,
     searchQuery,
     appliedFilters,

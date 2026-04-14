@@ -14,6 +14,8 @@ export class AuthorService {
     const author = await this.repo.create({
       id: id,
       name: createAuthorDto.name,
+      nameInBook: createAuthorDto.nameInBook,
+      classPeriod: createAuthorDto.classPeriod,
       bio: createAuthorDto.bio,
       grade: createAuthorDto.grade,
     });

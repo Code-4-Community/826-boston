@@ -1,5 +1,12 @@
-import { IsString, IsInt, IsBoolean, IsEnum, IsArray } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  IsInt,
+  IsBoolean,
+  IsEnum,
+  IsArray,
+  IsOptional,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SubmissionRound, EditRound } from '../types';
 
 export class CreateStoryDraftDto {
@@ -7,40 +14,55 @@ export class CreateStoryDraftDto {
   @IsInt()
   authorId: number;
 
+  @ApiProperty({ description: 'ID of the anthology' })
+  @IsInt()
+  anthologyId: number;
+
   @ApiProperty({ description: 'Link to the document' })
   @IsString()
   docLink: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Submission round',
     enum: SubmissionRound,
     example: SubmissionRound.ONE,
   })
   @IsEnum(SubmissionRound)
-  submissionRound: SubmissionRound;
+  @IsOptional()
+  submissionRound?: SubmissionRound;
 
-  @ApiProperty({ description: 'Whether the student has given consent' })
+  @ApiPropertyOptional({ description: 'Whether the student has given consent' })
   @IsBoolean()
-  studentConsent: boolean;
+  @IsOptional()
+  studentConsent?: boolean;
 
-  @ApiProperty({ description: 'Whether the story is in the manuscript' })
+  @ApiPropertyOptional({
+    description: 'Whether the story is in the manuscript',
+  })
   @IsBoolean()
-  inManuscript: boolean;
+  @IsOptional()
+  inManuscript?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Edit round',
     enum: EditRound,
     example: EditRound.ONE,
   })
   @IsEnum(EditRound)
-  editRound: EditRound;
+  @IsOptional()
+  editRound?: EditRound;
 
-  @ApiProperty({ description: 'Whether the story has been proofread' })
+  @ApiPropertyOptional({ description: 'Whether the story has been proofread' })
   @IsBoolean()
-  proofread: boolean;
+  @IsOptional()
+  proofread?: boolean;
 
-  @ApiProperty({ description: 'Notes about the story draft', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Notes about the story draft',
+    type: [String],
+  })
   @IsArray()
   @IsString({ each: true })
-  notes: string[];
+  @IsOptional()
+  notes?: string[];
 }

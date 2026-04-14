@@ -22,6 +22,7 @@ export class StoryDraftService {
     editRound: EditRound,
     proofread: boolean,
     notes: string[],
+    anthologyId: number, // add this
   ) {
     const author = await this.authorRepo.findOne({ where: { id: authorId } });
     if (!author) {
@@ -37,6 +38,7 @@ export class StoryDraftService {
       editRound,
       proofread,
       notes,
+      anthologyId,
     });
 
     return await this.repo.save(storyDraft);
@@ -97,5 +99,9 @@ export class StoryDraftService {
     }
 
     return this.repo.remove(storyDraft);
+  }
+
+  async findByAnthology(anthologyId: number) {
+    return this.repo.findBy({ anthologyId });
   }
 }

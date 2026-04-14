@@ -9,6 +9,9 @@ export class StoryDraft {
   @Column({ type: 'int' })
   authorId: number;
 
+  @Column({ type: 'int' })
+  anthologyId: number;
+
   @Column()
   docLink: string;
 

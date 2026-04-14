@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
   const isLibraryActive =
     location.pathname.startsWith('/archive') || location.pathname === '/';
   const isAuthorized =
-    user?.role === Role.ADMIN || user?.role === Role.VOLUNTEER;
+    user?.role === Role.ADMIN || user?.role === Role.STANDARD;
 
   return (
     <aside className={`root-sidebar ${collapsed ? 'collapsed' : ''}`}>
@@ -43,22 +43,18 @@ const Sidebar: React.FC = () => {
         {/* Navigation */}
         <nav className="sidebar-nav">
           {/* Home */}
-          <div className="sidebar-nav-item">
+          <NavLink to="/" className="sidebar-nav-item">
             <div className="sidebar-nav-item-content">
               <div className="sidebar-nav-item-left">
                 <img src={HomeIcon} alt="" className="sidebar-nav-icon" />
                 {!collapsed && <span className="sidebar-nav-label">Home</span>}
               </div>
             </div>
-          </div>
+          </NavLink>
 
           {/* Library - Expandable Section */}
           <div className="sidebar-library-section">
-            <button
-              type="button"
-              className="sidebar-library-header"
-              onClick={() => `/library/publication/archived`}
-            >
+            <NavLink to="/archive/published" className="sidebar-library-header">
               <div className="sidebar-library-header-content">
                 <div className="sidebar-library-header-left">
                   <img
@@ -73,11 +69,11 @@ const Sidebar: React.FC = () => {
                   )}
                 </div>
               </div>
-            </button>
+            </NavLink>
           </div>
 
           {/* Projects */}
-          <div className="sidebar-nav-item">
+          <NavLink to="/projects" className="sidebar-nav-item">
             <div className="sidebar-nav-item-content">
               <div className="sidebar-nav-item-left">
                 <img src={ProjectsIcon} alt="" className="sidebar-nav-icon" />
@@ -86,10 +82,10 @@ const Sidebar: React.FC = () => {
                 )}
               </div>
             </div>
-          </div>
+          </NavLink>
 
           {/* Resources */}
-          <div className="sidebar-nav-item">
+          <NavLink to="/resources" className="sidebar-nav-item">
             <div className="sidebar-nav-item-content">
               <div className="sidebar-nav-item-left">
                 <img src={ResourcesIcon} alt="" className="sidebar-nav-icon" />
@@ -98,7 +94,7 @@ const Sidebar: React.FC = () => {
                 )}
               </div>
             </div>
-          </div>
+          </NavLink>
 
           {/* People */}
           {isAuthorized && (

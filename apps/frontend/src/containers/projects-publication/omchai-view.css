@@ -1,0 +1,104 @@
+.omchai-loading {
+  padding: 24px;
+  color: var(--neutral-400);
+  font-family: var(--font-body);
+}
+
+.omchai-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.omchai-card {
+  background: #fff;
+  border: 1px solid var(--neutral-300, #e5e0de);
+  border-radius: 10px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.omchai-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.omchai-card__title {
+  margin: 0;
+  font-family: var(--font-heading, 'Roboto', sans-serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--neutral-600);
+}
+
+.omchai-card__toggle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--neutral-300, #e5e0de);
+  background: var(--neutral-100, #faf8f7);
+  color: var(--neutral-400, #9b9592);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.omchai-card__toggle:hover {
+  border-color: #E85100;
+  color: #E85100;
+  background: #fff;
+}
+
+.omchai-card__desc {
+  margin: 0;
+  font-family: var(--font-body, 'Open Sans', sans-serif);
+  font-size: 13px;
+  color: var(--neutral-400, #9b9592);
+  line-height: 1.5;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--neutral-200, #f0edeb);
+}
+
+.omchai-card__users {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.omchai-card__empty {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--neutral-400, #9b9592);
+  font-style: italic;
+}
+
+.omchai-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--neutral-100, #faf8f7);
+  border-radius: 8px;
+  border: 1px solid var(--neutral-200, #f0edeb);
+}
+
+.omchai-user-chip__name {
+  font-family: var(--font-body, 'Open Sans', sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600, #2d2926);
+}
+
+.omchai-user-chip__title {
+  font-family: var(--font-body, 'Open Sans', sans-serif);
+  font-size: 13px;
+  color: var(--neutral-400, #9b9592);
+}
