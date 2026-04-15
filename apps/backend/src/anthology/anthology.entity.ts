@@ -5,6 +5,7 @@ import {
   OneToMany,
   OneToOne,
   Relation,
+  JoinColumn,
 } from 'typeorm';
 
 import { AnthologyStatus, AnthologyPubLevel, AgeCategory } from './types';
@@ -53,14 +54,6 @@ export class Anthology {
   status: AnthologyStatus;
 
   @Column({
-    type: 'enum',
-    enum: AgeCategory,
-    name: 'age_category',
-    nullable: true,
-  })
-  ageCategory: AgeCategory;
-
-  @Column({
     name: 'pub_level',
     type: 'enum',
     enum: AnthologyPubLevel,
@@ -90,11 +83,9 @@ export class Anthology {
   @OneToMany(() => InventoryHolding, (holding) => holding.anthology)
   inventoryHoldings: Relation<InventoryHolding[]>;
 
-  @OneToOne(
-    () => ProductionInfo,
-    (productionInfo) => productionInfo.anthology_id,
-  )
-  productionInfo: ProductionInfo;
+  @OneToOne(() => ProductionInfo, (productionInfo) => productionInfo.anthology)
+  @JoinColumn({ name: 'production_info_id' })
+  productionInfo: Relation<ProductionInfo>;
 
   @OneToMany(() => Omchai, (omchai) => omchai.anthology)
   omchaiAssignments: Relation<Omchai[]>;

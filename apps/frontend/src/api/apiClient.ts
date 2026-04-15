@@ -10,6 +10,7 @@ import {
   SubmissionRound,
 } from '../types';
 import User from './dtos/user.dto';
+import Role from './dtos/role';
 
 export interface FilterSortAnthologyBody {
   pubDateRange?: { start: string; end: string };
@@ -173,6 +174,17 @@ export class ApiClient {
     return this.axiosInstance
       .delete(path, { headers })
       .then((response) => response.data);
+  }
+
+  public async createUser(body: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: Role;
+    title: string;
+  }): Promise<User> {
+    console.log(body);
+    return this.post('/api/auth/admin/users', body) as Promise<User>;
   }
 }
 

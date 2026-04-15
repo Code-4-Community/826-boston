@@ -4,6 +4,7 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  Relation,
 } from 'typeorm';
 import { Anthology } from '../anthology/anthology.entity';
 
@@ -40,4 +41,8 @@ export class ProductionInfo {
 
   @Column({ nullable: true })
   printed_by: string;
+
+  @OneToOne(() => Anthology, (anthology) => anthology.productionInfo)
+  @JoinColumn({ name: 'anthology_id' })
+  anthology: Relation<Anthology>;
 }

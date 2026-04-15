@@ -1,8 +1,10 @@
-import { useQuery } from 'react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import apiClient from '@api/apiClient';
 import useAuth from '../../hooks/useAuth';
 import Role from '@api/dtos/role';
 import User from '@api/dtos/user.dto';
+import CreateUserModal from '../create-user-modal';
 import './people.css';
 
 const PersonRow: React.FC<{ user: User }> = ({ user }) => (
@@ -35,13 +37,35 @@ const People: React.FC = () => {
     queryFn: () => apiClient.getUsers(),
   });
 
+  const [showModal, setShowModal] = useState(false);
+  const queryClient = useQueryClient();
+
+  const createUserMutation = useMutation(
+    (form: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: Role;
+      title: string;
+    }) => apiClient.createUser(form),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['users']);
+        setShowModal(false);
+      },
+    },
+  );
+
   return (
     <div className="people-wrapper">
       <div className="people-header">
         <h1 className="people-title-heading">People</h1>
-        {/* todo: implement the modal button (issue#123) */}
         {currentUser?.role === Role.ADMIN && (
-          <button type="button" className="people-create-btn">
+          <button
+            type="button"
+            className="people-create-btn"
+            onClick={() => setShowModal(true)}
+          >
             + Create User
           </button>
         )}
@@ -64,6 +88,22 @@ const People: React.FC = () => {
           !isError &&
           users?.map((user) => <PersonRow key={user.id} user={user} />)}
       </div>
+      {showModal && (
+        <CreateUserModal
+          onClose={() => setShowModal(false)}
+          onSave={(form) =>
+            createUserMutation.mutate(
+              form as {
+                firstName: string;
+                lastName: string;
+                email: string;
+                role: Role;
+                title: string;
+              },
+            )
+          }
+        />
+      )}
     </div>
   );
 };

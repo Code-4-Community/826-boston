@@ -4,11 +4,9 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  UseGuards,
   Body,
   Post,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
 import { UpdateStoryDraftDto } from './dto/update-story-draft.dto';

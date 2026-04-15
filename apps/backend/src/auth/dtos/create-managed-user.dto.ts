@@ -29,10 +29,9 @@ export class CreateManagedUserDto {
   @IsEnum(Role)
   role: Role;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Job title of this user',
   })
-  @IsOptional()
   @IsString()
-  title?: string;
+  title: string;
 }

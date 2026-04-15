@@ -21,7 +21,7 @@ describe('StoryDraftController', () => {
       controllers: [StoryDraftController],
       providers: [{ provide: StoryDraftService, useValue: mockService }],
     })
-      .overrideGuard(AuthGuard('jwt'))
+      .overrideGuard(AuthGuard)
       .useValue({ canActivate: () => true })
       .overrideInterceptor(CurrentUserInterceptor)
       .useValue({ intercept: (_ctx, next) => next.handle() })

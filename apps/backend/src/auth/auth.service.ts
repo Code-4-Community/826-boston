@@ -41,6 +41,8 @@ export class AuthService {
     email: string,
     firstName: string,
     lastName: string,
+    role: string,
+    title: string,
   ): Promise<void> {
     // user pool is configured with email aliases, so Username can't be an email value.
     const generatedUsername = `managed-${Date.now()}-${Math.random()
@@ -57,6 +59,8 @@ export class AuthService {
         { Name: 'given_name', Value: firstName },
         { Name: 'family_name', Value: lastName },
         { Name: 'name', Value: `${firstName} ${lastName}`.trim() },
+        { Name: 'custom:role', Value: role },
+        { Name: 'custom:title', Value: title },
       ],
     });
 

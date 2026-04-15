@@ -32,7 +32,7 @@ To run both the frontend and backend with one command:
 
 ```
 nx run-many -t serve -p frontend backend
-```git
+```
 
 
 ## Other commands

@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+} from 'typeorm';
 import { EditRound, SubmissionRound } from './types';
+import { Story } from 'src/story/story.entity';
 
 @Entity()
 export class StoryDraft {
@@ -38,4 +46,8 @@ export class StoryDraft {
 
   @Column('text', { array: true })
   notes: string[];
+
+  @OneToOne(() => Story, (story) => story.storyDraft)
+  @JoinColumn({ name: 'story_id' })
+  story: Relation<Story>;
 }

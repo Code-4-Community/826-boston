@@ -21,6 +21,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Role } from '../users/types';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import { Request } from 'express';
+import { UserStatus } from './roles.decorator';
 
 interface AuthenticatedUserResponse {
   id: number;
@@ -91,23 +92,11 @@ export class AuthController {
    * @returns The user object
    */
   @Post('/admin/users')
-  @UseGuards(AuthGuard('jwt'))
+  @UserStatus(Role.ADMIN)
   async createManagedUser(
     @Req() request: JwtUserRequest,
     @Body() body: CreateManagedUserDto,
   ): Promise<User> {
-    const requestingUserEmail = request.user?.email?.trim().toLowerCase();
-    if (!requestingUserEmail) {
-      throw new ForbiddenException('Only admins can create users');
-    }
-
-    const requestingUsers = await this.usersService.find(requestingUserEmail);
-    const requestingUser = requestingUsers[0];
-
-    if (!requestingUser || requestingUser.role !== Role.ADMIN) {
-      throw new ForbiddenException('Only admins can create users');
-    }
-
     const existingUsers = await this.usersService.find(body.email);
     if (existingUsers.length > 0) {
       throw new ConflictException('User already exists in database');
@@ -118,6 +107,8 @@ export class AuthController {
         body.email,
         body.firstName,
         body.lastName,
+        body.role,
+        body.title,
       );
     } catch (error) {
       if (

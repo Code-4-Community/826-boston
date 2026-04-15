@@ -11,8 +11,7 @@ import { User } from './users/user.entity';
 import { ProductionInfo } from './production-info/production-info.entity';
 import { StoryDraft } from './story-draft/story-draft.entity';
 
-dotenv.config();
-
+dotenv.config({ path: 'apps/backend/.env' });
 const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.NX_DB_HOST,

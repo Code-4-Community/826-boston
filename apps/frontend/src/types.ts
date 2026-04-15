@@ -1,4 +1,4 @@
-import { PUB_LEVEL_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
+//import { PUB_LEVEL_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
 
 export enum AnthologyStatus {
   DRAFT = 'Draft',
