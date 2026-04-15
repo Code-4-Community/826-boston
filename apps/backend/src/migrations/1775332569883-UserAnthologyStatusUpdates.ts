@@ -8,25 +8,15 @@ export class MigrationName1775332569883 implements MigrationInterface {
     await queryRunner.query(`DROP TYPE "public"."users_status_enum"`);
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "publishingName"`);
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "name"`);
-
-    await queryRunner.query(`
-        CREATE TYPE "public"."users_role_enum" AS ENUM('ADMIN', 'STANDARD')
-    `);
-
-    // await queryRunner.query(`
-    //   UPDATE "anthologys"
-    //   SET "status" = 'Archived'
-    //   WHERE "status" = 'CanBeShared'
-    // `);
-
-    await queryRunner.query(`
-        ALTER TABLE "users" ADD "role" "public"."users_role_enum" DEFAULT 'STANDARD'
-    `);
-
-    await queryRunner.query(`
-        ALTER TABLE "users" ADD "title" character varying
-    `);
-
+    await queryRunner.query(
+      `CREATE TYPE "public"."users_role_enum" AS ENUM('ADMIN', 'STANDARD')`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "users" ADD "role" "public"."users_role_enum" NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "users" ADD "title" character varying`,
+    );
     await queryRunner.query(
       `ALTER TYPE "public"."anthologys_status_enum" RENAME TO "anthologys_status_enum_old"`,
     );
