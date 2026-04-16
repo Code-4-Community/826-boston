@@ -6,12 +6,19 @@ import {
   ParseIntPipe,
   Body,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
 import { UpdateStoryDraftDto } from './dto/update-story-draft.dto';
 import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { OmchaiGuard } from 'src/auth/guards/omchai.guard';
+import { UserStatusGuard } from 'src/auth/guards/user-status.guard';
+import { UserStatus, OmchaiRoles } from 'src/auth/roles.decorator';
+import { OmchaiRole } from 'src/omchai/omchai.entity';
+import { Role } from 'src/users/types';
 
 @ApiTags('StoryDrafts')
 @ApiBearerAuth()
@@ -19,11 +26,18 @@ import { EditRound, SubmissionRound } from './types';
 export class StoryDraftController {
   constructor(private readonly storyDraftService: StoryDraftService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
   @Get()
   async getStoryDrafts() {
     return this.storyDraftService.findAll();
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Post()
   async createStoryDraft(
     @Body() createStoryDraftDto: CreateStoryDraftDto,
@@ -42,6 +56,10 @@ export class StoryDraftController {
     return { message: 'StoryDraft created successfully' };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Post('/:storyDraftId')
   async editStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,
@@ -63,6 +81,10 @@ export class StoryDraftController {
     };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Delete('/:storyDraftId')
   async deleteStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,

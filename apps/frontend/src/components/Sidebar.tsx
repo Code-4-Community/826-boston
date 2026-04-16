@@ -64,7 +64,7 @@ const Sidebar: React.FC = () => {
                   />
                   {!collapsed && (
                     <span className="sidebar-nav-label sidebar-nav-label--bold">
-                      Archive
+                      Library
                     </span>
                   )}
                 </div>
@@ -73,7 +73,7 @@ const Sidebar: React.FC = () => {
           </div>
 
           {/* Projects */}
-          <NavLink to="/projects" className="sidebar-nav-item">
+          {isAuthorized &&<NavLink to="/projects" className="sidebar-nav-item">
             <div className="sidebar-nav-item-content">
               <div className="sidebar-nav-item-left">
                 <img src={ProjectsIcon} alt="" className="sidebar-nav-icon" />
@@ -82,7 +82,7 @@ const Sidebar: React.FC = () => {
                 )}
               </div>
             </div>
-          </NavLink>
+          </NavLink>}
 
           {/* Resources */}
           <NavLink to="/resources" className="sidebar-nav-item">

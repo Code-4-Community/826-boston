@@ -41,10 +41,6 @@ import { UserStatusGuard } from './auth/guards/user-status.guard';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
       useClass: UserStatusGuard,
     },
     {

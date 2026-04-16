@@ -17,6 +17,12 @@ import { AuthorService } from './author.service';
 import { Author } from './author.entity';
 import { CreateAuthorDto } from './dtos/create-author.dto';
 import { EditAuthorDto } from './dtos/edit-author.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { OmchaiGuard } from 'src/auth/guards/omchai.guard';
+import { UserStatusGuard } from 'src/auth/guards/user-status.guard';
+import { UserStatus, OmchaiRoles } from 'src/auth/roles.decorator';
+import { OmchaiRole } from 'src/omchai/omchai.entity';
+import { Role } from 'src/users/types';
 
 @ApiTags('Author')
 @ApiBearerAuth()
@@ -31,6 +37,11 @@ export class AuthorController {
    * @param createAuthorDto frontend author data
    * @returns author with given bio, name, and grade.
    */
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Post('/author')
   async createAuthor(
     @Body() createAuthorDto: CreateAuthorDto,
@@ -44,6 +55,10 @@ export class AuthorController {
    * @param editAuthorDto bio, name, and/or grade of author that is being updated
    * @returns author with given id and updated fields
    */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Put('/author/:authorId')
   async updateAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,
@@ -68,6 +83,7 @@ export class AuthorController {
    * Get all authors.
    * @returns all authors in repository
    */
+
   @Get('/author')
   async getAuthors(): Promise<Author[]> {
     return this.authorService.findAll();
@@ -78,6 +94,10 @@ export class AuthorController {
    * @param authorId id of author to remove
    * @returns removed author
    */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Delete('/:authorId')
   async removeAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,

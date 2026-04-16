@@ -83,12 +83,6 @@ export default function NewStoryDraftModal({
         </div>
 
         <div className="modal__body">
-          {error && (
-            <div className="field" style={{ color: 'var(--error, #d32f2f)' }}>
-              {error}
-            </div>
-          )}
-
           <div className="field-row">
             <Field label="First Name" required>
               <input
@@ -143,6 +137,11 @@ export default function NewStoryDraftModal({
 
         <div className="modal__footer">
           <div className="modal__footer-right">
+            {error && (
+              <div className="field" style={{ color: 'var(--error, #d32f2f)' }}>
+                {error}
+              </div>
+            )}
             <button
               className="btn btn--secondary"
               onClick={onClose}

@@ -79,4 +79,11 @@ export const UsersSeed: UserSeedItem[] = [
     email: 'chris.park@gmail.com',
     title: 'Development Manager',
   },
+  {
+    role: Role.ADMIN,
+    firstName: 'Gauri',
+    lastName: 'Rajesh',
+    email: 'gauri.ggsr@gmail.com',
+    title: 'Test User',
+  },
 ];

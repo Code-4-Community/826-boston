@@ -23,6 +23,12 @@ import { AnthologyService } from '../anthology/anthology.service';
 import { AuthorService } from '../author/author.service';
 import { CreateStoryDto } from './dtos/create-story.dto';
 import { create } from 'domain';
+import { OmchaiGuard } from 'src/auth/guards/omchai.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserStatusGuard } from 'src/auth/guards/user-status.guard';
+import { UserStatus, OmchaiRoles } from 'src/auth/roles.decorator';
+import { OmchaiRole } from 'src/omchai/omchai.entity';
+import { Role } from 'src/users/types';
 
 @ApiTags('Story')
 @ApiBearerAuth()
@@ -42,6 +48,10 @@ export class StoryController {
     return this.storyService.findByAnthologyAndId(anthologyId, storyId);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Delete('/:storyId')
   async removeStory(
     @Param('storyId', ParseIntPipe) storyId: number,
@@ -49,6 +59,10 @@ export class StoryController {
     return this.storyService.remove(storyId);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard, OmchaiGuard)
+  @UserStatus(Role.ADMIN, Role.STANDARD)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @Post('/library/anthology/:anthologyId/story')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new story in a specific anthology' })

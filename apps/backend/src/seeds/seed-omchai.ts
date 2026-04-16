@@ -12,7 +12,7 @@ export async function seedOmchais(dataSource: DataSource) {
   console.log('Seeding omchais...');
 
   const allUsers = await userRepo.find();
-  const usersById = new Map(allUsers.map((u) => [u.id, u]));
+  const usersByEmail = new Map(allUsers.map((u) => [u.email, u]));
 
   for (const { anthologyTitle, ...data } of OmchaiSeed) {
     const anthology = await anthologyRepo.findOne({
@@ -26,16 +26,19 @@ export async function seedOmchais(dataSource: DataSource) {
       continue;
     }
 
-    const user = usersById.get(data.userId);
+    const user = usersByEmail.get(data.userEmail);
 
     if (!user) {
-      console.log(`  - User not found: id=${data.userId}, skipping omchai`);
+      console.log(
+        `  - User not found: email=${data.userEmail}, skipping omchai`,
+      );
       continue;
     }
 
+    const userId = allUsers.find((u) => u.email === data.userEmail)?.id;
     const exists = await omchaiRepo.findOne({
       where: {
-        userId: data.userId,
+        userId: userId,
         anthologyId: anthology.id,
         role: data.role,
       },
@@ -50,11 +53,11 @@ export async function seedOmchais(dataSource: DataSource) {
       });
       await omchaiRepo.save(entity);
       console.log(
-        `  ✓ Created omchai: userId=${data.userId}, anthology="${anthologyTitle}", role=${data.role}`,
+        `  ✓ Created omchai: userEmail=${data.userEmail}, anthology="${anthologyTitle}", role=${data.role}`,
       );
     } else {
       console.log(
-        `  - Omchai already exists: userId=${data.userId}, anthology="${anthologyTitle}", role=${data.role}`,
+        `  - Omchai already exists: userEmail=${data.userEmail}, anthology="${anthologyTitle}", role=${data.role}`,
       );
     }
   }

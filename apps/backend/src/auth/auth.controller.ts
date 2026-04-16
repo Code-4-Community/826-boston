@@ -22,6 +22,8 @@ import { Role } from '../users/types';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import { Request } from 'express';
 import { UserStatus } from './roles.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UserStatusGuard } from './guards/user-status.guard';
 
 interface AuthenticatedUserResponse {
   id: number;
@@ -46,7 +48,7 @@ export class AuthController {
   ) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(CurrentUserInterceptor)
   @Get('/me')
   async me(@Req() request): Promise<AuthenticatedUserResponse> {
@@ -65,6 +67,9 @@ export class AuthController {
     };
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard)
+  @UserStatus(Role.ADMIN)
   @Post('/delete')
   async delete(@Body() body: DeleteUserDto): Promise<void> {
     const user = await this.usersService.findOne(body.userId);
@@ -91,8 +96,10 @@ export class AuthController {
    * @param body The body object containing the user email, first name, last name, and role
    * @returns The user object
    */
-  @Post('/admin/users')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, UserStatusGuard)
   @UserStatus(Role.ADMIN)
+  @Post('/admin/users')
   async createManagedUser(
     @Req() request: JwtUserRequest,
     @Body() body: CreateManagedUserDto,
