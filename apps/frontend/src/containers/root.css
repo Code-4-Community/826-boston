@@ -247,40 +247,149 @@ a.sidebar-nav-link {
   font-weight: 600;
 }
 
-/* Log Out Section */
-.sidebar-logout-section {
-  padding: 24px 38px;
+/* Profile Section */
+.sidebar-profile-section {
+  position: relative;
+  padding: 20px 24px;
 }
 
-.root-sidebar.collapsed .sidebar-logout-section {
-  padding: 24px 0;
+.root-sidebar.collapsed .sidebar-profile-section {
+  padding: 20px 0;
   display: flex;
   justify-content: center;
 }
 
-.sidebar-logout {
+.sidebar-profile-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 16px;
-  color: #000000;
+  width: 100%;
+  text-align: left;
   transition: opacity 0.15s ease;
 }
 
-.sidebar-logout:hover {
+.sidebar-profile-btn:hover {
   opacity: 0.7;
 }
 
-.sidebar-logout-icon {
-  width: 31px;
-  height: 31px;
-  object-fit: contain;
+.sidebar-profile-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  background-color: var(--accent-500);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.sidebar-profile-name {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Profile Modal */
+.profile-modal {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 16px;
+  width: 260px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  z-index: 100;
+}
+
+.profile-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.profile-modal-avatar {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 50%;
+  background-color: var(--accent-500);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.profile-modal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.profile-modal-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-modal-job-title {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--neutral-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-modal-divider {
+  height: 1px;
+  background-color: var(--neutral-300);
+  margin: 4px 0;
+}
+
+.profile-modal-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  color: #000000;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.profile-modal-btn:hover {
+  background-color: var(--neutral-150);
+}
+
+.profile-modal-btn--signout {
+  color: #c0392b;
 }
 
 /* Main Content Area */

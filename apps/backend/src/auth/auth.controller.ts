@@ -27,6 +27,7 @@ interface AuthenticatedUserResponse {
   firstName: string;
   lastName: string;
   email: string;
+  title?: string;
   role: 'admin' | 'standard';
 }
 
@@ -60,6 +61,7 @@ export class AuthController {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      title: user.title,
       role: user.role === Role.ADMIN ? 'admin' : 'standard',
     };
   }

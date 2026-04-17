@@ -5,7 +5,13 @@ export class InitSchema1776029357853 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "storydrafts" ADD "anthologyId" integer NOT NULL`,
+      `ALTER TABLE "storydrafts" ADD "anthologyId" integer`,
+    );
+    await queryRunner.query(
+      `UPDATE "storydrafts" SET "anthologyId" = 0 WHERE "anthologyId" IS NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "storydrafts" ALTER COLUMN "anthologyId" SET NOT NULL`,
     );
     await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "role" SET NOT NULL`,

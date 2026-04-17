@@ -8,7 +8,7 @@ export async function seedUsers(dataSource: DataSource) {
   console.log('Seeding users...');
 
   for (const data of UsersSeed) {
-    const exists = await repository.findOne({ where: { id: data.id } });
+    const exists = await repository.findOne({ where: { email: data.email } });
 
     if (!exists) {
       const entity = repository.create(data);

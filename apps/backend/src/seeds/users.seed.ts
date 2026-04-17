@@ -1,10 +1,15 @@
-import { Role } from 'src/users/types';
-import { User } from 'src/users/user.entity';
-import { DeepPartial } from 'typeorm';
+import { Role } from '../users/types';
 
-export const UsersSeed: DeepPartial<User>[] = [
+interface UserSeedItem {
+  role: Role;
+  firstName: string;
+  lastName: string;
+  email: string;
+  title?: string;
+}
+
+export const UsersSeed: UserSeedItem[] = [
   {
-    id: 1,
     role: Role.ADMIN,
     firstName: 'Richie',
     lastName: 'Jacobs',
@@ -12,7 +17,6 @@ export const UsersSeed: DeepPartial<User>[] = [
     title: 'Publishing Manager',
   },
   {
-    id: 2,
     role: Role.ADMIN,
     firstName: 'Kanyin',
     lastName: 'Brown',
@@ -20,7 +24,6 @@ export const UsersSeed: DeepPartial<User>[] = [
     title: 'Volunteer Manager',
   },
   {
-    id: 3,
     role: Role.ADMIN,
     firstName: 'Mirn',
     lastName: 'Miller',
@@ -28,7 +31,6 @@ export const UsersSeed: DeepPartial<User>[] = [
     title: 'Program Manager',
   },
   {
-    id: 4,
     role: Role.STANDARD,
     firstName: 'Kelly',
     lastName: 'Williams',
@@ -36,11 +38,45 @@ export const UsersSeed: DeepPartial<User>[] = [
     title: 'Community Partner',
   },
   {
-    id: 5,
     role: Role.STANDARD,
     firstName: 'Tony',
     lastName: 'King',
     email: 'tony.king@gmail.com',
     title: 'Director of Communications',
+  },
+  {
+    role: Role.ADMIN,
+    firstName: 'Jordan',
+    lastName: 'Hayes',
+    email: 'jordan.hayes@gmail.com',
+    title: 'Director of Programs',
+  },
+  {
+    role: Role.ADMIN,
+    firstName: 'Alex',
+    lastName: 'Rivera',
+    email: 'alex.rivera@gmail.com',
+    title: 'Operations Manager',
+  },
+  {
+    role: Role.STANDARD,
+    firstName: 'Sam',
+    lastName: 'Chen',
+    email: 'sam.chen@gmail.com',
+    title: 'Event Coordinator',
+  },
+  {
+    role: Role.STANDARD,
+    firstName: 'Maya',
+    lastName: 'Osei',
+    email: 'maya.osei@gmail.com',
+    title: 'School Partner',
+  },
+  {
+    role: Role.STANDARD,
+    firstName: 'Chris',
+    lastName: 'Park',
+    email: 'chris.park@gmail.com',
+    title: 'Development Manager',
   },
 ];

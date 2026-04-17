@@ -9,7 +9,7 @@ interface User {
 
   email: string;
 
-  title: string;
+  title?: string;
 
   role: Role;
 }

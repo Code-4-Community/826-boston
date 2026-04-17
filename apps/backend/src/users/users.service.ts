@@ -15,16 +15,7 @@ export class UsersService {
     role: Role = Role.STANDARD,
     title?: string,
   ) {
-    const latestUser = await this.repo.find({
-      select: ['id'],
-      order: { id: 'DESC' },
-      take: 1,
-    });
-
-    const userId = latestUser.length > 0 ? Number(latestUser[0].id) : 1;
-
     const user = this.repo.create({
-      id: userId,
       role,
       firstName,
       lastName,

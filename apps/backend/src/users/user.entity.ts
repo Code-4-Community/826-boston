@@ -1,10 +1,16 @@
-import { Entity, Column, OneToMany, Relation } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToMany,
+  Relation,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from './types';
 import { Omchai } from 'src/omchai/omchai.entity';
 
 @Entity()
 export class User {
-  @Column({ primary: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'enum', enum: Role, default: Role.STANDARD })

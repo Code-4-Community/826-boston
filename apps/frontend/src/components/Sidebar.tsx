@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import useAuth from '../hooks/useAuth';
 import Role from '@api/dtos/role';
 
@@ -10,19 +11,41 @@ import LibraryActiveIcon from '../assets/icons/library-active.svg';
 import ProjectsIcon from '../assets/icons/projects.svg';
 import ResourcesIcon from '../assets/icons/resources.svg';
 import PeopleIcon from '../assets/icons/people.svg';
-import ChevronRightIcon from '../assets/icons/chevron-right.svg';
 import CollapseArrowIcon from '../assets/icons/collapse-arrow.svg';
-import LogoutIcon from '../assets/icons/logout.svg';
 
 const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
   const [, , user] = useAuth();
+  const { signOut } = useAuthenticator();
+  const profileRef = useRef<HTMLDivElement>(null);
 
   const isLibraryActive =
     location.pathname.startsWith('/archive') || location.pathname === '/';
   const isAuthorized =
     user?.role === Role.ADMIN || user?.role === Role.STANDARD;
+
+  const initials = user
+    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+    : '?';
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setProfileOpen(false);
+      }
+    };
+    if (profileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [profileOpen]);
 
   return (
     <aside className={`root-sidebar ${collapsed ? 'collapsed' : ''}`}>
@@ -112,11 +135,50 @@ const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Logout */}
-      <div className="sidebar-logout-section">
-        <button type="button" className="sidebar-logout">
-          <img src={LogoutIcon} alt="" className="sidebar-logout-icon" />
-          {!collapsed && <span>Log Out</span>}
+      {/* Profile Section */}
+      <div className="sidebar-profile-section" ref={profileRef}>
+        {profileOpen && (
+          <div className="profile-modal">
+            <div className="profile-modal-header">
+              <div className="profile-modal-avatar">{initials}</div>
+              <div className="profile-modal-info">
+                <span className="profile-modal-name">
+                  {user?.firstName} {user?.lastName}
+                </span>
+                {user?.title && (
+                  <span className="profile-modal-job-title">{user.title}</span>
+                )}
+              </div>
+            </div>
+            <div className="profile-modal-divider" />
+            <button
+              type="button"
+              className="profile-modal-btn"
+              onClick={() => setProfileOpen(false)}
+            >
+              Manage account
+            </button>
+            <div className="profile-modal-divider" />
+            <button
+              type="button"
+              className="profile-modal-btn profile-modal-btn--signout"
+              onClick={signOut}
+            >
+              Sign out
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          className="sidebar-profile-btn"
+          onClick={() => setProfileOpen(!profileOpen)}
+        >
+          <div className="sidebar-profile-avatar">{initials}</div>
+          {!collapsed && (
+            <span className="sidebar-profile-name">
+              {user?.firstName} {user?.lastName}
+            </span>
+          )}
         </button>
       </div>
     </aside>
