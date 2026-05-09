@@ -12,6 +12,7 @@ import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
 import { UpdateStoryDraftDto } from './dto/update-story-draft.dto';
 import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
+import { Public } from 'src/auth/roles.decorator';
 
 @ApiTags('StoryDrafts')
 @ApiBearerAuth()
@@ -19,11 +20,13 @@ import { EditRound, SubmissionRound } from './types';
 export class StoryDraftController {
   constructor(private readonly storyDraftService: StoryDraftService) {}
 
+  @Public()
   @Get()
   async getStoryDrafts() {
     return this.storyDraftService.findAll();
   }
 
+  @ApiBearerAuth()
   @Post()
   async createStoryDraft(
     @Body() createStoryDraftDto: CreateStoryDraftDto,
@@ -42,6 +45,7 @@ export class StoryDraftController {
     return { message: 'StoryDraft created successfully' };
   }
 
+  @ApiBearerAuth()
   @Post('/:storyDraftId')
   async editStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,
@@ -63,6 +67,7 @@ export class StoryDraftController {
     };
   }
 
+  @ApiBearerAuth()
   @Delete('/:storyDraftId')
   async deleteStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,
@@ -71,6 +76,7 @@ export class StoryDraftController {
     return { message: 'StoryDraft deleted successfully' };
   }
 
+  @Public()
   @Get('/anthology/:anthologyId')
   async getStoryDraftsByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,

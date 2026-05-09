@@ -23,6 +23,7 @@ import { AnthologyService } from '../anthology/anthology.service';
 import { AuthorService } from '../author/author.service';
 import { CreateStoryDto } from './dtos/create-story.dto';
 import { create } from 'domain';
+import { Public } from 'src/auth/roles.decorator';
 
 @ApiTags('Story')
 @ApiBearerAuth()
@@ -34,6 +35,7 @@ export class StoryController {
     private authorService: AuthorService,
   ) {}
 
+  @Public()
   @Get('/library/anthology/:anthologyId/story/:storyId')
   async getStory(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
@@ -42,6 +44,7 @@ export class StoryController {
     return this.storyService.findByAnthologyAndId(anthologyId, storyId);
   }
 
+  @ApiBearerAuth()
   @Delete('/:storyId')
   async removeStory(
     @Param('storyId', ParseIntPipe) storyId: number,
@@ -49,6 +52,7 @@ export class StoryController {
     return this.storyService.remove(storyId);
   }
 
+  @ApiBearerAuth()
   @Post('/library/anthology/:anthologyId/story')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new story in a specific anthology' })

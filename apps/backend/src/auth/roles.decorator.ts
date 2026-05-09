@@ -11,3 +11,6 @@ export const OmchaiRoles = (...roles: OmchaiRole[]) =>
 export const USER_STATUS = 'user_status';
 export const UserStatus = (...statuses: Role[]) =>
   SetMetadata(USER_STATUS, statuses);
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);

@@ -31,8 +31,19 @@ interface AuthenticatedUserResponse {
   role: 'admin' | 'standard';
 }
 
+type GetUserRequest = Request & {
+  user?: {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+  };
+};
+
 type JwtUserRequest = Request & {
   user?: {
+    id?: number;
     email?: string;
   };
 };
@@ -46,10 +57,9 @@ export class AuthController {
   ) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(CurrentUserInterceptor)
   @Get('/me')
-  async me(@Req() request): Promise<AuthenticatedUserResponse> {
+  async me(@Req() request: GetUserRequest): Promise<AuthenticatedUserResponse> {
     const user = request.user;
 
     if (!user?.id) {
@@ -65,6 +75,8 @@ export class AuthController {
     };
   }
 
+  @ApiBearerAuth()
+  @UserStatus(Role.ADMIN)
   @Post('/delete')
   async delete(@Body() body: DeleteUserDto): Promise<void> {
     const user = await this.usersService.findOne(body.userId);
@@ -91,6 +103,7 @@ export class AuthController {
    * @param body The body object containing the user email, first name, last name, and role
    * @returns The user object
    */
+  @ApiBearerAuth()
   @Post('/admin/users')
   @UserStatus(Role.ADMIN)
   async createManagedUser(

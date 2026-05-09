@@ -21,7 +21,7 @@ import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FilterSortAnthologyDto } from './dtos/filter-anthology.dto';
-import { OmchaiRoles, UserStatus } from '../auth/roles.decorator';
+import { OmchaiRoles, Public, UserStatus } from '../auth/roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
 import { CreateAnthologyDto } from './dtos/create-anthology.dto';
 import { UpdateAnthologyDto } from './dtos/update-anthology.dto';
@@ -46,16 +46,19 @@ export class AnthologyController {
     private readonly s3Service: AwsS3Service,
   ) {}
 
+  @Public()
   @Post('filter-sort')
   filterSort(@Body() dto: FilterSortAnthologyDto): Promise<Anthology[]> {
     return this.anthologyService.findWithFilterSort(dto);
   }
 
+  @Public()
   @Get()
   async getAllAnthologies(): Promise<Anthology[]> {
     return this.anthologyService.findAll();
   }
 
+  @Public()
   @Get(':id')
   async getAnthology(
     @Param('id', ParseIntPipe) id: number,
@@ -70,6 +73,7 @@ export class AnthologyController {
   }
 
   @ApiBearerAuth()
+  @UserStatus(Role.ADMIN)
   @Delete('/:anthologyId')
   async removeAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
