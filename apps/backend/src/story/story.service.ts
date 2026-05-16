@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Story } from './story.entity';
+import { Anthology } from 'src/anthology/anthology.entity';
 
 @Injectable()
 export class StoryService {
@@ -18,6 +19,10 @@ export class StoryService {
 
   findAll() {
     return this.repo.find();
+  }
+
+  async getStoriesByAnthology(anthologyId: number) {
+    return this.repo.find({ where: { anthologyId: anthologyId } });
   }
 
   findByTitle(title: string) {
