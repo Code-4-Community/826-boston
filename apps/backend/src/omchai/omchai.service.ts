@@ -32,7 +32,7 @@ export class OmchaiService {
 
   findByAnthologyId(anthologyId: number) {
     return this.repo.find({
-      where: { anthologyId },
+      where: { anthology: { id: anthologyId } },
       relations: ['user'],
     });
   }

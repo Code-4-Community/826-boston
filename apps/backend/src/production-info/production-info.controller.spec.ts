@@ -4,16 +4,16 @@ import { ProductionInfoService } from './production-info.service';
 import { CreateProductionInfoDto } from './dtos/create-production-info.dto';
 import { UpdateProductionInfoDto } from './dtos/update-production-info.dto';
 import { ProductionInfo } from './production-info.entity';
+import { Anthology } from 'src/anthology/anthology.entity';
 
 describe('ProductionInfoController', () => {
   let controller: ProductionInfoController;
   let service: ProductionInfoService;
 
-  const mockProductionInfo = {
-    id: 1,
-    anthology_id: 1,
-    design_files_link: 'http://noidea.com',
-  } as ProductionInfo;
+  const mockProductionInfo: ProductionInfo = {
+    id: 0,
+    anthology: {id: 1} as Anthology
+  };
 
   const mockService = {
     create: jest.fn(),

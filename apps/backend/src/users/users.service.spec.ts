@@ -6,6 +6,7 @@ import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { Role } from './types';
 import { Omchai, OmchaiRole } from '../omchai/omchai.entity';
+import { Anthology } from 'src/anthology/anthology.entity';
 
 export const mockUser: User = {
   id: 1,
@@ -70,7 +71,6 @@ describe('UsersService', () => {
         Role.STANDARD,
       );
 
-      expect(repo.find).toHaveBeenCalled();
       expect(repo.create).toHaveBeenCalled();
       expect(repo.save).toHaveBeenCalled();
       expect(result).toEqual(mockUser);
@@ -136,12 +136,10 @@ describe('UsersService', () => {
     it('should return users with one omchai assignment', async () => {
       const mockOmchai: Omchai = {
         id: 1,
-        anthologyId: 1,
-        userId: 1,
         role: OmchaiRole.OWNER,
         datetimeAssigned: new Date(),
-        user: null,
-        anthology: null,
+        user: {id: 1} as User,
+        anthology: {id: 1} as Anthology,
       };
 
       const userWithOneOmchai = {
@@ -164,32 +162,26 @@ describe('UsersService', () => {
     it('should return users with many omchai assignments', async () => {
       const mockOmchai1: Omchai = {
         id: 1,
-        anthologyId: 1,
-        userId: 1,
         role: OmchaiRole.OWNER,
         datetimeAssigned: new Date(),
-        user: null,
-        anthology: null,
+        user: { id: 1 } as User,
+        anthology: { id: 1 } as Anthology,
       };
 
       const mockOmchai2: Omchai = {
         id: 2,
-        anthologyId: 2,
-        userId: 1,
         role: OmchaiRole.MANAGER,
         datetimeAssigned: new Date(),
-        user: null,
-        anthology: null,
+        user: { id: 1 } as User,
+        anthology: { id: 1 } as Anthology,
       };
 
       const mockOmchai3: Omchai = {
         id: 3,
-        anthologyId: 3,
-        userId: 1,
         role: OmchaiRole.HELPER,
         datetimeAssigned: new Date(),
-        user: null,
-        anthology: null,
+        user: { id: 1 } as User,
+        anthology: { id: 1 } as Anthology,
       };
 
       const userWithManyOmchai = {

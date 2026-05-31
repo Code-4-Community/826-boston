@@ -23,12 +23,6 @@ export class Omchai {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', name: 'anthology_id' })
-  anthologyId: number;
-
-  @Column({ type: 'int', name: 'user_id' })
-  userId: number;
-
   @Column({
     type: 'enum',
     enum: OmchaiRole,

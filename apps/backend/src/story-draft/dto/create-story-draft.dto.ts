@@ -10,13 +10,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SubmissionRound, EditRound } from '../types';
 
 export class CreateStoryDraftDto {
-  @ApiProperty({ description: 'ID of the author' })
+  @ApiProperty({ description: 'ID of the story' })
   @IsInt()
-  authorId: number;
-
-  @ApiProperty({ description: 'ID of the anthology' })
-  @IsInt()
-  anthologyId: number;
+  storyId: number;
 
   @ApiProperty({ description: 'Link to the document' })
   @IsString()

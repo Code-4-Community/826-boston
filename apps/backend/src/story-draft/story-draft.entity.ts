@@ -14,12 +14,6 @@ export class StoryDraft {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int' })
-  authorId: number;
-
-  @Column({ type: 'int' })
-  anthologyId: number;
-
   @Column()
   docLink: string;
 
@@ -48,6 +42,5 @@ export class StoryDraft {
   notes: string[];
 
   @OneToOne(() => Story, (story) => story.storyDraft)
-  @JoinColumn({ name: 'story_id' })
   story: Relation<Story>;
 }

@@ -32,7 +32,6 @@ export class StoryDraftController {
     @Body() createStoryDraftDto: CreateStoryDraftDto,
   ): Promise<{ message: string }> {
     await this.storyDraftService.create(
-      createStoryDraftDto.authorId,
       createStoryDraftDto.docLink,
       createStoryDraftDto.submissionRound ?? SubmissionRound.ONE,
       createStoryDraftDto.studentConsent ?? false,
@@ -40,7 +39,7 @@ export class StoryDraftController {
       createStoryDraftDto.editRound ?? EditRound.ONE,
       createStoryDraftDto.proofread ?? false,
       createStoryDraftDto.notes ?? [],
-      createStoryDraftDto.anthologyId,
+      createStoryDraftDto.storyId
     );
     return { message: 'StoryDraft created successfully' };
   }
@@ -53,7 +52,6 @@ export class StoryDraftController {
   ): Promise<{ message: string }> {
     await this.storyDraftService.edit(
       storyDraftId,
-      updateStoryDraftDto.authorId,
       updateStoryDraftDto.docLink,
       updateStoryDraftDto.submissionRound,
       updateStoryDraftDto.studentConsent,
@@ -74,13 +72,5 @@ export class StoryDraftController {
   ): Promise<{ message: string }> {
     await this.storyDraftService.remove(storyDraftId);
     return { message: 'StoryDraft deleted successfully' };
-  }
-
-  @Public()
-  @Get('/anthology/:anthologyId')
-  async getStoryDraftsByAnthology(
-    @Param('anthologyId', ParseIntPipe) anthologyId: number,
-  ) {
-    return this.storyDraftService.findByAnthology(anthologyId);
   }
 }

@@ -40,14 +40,6 @@ export class StoryController {
   ): Promise<Story[]> {
     const stories = await this.storyService.getStoriesByAnthology(anthologyId);
 
-    // get authors for each story
-    await Promise.all(
-      stories.map(async (story) => {
-        const authorId = story.authorId;
-        story.author = await this.authorService.findOne(authorId);
-      }),
-    );
-
     return stories;
   }
 
@@ -96,5 +88,17 @@ export class StoryController {
       createStoryDto.studentBio,
       createStoryDto.description,
     );
+  }
+
+  @Public()
+  @Get('/anthology/:anthologyId/story-drafts')
+  async getStoryDraftsByAnthology(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+  ) {
+    // get stories with given anthology id and map to get non-null story drafts
+    const stories = await this.getStoriesByAnthology(anthologyId);
+    return stories
+      .map((story) => story.storyDraft)
+      .filter((draft) => draft !== null);
   }
 }

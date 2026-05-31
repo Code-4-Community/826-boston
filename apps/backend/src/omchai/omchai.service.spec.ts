@@ -5,20 +5,17 @@ import { OmchaiService } from './omchai.service';
 import { Omchai, OmchaiRole } from './omchai.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { User } from 'src/users/user.entity';
-import { mockAnthology } from 'src/production-info/production-info.service.spec';
-import { mockUser } from 'src/users/users.service.spec';
+import { CreateOmchaiDto } from './dtos/create-omchai.dto';
 
 describe('OmchaiService', () => {
   let service: OmchaiService;
 
   const mockOmchai: Omchai = {
     id: 1,
-    anthologyId: 1,
-    userId: 1,
+    anthology: { id: 1 } as Anthology,
+    user: { id: 1 } as User,
     role: OmchaiRole.OWNER,
     datetimeAssigned: new Date(),
-    user: mockUser,
-    anthology: mockAnthology,
   };
 
   const mockRepository = {
@@ -52,11 +49,11 @@ describe('OmchaiService', () => {
 
   describe('create', () => {
     it('should create a new omchai', async () => {
-      const dto = {
-        anthology_id: 1,
-        user_id: 1,
+      const dto: CreateOmchaiDto = {
+        anthologyId: 1,
+        userId: 1,
         role: OmchaiRole.OWNER,
-        datetime_assigned: new Date(),
+        datetimeAssigned: new Date(),
       };
 
       mockRepository.create.mockReturnValue(mockOmchai);
@@ -88,7 +85,8 @@ describe('OmchaiService', () => {
       const result = await service.findByAnthologyId(1);
 
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { anthologyId: 1 },
+        where: { anthology: { id: 1 } },
+        relations: ['user'],
       });
       expect(result).toEqual([mockOmchai]);
     });

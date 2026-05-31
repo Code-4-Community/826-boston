@@ -6,24 +6,10 @@ import { EditOmchaiDto } from './dtos/edit-omchai.dto';
 import { OmchaiRole } from './omchai.entity';
 
 const omchaiDto1: CreateOmchaiDto = {
-  anthology_id: 1,
-  user_id: 1,
+  anthologyId: 1,
+  userId: 1,
   role: OmchaiRole.OWNER,
-  datetime_assigned: new Date(),
-};
-
-const omchaiDto2: CreateOmchaiDto = {
-  anthology_id: 2,
-  user_id: 1,
-  role: OmchaiRole.MANAGER,
-  datetime_assigned: new Date(),
-};
-
-const omchaiDto3: CreateOmchaiDto = {
-  anthology_id: 3,
-  user_id: 2,
-  role: OmchaiRole.CONSULTED,
-  datetime_assigned: new Date(),
+  datetimeAssigned: new Date(),
 };
 
 describe('OmchaiController', () => {

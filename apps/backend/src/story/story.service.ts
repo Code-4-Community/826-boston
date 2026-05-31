@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 
 import { Story } from './story.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
+import { Author } from 'src/author/author.entity';
+import { StoryDraft } from 'src/story-draft/story-draft.entity';
 
 @Injectable()
 export class StoryService {
@@ -22,7 +24,10 @@ export class StoryService {
   }
 
   async getStoriesByAnthology(anthologyId: number) {
-    return this.repo.find({ where: { anthologyId: anthologyId } });
+    return this.repo.find({
+      where: { anthology: { id: anthologyId } },
+      relations: ['storyDraft', 'author', 'anthology'],
+    });
   }
 
   findByTitle(title: string) {
@@ -62,7 +67,7 @@ export class StoryService {
     const story = await this.repo.findOne({
       where: {
         id: storyId,
-        anthologyId: anthologyId,
+        anthology: { id: anthologyId },
       },
     });
 
@@ -79,20 +84,19 @@ export class StoryService {
     authorId: number,
     studentBio?: string,
     description?: string,
+    theme?: string,
+    storyDraftId?: number,
   ): Promise<Story> {
-    // TODO: security concern for not randomizing the primary key
-    const storyId = (await this.repo.count()) + 1;
     const story = this.repo.create({
-      id: storyId,
       title,
+      anthology: { id: anthologyId } as Anthology,
+      author: { id: authorId } as Author,
       studentBio,
       description,
-      authorId,
-      anthologyId,
+      theme,
+      storyDraft: { id: storyDraftId } as StoryDraft,
     });
 
-    await this.repo.save(story);
-
-    return story;
+    return this.repo.save(story);
   }
 }

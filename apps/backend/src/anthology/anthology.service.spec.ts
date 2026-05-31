@@ -10,7 +10,7 @@ const mockAnthology1: Anthology = {
   id: 1,
   title: 'Alpha Anthology',
   byline: '',
-  subtitle: undefined,
+  subtitle: '',
   description: 'desc',
   genres: ['mystery'],
   themes: [],
@@ -19,15 +19,17 @@ const mockAnthology1: Anthology = {
   programs: ['after-school'],
   sponsors: [],
   status: AnthologyStatus.IN_PRODUCTION,
-  ageCategory: AgeCategory.YA,
   pubLevel: AnthologyPubLevel.ZINE,
   photoUrl: '',
   isbn: '',
   shopifyUrl: '',
   stories: [],
   inventoryHoldings: [],
-  productionInfo: null,
   omchaiAssignments: [],
+  productionInfo: {
+    id: 1,
+    anthology: { id: 1 } as Anthology,
+  },
 };
 
 const mockAnthology2: Anthology = {
@@ -43,15 +45,17 @@ const mockAnthology2: Anthology = {
   programs: ['summer'],
   sponsors: [],
   status: AnthologyStatus.IN_REVISION,
-  ageCategory: AgeCategory.YA,
   pubLevel: AnthologyPubLevel.CHAPBOOK,
   photoUrl: '',
   isbn: '',
   shopifyUrl: '',
   stories: [],
   inventoryHoldings: [],
-  productionInfo: null,
   omchaiAssignments: [],
+  productionInfo: {
+    id: 2,
+    anthology: { id: 2 } as Anthology,
+  },
 };
 
 const mockAnthology3: Anthology = {
@@ -67,15 +71,17 @@ const mockAnthology3: Anthology = {
   programs: ['in-school'],
   sponsors: [],
   status: AnthologyStatus.DRAFT,
-  ageCategory: AgeCategory.YA,
   pubLevel: AnthologyPubLevel.PERFECT_BOUND,
   photoUrl: '',
   isbn: '',
   shopifyUrl: '',
   stories: [],
   inventoryHoldings: [],
-  productionInfo: null,
   omchaiAssignments: [],
+  productionInfo: {
+    id: 3,
+    anthology: { id: 3 } as Anthology,
+  },
 };
 
 describe('AnthologyService', () => {

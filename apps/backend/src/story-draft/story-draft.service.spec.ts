@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
 import { StoryDraft } from './story-draft.entity';
-import { Author } from '../author/author.entity';
+
 
 describe('StoryDraftService', () => {
   let service: StoryDraftService;
@@ -17,16 +17,11 @@ describe('StoryDraftService', () => {
     remove: jest.fn(),
   };
 
-  const mockAuthorRepo = {
-    findOne: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StoryDraftService,
         { provide: getRepositoryToken(StoryDraft), useValue: mockRepo },
-        { provide: getRepositoryToken(Author), useValue: mockAuthorRepo },
       ],
     }).compile();
 
@@ -35,31 +30,8 @@ describe('StoryDraftService', () => {
   });
 
   describe('create', () => {
-    it('throws when author does not exist', async () => {
-      mockAuthorRepo.findOne.mockResolvedValue(null);
-
-      await expect(
-        service.create(
-          999,
-          'https://docs.google.com/doc1',
-          SubmissionRound.ONE,
-          true,
-          false,
-          EditRound.ONE,
-          false,
-          ['First draft'],
-        ),
-      ).rejects.toBeInstanceOf(NotFoundException);
-
-      expect(mockAuthorRepo.findOne).toHaveBeenCalledWith({
-        where: { id: 999 },
-      });
-      expect(mockRepo.create).not.toHaveBeenCalled();
-    });
-
     it('persists a new story draft successfully', async () => {
       const payload = {
-        authorId: 1,
         docLink: 'https://docs.google.com/doc1',
         submissionRound: SubmissionRound.ONE,
         studentConsent: true,
@@ -67,15 +39,14 @@ describe('StoryDraftService', () => {
         editRound: EditRound.ONE,
         proofread: false,
         notes: ['First draft'],
+        story: { id: 1 },
       };
 
-      mockAuthorRepo.findOne.mockResolvedValue({ id: 1 } as Author);
       const created = { id: 1, ...payload } as StoryDraft;
       mockRepo.create.mockReturnValue(created);
       mockRepo.save.mockResolvedValue(created);
 
       const result = await service.create(
-        payload.authorId,
         payload.docLink,
         payload.submissionRound,
         payload.studentConsent,
@@ -83,11 +54,9 @@ describe('StoryDraftService', () => {
         payload.editRound,
         payload.proofread,
         payload.notes,
+        payload.story.id,
       );
 
-      expect(mockAuthorRepo.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
-      });
       expect(mockRepo.create).toHaveBeenCalledWith(payload);
       expect(mockRepo.save).toHaveBeenCalledWith(created);
       expect(result).toBe(created);
@@ -98,23 +67,7 @@ describe('StoryDraftService', () => {
     it('throws when story draft does not exist', async () => {
       mockRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.edit(7, 1, 'newLink')).rejects.toBeInstanceOf(
-        NotFoundException,
-      );
-      expect(mockRepo.save).not.toHaveBeenCalled();
-    });
-
-    it('throws when new authorId does not exist', async () => {
-      const existing = {
-        id: 3,
-        authorId: 1,
-        docLink: 'https://docs.google.com/old',
-      } as StoryDraft;
-
-      mockRepo.findOne.mockResolvedValue(existing);
-      mockAuthorRepo.findOne.mockResolvedValue(null);
-
-      await expect(service.edit(3, 999)).rejects.toBeInstanceOf(
+      await expect(service.edit(7, 'newLink')).rejects.toBeInstanceOf(
         NotFoundException,
       );
       expect(mockRepo.save).not.toHaveBeenCalled();
@@ -123,7 +76,6 @@ describe('StoryDraftService', () => {
     it('updates and saves story draft when found', async () => {
       const existing = {
         id: 3,
-        authorId: 1,
         docLink: 'https://docs.google.com/old',
         submissionRound: SubmissionRound.ONE,
         studentConsent: false,
@@ -134,12 +86,10 @@ describe('StoryDraftService', () => {
       } as StoryDraft;
 
       mockRepo.findOne.mockResolvedValue(existing);
-      mockAuthorRepo.findOne.mockResolvedValue({ id: 2 } as Author);
       mockRepo.save.mockImplementation(async (storyDraft) => storyDraft);
 
       const result = await service.edit(
         3,
-        2,
         'https://docs.google.com/new',
         SubmissionRound.TWO,
         true,
@@ -149,12 +99,9 @@ describe('StoryDraftService', () => {
         ['New note'],
       );
 
-      expect(mockAuthorRepo.findOne).toHaveBeenCalledWith({
-        where: { id: 2 },
-      });
       expect(mockRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          authorId: 2,
+          id: 3,
           docLink: 'https://docs.google.com/new',
           submissionRound: SubmissionRound.TWO,
           studentConsent: true,
@@ -164,7 +111,6 @@ describe('StoryDraftService', () => {
           notes: ['New note'],
         }),
       );
-      expect(result.authorId).toBe(2);
       expect(result.docLink).toBe('https://docs.google.com/new');
       expect(result.submissionRound).toBe(SubmissionRound.TWO);
       expect(result.studentConsent).toBe(true);

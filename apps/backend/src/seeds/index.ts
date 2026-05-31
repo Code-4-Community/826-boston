@@ -5,7 +5,6 @@ import { seedInventories } from './seed-inventories';
 import { seedInventoryHoldings } from './seed-inventory-holdings';
 import { seedOmchais } from './seed-omchai';
 import { seedStories } from './seed-stories';
-import { seedStoryDrafts } from './seed-story-drafts';
 import { seedUsers } from './seed-users';
 
 async function runSeeds() {
@@ -34,11 +33,8 @@ async function runSeeds() {
     await seedAuthors(AppDataSource);
     console.log('Authors seeded successfully.');
 
-    await seedStoryDrafts(AppDataSource);
-    console.log('Story drafts seeded successfully.');
-
     await seedStories(AppDataSource);
-    console.log('Stories seeded successfully.');
+    console.log('Stories and Story Drafts seeded successfully.');
 
     console.log('Seeding completed successfully!');
   } catch (error) {

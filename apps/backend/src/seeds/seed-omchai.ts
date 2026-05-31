@@ -14,47 +14,47 @@ export async function seedOmchais(dataSource: DataSource) {
   const allUsers = await userRepo.find();
   const usersById = new Map(allUsers.map((u) => [u.id, u]));
 
-  for (const { anthologyTitle, ...data } of OmchaiSeed) {
+  for (const omchai of OmchaiSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { title: anthologyTitle },
+      where: { id: omchai.anthology_id },
     });
 
     if (!anthology) {
       console.log(
-        `  - Anthology not found: "${anthologyTitle}", skipping omchai`,
+        `  - Anthology with id not found: "${omchai.anthology_id}", skipping omchai`,
       );
       continue;
     }
 
-    const user = usersById.get(data.userId);
+    const user = usersById.get(omchai.user_id);
 
     if (!user) {
-      console.log(`  - User not found: id=${data.userId}, skipping omchai`);
+      console.log(`  - User with id not found: id=${omchai.user_id}, skipping omchai`);
       continue;
     }
 
     const exists = await omchaiRepo.findOne({
       where: {
-        userId: data.userId,
-        anthologyId: anthology.id,
-        role: data.role,
+        user: { id: omchai.user_id },
+        anthology: { id: anthology.id },
+        role: omchai.role,
       },
     });
 
     if (!exists) {
       const entity = omchaiRepo.create({
-        ...data,
-        anthologyId: anthology.id,
-        anthology,
-        user,
+        user: { id: omchai.user_id },
+        anthology: { id: anthology.id },
+        role: omchai.role,
+        datetimeAssigned: omchai.datetimeAssigned,
       });
       await omchaiRepo.save(entity);
       console.log(
-        `  ✓ Created omchai: userId=${data.userId}, anthology="${anthologyTitle}", role=${data.role}`,
+        `  ✓ Created omchai: userId=${omchai.user_id}, anthology="${anthology.title}", role=${omchai.role}`,
       );
     } else {
       console.log(
-        `  - Omchai already exists: userId=${data.userId}, anthology="${anthologyTitle}", role=${data.role}`,
+        `  - Omchai already exists: userId=${omchai.user_id}, anthology="${anthology.title}", role=${omchai.role}`,
       );
     }
   }

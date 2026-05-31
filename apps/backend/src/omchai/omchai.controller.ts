@@ -4,8 +4,6 @@ import { CreateOmchaiDto } from './dtos/create-omchai.dto';
 import { EditOmchaiDto } from './dtos/edit-omchai.dto';
 import { CreateOmchaiAssignmentsDto } from 'src/anthology/dtos/create-omchai-assignments-dto';
 import { OmchaiRole } from './omchai.entity';
-import { Anthology } from 'src/anthology/anthology.entity';
-import { User } from 'src/users/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('omchai')
@@ -32,10 +30,6 @@ export class OmchaiController {
           userId: userId,
           role: role,
           datetimeAssigned: createOmchaiAssignmentsDto.datetime_assigned,
-          user: { id: userId } as User,
-          anthology: {
-            id: createOmchaiAssignmentsDto.anthology_id,
-          } as Anthology,
         });
       });
     }

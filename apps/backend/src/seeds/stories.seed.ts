@@ -1,10 +1,12 @@
 export interface StorySeedItem {
+  id?: number;
   title: string;
-  description: string;
-  studentBio: string;
-  theme: string;
-  anthologyTitle: string;
-  authorName: string;
+  description?: string;
+  studentBio?: string;
+  theme?: string;
+  anthology_id: number;
+  author_id: number;
+  story_draft_id?: number;
 }
 
 export const StoriesSeed: StorySeedItem[] = [
@@ -15,8 +17,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
     theme: 'Immigration and Belonging',
-    anthologyTitle: 'Voices From the Threshold',
-    authorName: 'Abdullah Syed Abid',
+    anthology_id: 1,
+    author_id: 1,
+    story_draft_id: 1,
   },
   {
     title: 'Saturday Mornings',
@@ -24,8 +27,9 @@ export const StoriesSeed: StorySeedItem[] = [
       'A fictional account of a perfect Saturday morning, from the smell of breakfast to the last light of afternoon.',
     studentBio: 'Sylvestre is an 8th-grade student at Westbrook Middle School.',
     theme: 'Childhood and Joy',
-    anthologyTitle: 'The Color of Saturday',
-    authorName: 'Sylvestre Ahday',
+    anthology_id: 2,
+    author_id: 2,
+    story_draft_id: 2,
   },
   {
     title: 'The River Remembers',
@@ -34,8 +38,10 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Marcus is a 10th-grade student with a passion for bilingual poetry.',
     theme: 'Heritage and Water',
-    anthologyTitle: 'What the River Carries',
-    authorName: 'Marcus Chen',
+    anthology_id: 3,
+    author_id: 3,
+      story_draft_id: 3,
+
   },
   {
     title: 'Borrowed Words',
@@ -44,8 +50,8 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Fatima is a 9th-grade student who has been writing since she was seven.',
     theme: 'Culture and Ownership',
-    anthologyTitle: 'Prism Literary Magazine #14: Borrowed and Stolen',
-    authorName: 'Fatima Al-Rashid',
+    anthology_id: 4,
+    author_id: 4,
   },
   {
     title: '3:17 AM',
@@ -53,8 +59,8 @@ export const StoriesSeed: StorySeedItem[] = [
       'Flash fiction about the strange clarity that comes at 3AM when the world is quiet and the mind is loudest.',
     studentBio: 'Diego is a 10th-grade YLAB member from Muñiz Academy.',
     theme: 'Insomnia and Clarity',
-    anthologyTitle: 'Snapshots at 3AM',
-    authorName: 'Diego Ramirez',
+    anthology_id: 5,
+    author_id: 5,
   },
   {
     title: 'The Strategic Seat',
@@ -63,8 +69,8 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Amara is an 11th-grade student who once survived a catastrophic seating incident.',
     theme: 'Social Dynamics',
-    anthologyTitle: 'How to Survive a Cafeteria',
-    authorName: 'Amara Osei',
+    anthology_id: 6,
+    author_id: 6,
   },
   {
     title: 'Dear Nobody',
@@ -72,8 +78,9 @@ export const StoriesSeed: StorySeedItem[] = [
       'A letter to the version of herself she had to leave behind when her grandmother passed away.',
     studentBio: 'Elena is a 9th-grade student at Eastfield Academy.',
     theme: 'Grief and Healing',
-    anthologyTitle: 'Letters to Nobody',
-    authorName: 'Elena Kowalski',
+    anthology_id: 7,
+    author_id: 7,
+    story_draft_id: 1,
   },
   {
     title: 'After the Flood',
@@ -82,8 +89,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Jamal is a 12th-grade playwright and Youth Arts & Books Program alumnus.',
     theme: 'Community and Resilience',
-    anthologyTitle: "I'll Light Up My Own Sky",
-    authorName: 'Jamal Washington',
+    anthology_id: 8,
+    author_id: 8,
+    story_draft_id: 2,
   },
   {
     title: 'The Beat of Memory',
@@ -92,9 +100,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Abdullah expanded his writing practice from personal narrative to music criticism this year.',
     theme: 'Music and Identity',
-    anthologyTitle:
-      'https://c4c-826boston-dev.s3.us-east-1.amazonaws.com/images/RUBIX.webp',
-    authorName: 'Abdullah Syed Abid',
+    anthology_id: 9,
+    author_id: 1,
+    story_draft_id: 3,
   },
   {
     title: 'Weather Report: 2075',
@@ -103,7 +111,7 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Sylvestre is fascinated by speculative fiction and climate futures.',
     theme: 'The Future and Prediction',
-    anthologyTitle: "Tomorrow's Almanac",
-    authorName: 'Sylvestre Ahday',
+    anthology_id: 10,
+    author_id: 2,
   },
 ];
