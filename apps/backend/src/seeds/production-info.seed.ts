@@ -1,5 +1,5 @@
 interface ProductionInfoSeedData {
-  anthologyTitle: string;
+  id?: number;
   binding_type?: string;
   printed_by?: string;
   print_run?: number;
@@ -12,7 +12,6 @@ interface ProductionInfoSeedData {
 }
 export const ProductionInfoSeed: ProductionInfoSeedData[] = [
   {
-    anthologyTitle: 'Voices From the Threshold',
     binding_type: 'Saddle Stitch',
     printed_by: 'FlashPrint',
     print_run: 60,
@@ -21,7 +20,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/voices-from-the-threshold.png',
   },
   {
-    anthologyTitle: 'The Color of Saturday',
     binding_type: 'Tape Bound/Binding Strips',
     printed_by: 'FlashPrint',
     print_run: 80,
@@ -30,7 +28,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/color-of-saturday.png',
   },
   {
-    anthologyTitle: 'What the River Carries',
     binding_type: 'Tape Bound/Binding Strips',
     printed_by: 'FlashPrint',
     print_run: 50,
@@ -39,7 +36,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/what-the-river-carries.png',
   },
   {
-    anthologyTitle: 'Prism Literary Magazine #14: Borrowed and Stolen',
     binding_type: 'Perfect Bound',
     printed_by: 'Country Press',
     print_run: 75,
@@ -48,7 +44,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/rubix-14-front.png',
   },
   {
-    anthologyTitle: 'Snapshots at 3AM',
     binding_type: 'Perfect Bound',
     printed_by: 'PaperGraphics',
     print_run: 320,
@@ -57,7 +52,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/snapshots-3am.png',
   },
   {
-    anthologyTitle: 'How to Survive a Cafeteria',
     binding_type: 'Tape Bound/Binding Strips',
     printed_by: 'FlashPrint',
     print_run: 100,
@@ -66,7 +60,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/how-to-survive-cafeteria.png',
   },
   {
-    anthologyTitle: 'Letters to Nobody',
     binding_type: 'Tape Bound/Binding Strips',
     printed_by: 'FlashPrint',
     print_run: 80,
@@ -75,7 +68,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/letters-to-nobody.png',
   },
   {
-    anthologyTitle: "I'll Light Up My Own Sky",
     binding_type: 'Perfect Bound',
     printed_by: 'Marquis',
     print_run: 500,
@@ -85,7 +77,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
       'https://c4c-826boston-dev.s3.us-east-1.amazonaws.com/images/Ill_Light_Up_My_Own_Sky.webp',
   },
   {
-    anthologyTitle: 'Rubix Literary Magazine #12 - Futures',
     binding_type: 'Perfect Bound',
     printed_by: 'Country Press',
     print_run: 75,
@@ -95,7 +86,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
       'https://c4c-826boston-dev.s3.us-east-1.amazonaws.com/images/RUBIX.webp',
   },
   {
-    anthologyTitle: "Tomorrow's Almanac",
     binding_type: 'Perfect Bound',
     printed_by: 'PaperGraphics',
     print_run: 320,
@@ -104,7 +94,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/tomorrows-almanac.png',
   },
   {
-    anthologyTitle: 'Prism Literary Magazine #15: Memory Palace',
     binding_type: 'Perfect Bound',
     printed_by: 'Country Press',
     print_run: 75,
@@ -113,7 +102,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/rubix-15-front.png',
   },
   {
-    anthologyTitle: 'Not Guilty',
     binding_type: 'Perfect Bound',
     printed_by: 'PaperGraphics',
     print_run: 500,
@@ -122,7 +110,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/not-guilty-cover.png',
   },
   {
-    anthologyTitle: 'Unlocked',
     binding_type: 'Perfect Bound',
     printed_by: 'Marquis',
     print_run: 500,
@@ -131,7 +118,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/unlocked-cover.png',
   },
   {
-    anthologyTitle: 'Utopia vs. Dystopia',
     binding_type: 'Tape Bound/BInding Strips',
     printed_by: 'FlashPrint',
     print_run: 100,
@@ -141,7 +127,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
       'https://c4c-826boston-dev.s3.us-east-1.amazonaws.com/images/UtopiaDystopia.webp',
   },
   {
-    anthologyTitle: 'Civic Creatures',
     binding_type: 'Perfect Bound',
     printed_by: 'PaperGraphics',
     print_run: 500,
@@ -150,7 +135,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/civic-creatures-cover.png',
   },
   {
-    anthologyTitle: 'The Weight of a Suitcase',
     binding_type: 'Saddle Stitch',
     printed_by: 'FlashPrint',
     print_run: 60,
@@ -159,7 +143,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/weight-of-suitcase.png',
   },
   {
-    anthologyTitle: 'Walk a Mile in Our Shoes',
     binding_type: 'Saddle Stitch',
     printed_by: 'FlashPrint',
     print_run: 0,
@@ -169,7 +152,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
       'https://c4c-826boston-dev.s3.us-east-1.amazonaws.com/images/walk_a_mile.webp',
   },
   {
-    anthologyTitle: 'The Night Kitchen',
     binding_type: 'Tape Bound/Binding Strips',
     printed_by: 'FlashPrint',
     print_run: 50,
@@ -178,7 +160,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/night-kitchen.png',
   },
   {
-    anthologyTitle: 'Hard Pivot',
     binding_type: 'Perfect Bound',
     printed_by: 'Marquis',
     print_run: 400,
@@ -187,7 +168,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/hard-pivot.png',
   },
   {
-    anthologyTitle: 'The Space Between Languages',
     binding_type: 'Tape Bound/Binding Strips',
     printed_by: 'FlashPrint',
     print_run: 50,
@@ -196,7 +176,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/space-between-languages.png',
   },
   {
-    anthologyTitle: 'Hallway Dispatches',
     binding_type: 'Saddle Stitch',
     printed_by: 'FlashPrint',
     print_run: 40,
@@ -205,7 +184,6 @@ export const ProductionInfoSeed: ProductionInfoSeedData[] = [
     cover_image_file_link: 'publications/covers/hallway-dispatches.png',
   },
   {
-    anthologyTitle: 'Field Notes From the T',
     binding_type: 'Saddle Stitch',
     printed_by: 'FlashPrint',
     print_run: 50,

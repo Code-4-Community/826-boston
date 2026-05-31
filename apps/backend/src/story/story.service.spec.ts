@@ -3,6 +3,18 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Story } from './story.entity';
 import { StoryService } from './story.service';
 import { StoriesSeed } from '../seeds/stories.seed';
+import { Anthology } from 'src/anthology/anthology.entity';
+import { Author } from 'src/author/author.entity';
+
+export const storyExample = {
+  title: 'Standing at the Threshold',
+  description: 'A reflection on crossing borders — geographic, cultural, and emotional — and what it means to build a new home while carrying the old one.',
+  studentBio: 'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
+  theme: 'Immigration and Belonging',
+  anthology_id: 1,
+  author_id: 1,
+  id: 1,
+} as unknown as Story;
 
 describe('StoryService', () => {
   let service: StoryService;
@@ -39,24 +51,24 @@ describe('StoryService', () => {
   });
 
   describe('get stories by anthology', () => {
-    it('get stories given anthology id', () => {
-      mockRepository.find.mockImplementation((query) => {
-        if (query.where?.anthologyId === 999) {
-          return Promise.resolve([StoriesSeed[0]]);
+    it('get stories given anthology id', async () => {
+      mockRepository.find.mockImplementation(async (query) => {
+        if (query.where?.anthology?.id === 999) {
+          return [storyExample];
         }
-        return Promise.resolve([]);
+        return [];
       });
 
-      const result1 = service.getStoriesByAnthology(999);
-      expect(result1).resolves.toEqual([StoriesSeed[0]]);
+      const result1 = await service.getStoriesByAnthology(999);
+      expect(result1).toEqual([storyExample]);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { anthologyId: 999 },
+        where: { anthology: { id: 999 } },
       });
 
-      const result2 = service.getStoriesByAnthology(1);
-      expect(result2).resolves.toEqual([]);
+      const result2 = await service.getStoriesByAnthology(1);
+      expect(result2).toEqual([]);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { anthologyId: 1 },
+        where: { anthology: { id: 1 } },
       });
     });
   });

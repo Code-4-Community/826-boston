@@ -97,7 +97,7 @@ export class ApiClient {
   }
 
   public async getStoryDrafts(anthologyId: number) {
-    return this.get(`/api/story-drafts/anthology/${anthologyId}`) as Promise<
+    return this.get(`/api/story/anthology/${anthologyId}/story-drafts`) as Promise<
       StoryDraft[]
     >;
   }

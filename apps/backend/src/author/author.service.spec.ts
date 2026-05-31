@@ -114,20 +114,19 @@ describe('AuthorService', () => {
       expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
     });
 
-    it('should return null when author not found', async () => {
+    it('should raise not found exception when author not found', async () => {
       mockRepository.findOneBy.mockResolvedValue(null);
-
-      const result = await service.findOne(999);
-
-      expect(result).toBeNull();
+      
+      await expect(service.findOne(999)).rejects.toThrow(
+        new NotFoundException('Author not found'),
+      );
       expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 999 });
     });
 
-    it('should return null when id is falsy', async () => {
-      const result = await service.findOne(0);
-
-      expect(result).toBeNull();
-      expect(mockRepository.findOneBy).not.toHaveBeenCalled();
+    it('should raise not found exception when id is falsy', async () => {
+      await expect(service.findOne(0)).rejects.toThrow(
+        new NotFoundException('Author not found'),
+      );
     });
   });
 

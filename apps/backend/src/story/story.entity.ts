@@ -5,7 +5,6 @@ import {
   ManyToOne,
   JoinColumn,
   Relation,
-  ManyToMany,
   OneToOne,
 } from 'typeorm';
 import { Anthology } from '../anthology/anthology.entity';
@@ -20,24 +19,19 @@ export class Story {
   @Column()
   title: string;
 
-  @Column()
+  @Column({nullable: true})
   description?: string;
 
-  @Column()
+  @Column({nullable: true})
   studentBio?: string;
 
-  @Column()
+  @Column({nullable: true})
   theme?: string;
-
-  @Column({ name: 'anthology_id' })
-  anthologyId: number;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.stories)
   @JoinColumn({ name: 'anthology_id' })
   anthology: Relation<Anthology>;
 
-  @Column({ name: 'author_id' })
-  authorId: number;
 
   @ManyToOne(() => Author, (author) => author.stories)
   @JoinColumn({ name: 'author_id' })
@@ -45,5 +39,5 @@ export class Story {
 
   @OneToOne(() => StoryDraft, (storyDraft) => storyDraft.story)
   @JoinColumn({ name: 'story_draft_id' })
-  storyDraft: Relation<StoryDraft>;
+  storyDraft?: Relation<StoryDraft>;
 }

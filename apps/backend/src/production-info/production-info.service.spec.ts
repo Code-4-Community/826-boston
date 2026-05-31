@@ -7,11 +7,7 @@ import { Anthology } from '../anthology/anthology.entity';
 import { CreateProductionInfoDto } from './dtos/create-production-info.dto';
 import { UpdateProductionInfoDto } from './dtos/update-production-info.dto';
 import { Repository } from 'typeorm';
-import {
-  AnthologyStatus,
-  AgeCategory,
-  AnthologyPubLevel,
-} from 'src/anthology/types';
+import { AnthologyStatus, AnthologyPubLevel } from 'src/anthology/types';
 
 export const mockAnthology: Anthology = {
   id: 1,
@@ -24,7 +20,6 @@ export const mockAnthology: Anthology = {
   triggers: [],
   publishedDate: undefined,
   status: AnthologyStatus.ARCHIVED,
-  ageCategory: AgeCategory.YA,
   pubLevel: AnthologyPubLevel.ZINE,
   photoUrl: '',
   isbn: '',
@@ -33,11 +28,12 @@ export const mockAnthology: Anthology = {
   inventoryHoldings: [],
   productionInfo: new ProductionInfo(),
   omchaiAssignments: [],
+  programs: [],
+  sponsors: [],
 };
 
 export const mockProductionInfo: ProductionInfo = {
   id: 1,
-  anthology_id: 1,
   design_files_link: 'http://example.com',
   cover_image_file_link: '',
   binding_type: '',
@@ -47,6 +43,7 @@ export const mockProductionInfo: ProductionInfo = {
   weight_in_grams: 0,
   page_count: 0,
   printed_by: '',
+  anthology: { id: 1 } as Anthology,
 };
 
 describe('ProductionInfoService', () => {
@@ -149,7 +146,7 @@ describe('ProductionInfoService', () => {
       const result = await service.findOneByAnthologyId(1);
 
       expect(productionInfoRepository.findOne).toHaveBeenCalledWith({
-        where: { anthology_id: 1 },
+        where: { anthology: { id: 1 } },
         relations: ['anthology'],
       });
       expect(result).toEqual(mockProductionInfo);
