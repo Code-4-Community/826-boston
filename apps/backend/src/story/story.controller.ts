@@ -42,9 +42,10 @@ export class StoryController {
 
     return stories;
   }
+  
 
   @Public()
-  @Get('/library/anthology/:anthologyId/story/:storyId')
+  @Get('/anthology/:anthologyId/story/:storyId')
   async getStory(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
     @Param('storyId', ParseIntPipe) storyId: number,
@@ -61,7 +62,7 @@ export class StoryController {
   }
 
   @ApiBearerAuth()
-  @Post('/library/anthology/:anthologyId/story')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new story in a specific anthology' })
   @ApiResponse({
@@ -95,10 +96,7 @@ export class StoryController {
   async getStoryDraftsByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
   ) {
-    // get stories with given anthology id and map to get non-null story drafts
-    const stories = await this.getStoriesByAnthology(anthologyId);
-    return stories
-      .map((story) => story.storyDraft)
-      .filter((draft) => draft !== null);
+    return this.storyService.getStoryDraftsByAnthology(anthologyId);
   }
+  
 }

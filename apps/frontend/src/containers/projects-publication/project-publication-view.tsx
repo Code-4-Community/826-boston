@@ -19,8 +19,8 @@ interface StoryDraftRow {
   authorId: number;
   firstName: string;
   lastName: string;
-  nameInBook: string;
-  classPeriod: string;
+  nameInBook?: string;
+  classPeriod?: string;
   docLink: string;
   submissionRound: SubmissionRound;
   studentConsent: boolean;
@@ -82,40 +82,33 @@ const ProjectPublicationView: React.FC = () => {
 
   const loadStoryDrafts = useCallback(async () => {
     if (!id) return;
+
     try {
-      const [drafts, authors] = await Promise.all([
-        apiClient.getStoryDrafts(Number(id)),
-        apiClient.getAuthors(),
-      ]);
+      const stories = await apiClient.getStoryDrafts(Number(id));
+      const storyDraftRows = stories.map((story) => {
+        const firstName = story.author.name.split(' ')[0] || '';
+        const lastName = story.author.name.split(' ')[1] || '';
 
-      const authorMap = new Map<number, Author>();
-      for (const author of authors) {
-        authorMap.set(author.id, author);
-      }
+        return {
+          storyDraftId: story.storyDraft.id,
+          authorId: story.author.id,
+          firstName: firstName,
+          lastName: lastName,
+          nameInBook: story.author.nameInBook,
+          classPeriod: story.author.classPeriod,
+          docLink: story.storyDraft.docLink,
+          submissionRound: story.storyDraft.submissionRound,
+          studentConsent: story.storyDraft.studentConsent,
+          inManuscript: story.storyDraft.inManuscript,
+          editRound: story.storyDraft.editRound,
+          proofread: story.storyDraft.proofread,
+          notes: story.storyDraft.notes,
+        };
+      });
 
-      setStoryDrafts(
-        drafts.map((draft) => {
-          const author = authorMap.get(draft.authorId);
-          const nameParts = author?.name?.split(' ') ?? [];
-          return {
-            storyDraftId: draft.id,
-            authorId: draft.authorId,
-            firstName: nameParts[0] ?? '',
-            lastName: nameParts.slice(1).join(' '),
-            nameInBook: author?.nameInBook ?? '',
-            classPeriod: author?.classPeriod ?? '',
-            docLink: draft.docLink,
-            submissionRound: draft.submissionRound,
-            studentConsent: draft.studentConsent,
-            inManuscript: draft.inManuscript,
-            editRound: draft.editRound,
-            proofread: draft.proofread,
-            notes: draft.notes,
-          };
-        }),
-      );
+      setStoryDrafts(storyDraftRows);
     } catch {
-      // Story drafts will remain as-is on fetch failure
+      console.error('Failed to load story drafts');
     }
   }, [id]);
 

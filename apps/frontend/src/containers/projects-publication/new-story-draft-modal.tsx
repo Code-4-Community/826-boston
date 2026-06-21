@@ -30,6 +30,10 @@ export default function NewStoryDraftModal({
   onClose,
   onSaved,
 }: Props) {
+  const [studentBio, setStudentBio] = useState('');
+  const [grade, setGrade] = useState<number | null>(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [nameInBook, setNameInBook] = useState('');
@@ -38,7 +42,14 @@ export default function NewStoryDraftModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isValid = firstName.trim() && lastName.trim() && docLink.trim();
+  const isValid =
+    firstName.trim() &&
+    lastName.trim() &&
+    docLink.trim() &&
+    title.trim() &&
+    description.trim() &&
+    classPeriod.trim() &&
+    grade !== null;
 
   const handleSave = async () => {
     if (!isValid) return;
@@ -53,10 +64,19 @@ export default function NewStoryDraftModal({
         classPeriod: classPeriod || undefined,
       });
 
+      const story = await apiClient.createStory({
+        title: title.trim() || 'Untitled Story',
+        description: description,
+        studentBio: studentBio,
+        anthologyId: anthologyId,
+        authorId: author.id,
+      });
+
       await apiClient.createStoryDraft({
         authorId: author.id,
         anthologyId: anthologyId,
         docLink: docLink.trim(),
+        storyId: story.id,
       });
 
       onSaved();
@@ -83,12 +103,6 @@ export default function NewStoryDraftModal({
         </div>
 
         <div className="modal__body">
-          {error && (
-            <div className="field" style={{ color: 'var(--error, #d32f2f)' }}>
-              {error}
-            </div>
-          )}
-
           <div className="field-row">
             <Field label="First Name" required>
               <input
@@ -109,7 +123,6 @@ export default function NewStoryDraftModal({
               />
             </Field>
           </div>
-
           <Field label="Name in Book">
             <input
               className="input"
@@ -119,16 +132,57 @@ export default function NewStoryDraftModal({
               disabled={saving}
             />
           </Field>
-
-          <Field label="Class Period">
+          <Field label="Student Bio">
             <input
               className="input"
-              placeholder="e.g. Edwards 1/6"
-              value={classPeriod}
-              onChange={(e) => setClassPeriod(e.target.value)}
+              placeholder="Short bio of the author"
+              value={studentBio}
+              onChange={(e) => setStudentBio(e.target.value)}
               disabled={saving}
             />
           </Field>
+          <Field label="Title" required>
+            <input
+              className="input"
+              placeholder="Title of story draft"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={saving}
+            />
+          </Field>
+          <Field label="Description" required>
+            <input
+              className="input"
+              placeholder="Description of story draft"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={saving}
+            />
+          </Field>
+
+          <div className="field-row">
+            <Field label="Class Period" required>
+              <input
+                className="input"
+                placeholder="e.g. Edwards 1/6"
+                value={classPeriod}
+                onChange={(e) => setClassPeriod(e.target.value)}
+                disabled={saving}
+              />
+            </Field>
+            <Field label="Grade" required>
+              <input
+                type="number"
+                className="input"
+                placeholder="Author's grade level"
+                value={grade ?? ''}
+                onChange={(e) =>
+                  setGrade(e.target.value ? parseInt(e.target.value) : null)
+                }
+                disabled={saving}
+              />
+            </Field>
+          </div>
 
           <Field label="Document Link" required>
             <input
@@ -157,6 +211,11 @@ export default function NewStoryDraftModal({
             >
               {saving ? 'Saving...' : 'Save'}
             </button>
+            {error && (
+              <div className="field" style={{ color: 'var(--error, #d32f2f)' }}>
+                {error}
+              </div>
+            )}
           </div>
         </div>
       </div>

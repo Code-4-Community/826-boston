@@ -9,6 +9,7 @@ import {
   OmchaiEntry,
   Story,
   StoryDraft,
+  StoryWithStoryDraft,
   SubmissionRound,
 } from '../types';
 import User from './dtos/user.dto';
@@ -97,15 +98,26 @@ export class ApiClient {
   }
 
   public async getStoryDrafts(anthologyId: number) {
-    return this.get(`/api/story/anthology/${anthologyId}/story-drafts`) as Promise<
-      StoryDraft[]
-    >;
+    return this.get(
+      `/api/story/anthology/${anthologyId}/story-drafts`,
+    ) as Promise<StoryWithStoryDraft[]>;
+  }
+
+  public async createStory(body: {
+    title: string;
+    description: string;
+    studentBio: string;
+    anthologyId: number;
+    authorId: number;
+  }): Promise<Story> {
+    return this.post(`/api/story`, body) as Promise<Story>;
   }
 
   public async createStoryDraft(body: {
     authorId: number;
     anthologyId: number;
     docLink: string;
+    storyId: number;
   }): Promise<{ message: string }> {
     return this.post('/api/story-drafts', body) as Promise<{
       message: string;

@@ -15,19 +15,8 @@ export class CreateStoryDto {
   @IsOptional()
   studentBio: string;
 
-  @ApiProperty({ description: 'Genre of story' })
-  @IsString()
-  @IsOptional()
-  genre: string;
-
-  @ApiProperty({ description: 'Theme of story' })
-  @IsString()
-  @IsOptional()
-  theme: string;
-
   @ApiProperty({ description: 'ID of Anthology the story is in' })
   @IsNumber()
-  @IsOptional()
   anthologyId: number;
 
   @ApiProperty({ description: 'Author of story' })

@@ -22,9 +22,11 @@ export class Story {
   @Column({nullable: true})
   description?: string;
 
+  // TODO: remove this since in author
   @Column({nullable: true})
   studentBio?: string;
 
+  // TODO: remove this since in anthology
   @Column({nullable: true})
   theme?: string;
 

@@ -80,11 +80,13 @@ export class StoryDraftService {
       return null;
     }
 
-    return this.repo.findOneBy({ id });
+    return this.repo.findOne({ where: { id } , relations: ['anthology', 'author', 'story']});
   }
 
   async findAll() {
-    return this.repo.find();
+    return this.repo.find({
+      relations: ['anthology', 'author', 'story'],
+    });
   }
 
   async remove(id: number) {

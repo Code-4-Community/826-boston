@@ -30,6 +30,15 @@ export class StoryService {
     });
   }
 
+  async getStoryDraftsByAnthology(anthologyId: number) {
+    const stories = await this.repo.find({
+      where: { anthology: { id: anthologyId } },
+      relations: ['storyDraft', 'author'],
+    });
+
+    return stories.filter((story) => story.storyDraft !== null);
+  }
+
   findByTitle(title: string) {
     return this.repo.find({ where: { title } });
   }
@@ -82,9 +91,8 @@ export class StoryService {
     title: string,
     anthologyId: number,
     authorId: number,
-    studentBio?: string,
-    description?: string,
-    theme?: string,
+    studentBio: string,
+    description: string,
     storyDraftId?: number,
   ): Promise<Story> {
     const story = this.repo.create({
@@ -93,9 +101,11 @@ export class StoryService {
       author: { id: authorId } as Author,
       studentBio,
       description,
-      theme,
-      storyDraft: { id: storyDraftId } as StoryDraft,
     });
+
+    if (storyDraftId) {
+      story.storyDraft = { id: storyDraftId } as StoryDraft;
+    }
 
     return this.repo.save(story);
   }

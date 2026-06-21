@@ -47,17 +47,18 @@ export interface StoryDraft {
   notes: string[];
 }
 
+export interface StoryWithStoryDraft extends Story {
+  storyDraft: StoryDraft;
+  author: Author;
+}
+
 export interface Story {
   id: number;
   title: string;
   description?: string;
-  studentBio?: string;
-  genre?: string;
-  theme?: string;
-  anthologyId: number;
-  anthology?: Anthology;
-  authorId: number;
-  author?: Author;
+  anthology_id: number;
+  author_id: number;
+  story_draft_id?: number;
 }
 
 export enum AnthologyProgram {
