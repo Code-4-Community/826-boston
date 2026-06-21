@@ -42,7 +42,6 @@ export class StoryController {
 
     return stories;
   }
-  
 
   @Public()
   @Get('/anthology/:anthologyId/story/:storyId')
@@ -86,7 +85,6 @@ export class StoryController {
       createStoryDto.title,
       createStoryDto.anthologyId,
       createStoryDto.authorId,
-      createStoryDto.studentBio,
       createStoryDto.description,
     );
   }
@@ -98,5 +96,4 @@ export class StoryController {
   ) {
     return this.storyService.getStoryDraftsByAnthology(anthologyId);
   }
-  
 }

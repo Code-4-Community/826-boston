@@ -40,8 +40,7 @@ export const StoriesSeed: StorySeedItem[] = [
     theme: 'Heritage and Water',
     anthology_id: 3,
     author_id: 3,
-      story_draft_id: 3,
-
+    story_draft_id: 3,
   },
   {
     title: 'Borrowed Words',

@@ -49,7 +49,6 @@ describe('OmchaiController', () => {
 
   describe('create', () => {
     it('should create an omchai', () => {
-      
       mockOmchaiService.create.mockReturnValue('created');
 
       const result = controller.create(omchaiDto1);

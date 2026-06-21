@@ -52,7 +52,9 @@ export class OmchaiGuard implements CanActivate {
       return false;
     }
 
-    const assignment = user.omchaiAssignments.find((a) => a.anthology.id === anthologyId);
+    const assignment = user.omchaiAssignments.find(
+      (a) => a.anthology.id === anthologyId,
+    );
 
     const allowed = !!assignment && requiredRoles.includes(assignment.role);
     if (allowed) {

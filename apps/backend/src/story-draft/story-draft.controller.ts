@@ -39,7 +39,7 @@ export class StoryDraftController {
       createStoryDraftDto.editRound ?? EditRound.ONE,
       createStoryDraftDto.proofread ?? false,
       createStoryDraftDto.notes ?? [],
-      createStoryDraftDto.storyId
+      createStoryDraftDto.storyId,
     );
     return { message: 'StoryDraft created successfully' };
   }

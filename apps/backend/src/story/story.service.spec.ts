@@ -2,14 +2,13 @@ import { TestingModule, Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Story } from './story.entity';
 import { StoryService } from './story.service';
-import { StoriesSeed } from '../seeds/stories.seed';
-import { Anthology } from 'src/anthology/anthology.entity';
-import { Author } from 'src/author/author.entity';
 
 export const storyExample = {
   title: 'Standing at the Threshold',
-  description: 'A reflection on crossing borders — geographic, cultural, and emotional — and what it means to build a new home while carrying the old one.',
-  studentBio: 'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
+  description:
+    'A reflection on crossing borders — geographic, cultural, and emotional — and what it means to build a new home while carrying the old one.',
+  studentBio:
+    'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
   theme: 'Immigration and Belonging',
   anthology_id: 1,
   author_id: 1,

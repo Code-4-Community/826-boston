@@ -80,7 +80,10 @@ export class StoryDraftService {
       return null;
     }
 
-    return this.repo.findOne({ where: { id } , relations: ['anthology', 'author', 'story']});
+    return this.repo.findOne({
+      where: { id },
+      relations: ['anthology', 'author', 'story'],
+    });
   }
 
   async findAll() {

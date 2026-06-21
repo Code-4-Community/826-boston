@@ -43,10 +43,6 @@ export class StoryService {
     return this.repo.find({ where: { title } });
   }
 
-  findByTheme(theme: string) {
-    return this.repo.find({ where: { theme } });
-  }
-
   async update(id: number, attrs: Partial<Story>) {
     const story = await this.findOne(id);
 
@@ -91,7 +87,6 @@ export class StoryService {
     title: string,
     anthologyId: number,
     authorId: number,
-    studentBio: string,
     description: string,
     storyDraftId?: number,
   ): Promise<Story> {
@@ -99,7 +94,6 @@ export class StoryService {
       title,
       anthology: { id: anthologyId } as Anthology,
       author: { id: authorId } as Author,
-      studentBio,
       description,
     });
 
