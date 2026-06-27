@@ -27,28 +27,9 @@ export async function seedAnthologies(dataSource: DataSource) {
 
   console.log('Seeding production info...');
 
-  for (const { anthologyTitle, ...piData } of ProductionInfoSeed) {
-    const anthology = await anthologyRepo.findOne({
-      where: { title: anthologyTitle },
-    });
-
-    if (!anthology) {
-      console.warn(
-        `  ✗ Anthology not found for production info: ${anthologyTitle}`,
-      );
-      continue;
-    }
-
-    const exists = await piRepo.findOne({
-      where: { anthology: { id: anthology.id } },
-    });
-
-    if (!exists) {
-      const pi = piRepo.create({ ...piData, anthology });
-      await piRepo.save(pi);
-      console.log(`  ✓ Created production info for: ${anthologyTitle}`);
-    } else {
-      console.log(`  - Production info already exists for: ${anthologyTitle}`);
-    }
+  for (const piData of ProductionInfoSeed) {
+    const pi = piRepo.create(piData);
+    await piRepo.save(pi);
+    console.log(`  ✓ Created production info with id: ${pi.id}`);
   }
 }

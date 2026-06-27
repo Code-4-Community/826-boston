@@ -17,6 +17,7 @@ import { AuthorService } from './author.service';
 import { Author } from './author.entity';
 import { CreateAuthorDto } from './dtos/create-author.dto';
 import { EditAuthorDto } from './dtos/edit-author.dto';
+import { Public, UserStatus } from 'src/auth/roles.decorator';
 
 @ApiTags('Author')
 @ApiBearerAuth()
@@ -31,6 +32,7 @@ export class AuthorController {
    * @param createAuthorDto frontend author data
    * @returns author with given bio, name, and grade.
    */
+  @ApiBearerAuth()
   @Post('/author')
   async createAuthor(
     @Body() createAuthorDto: CreateAuthorDto,
@@ -44,6 +46,7 @@ export class AuthorController {
    * @param editAuthorDto bio, name, and/or grade of author that is being updated
    * @returns author with given id and updated fields
    */
+  @ApiBearerAuth()
   @Put('/author/:authorId')
   async updateAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,
@@ -57,10 +60,9 @@ export class AuthorController {
    * @param authorId id of author
    * @returns author with given id
    */
+  @Public()
   @Get('/author/:authorId')
-  async getAuthor(
-    @Param('authorId', ParseIntPipe) authorId: number,
-  ): Promise<Author> {
+  async getAuthor(@Param('authorId', ParseIntPipe) authorId: number) {
     return this.authorService.findOne(authorId);
   }
 
@@ -68,6 +70,7 @@ export class AuthorController {
    * Get all authors.
    * @returns all authors in repository
    */
+  @Public()
   @Get('/author')
   async getAuthors(): Promise<Author[]> {
     return this.authorService.findAll();
@@ -78,6 +81,7 @@ export class AuthorController {
    * @param authorId id of author to remove
    * @returns removed author
    */
+  @ApiBearerAuth()
   @Delete('/:authorId')
   async removeAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,

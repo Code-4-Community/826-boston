@@ -30,7 +30,6 @@ export class ProductionInfoService {
 
     const productionInfo = this.productionInfoRepository.create({
       ...createProductionInfoDto,
-      anthology_id: anthology.id,
     });
 
     return this.productionInfoRepository.save(productionInfo);
@@ -42,7 +41,7 @@ export class ProductionInfoService {
 
   async findOneByAnthologyId(anthologyId: number): Promise<ProductionInfo> {
     const productionInfo = await this.productionInfoRepository.findOne({
-      where: { anthology_id: anthologyId },
+      where: { anthology: { id: anthologyId } },
       relations: ['anthology'],
     });
 
@@ -78,7 +77,7 @@ export class ProductionInfoService {
           `Anthology with ID ${updateProductionInfoDto.anthology_id} not found`,
         );
       }
-      productionInfo.anthology_id = anthology.id;
+      productionInfo.anthology.id = anthology.id;
     }
 
     Object.assign(productionInfo, updateProductionInfoDto);

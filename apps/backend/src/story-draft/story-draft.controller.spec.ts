@@ -33,7 +33,6 @@ describe('StoryDraftController', () => {
 
   it('creates a story draft and returns success message', async () => {
     const dto: CreateStoryDraftDto = {
-      authorId: 1,
       docLink: 'https://docs.google.com/doc1',
       submissionRound: SubmissionRound.ONE,
       studentConsent: true,
@@ -41,12 +40,12 @@ describe('StoryDraftController', () => {
       editRound: EditRound.ONE,
       proofread: false,
       notes: ['First draft'],
+      storyId: 1,
     };
 
     const response = await controller.createStoryDraft(dto);
 
     expect(mockService.create).toHaveBeenCalledWith(
-      dto.authorId,
       dto.docLink,
       dto.submissionRound,
       dto.studentConsent,
@@ -54,6 +53,7 @@ describe('StoryDraftController', () => {
       dto.editRound,
       dto.proofread,
       dto.notes,
+      dto.storyId,
     );
     expect(response).toEqual({ message: 'StoryDraft created successfully' });
   });
@@ -69,7 +69,6 @@ describe('StoryDraftController', () => {
 
     expect(mockService.edit).toHaveBeenCalledWith(
       7,
-      dto.authorId,
       dto.docLink,
       dto.submissionRound,
       dto.studentConsent,

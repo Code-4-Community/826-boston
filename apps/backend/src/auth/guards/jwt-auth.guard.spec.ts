@@ -3,10 +3,12 @@ import { ExecutionContext } from '@nestjs/common';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { UsersService } from '../../users/users.service';
 import { Omchai, OmchaiRole } from '../../omchai/omchai.entity';
+import { Reflector } from '@nestjs/core';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
   let usersService: jest.Mocked<UsersService>;
+  let reflector: jest.Mocked<Reflector>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,11 +20,18 @@ describe('JwtAuthGuard', () => {
             findWithOmchai: jest.fn(),
           },
         },
+        {
+          provide: Reflector,
+          useValue: {
+            getAllAndOverride: jest.fn().mockReturnValue(false),
+          },
+        },
       ],
     }).compile();
 
     guard = module.get<JwtAuthGuard>(JwtAuthGuard);
     usersService = module.get(UsersService) as jest.Mocked<UsersService>;
+    reflector = module.get(Reflector) as jest.Mocked<Reflector>;
 
     jest
       .spyOn(Object.getPrototypeOf(Object.getPrototypeOf(guard)), 'canActivate')
@@ -40,6 +49,8 @@ describe('JwtAuthGuard', () => {
       };
 
       const mockContext = {
+        getHandler: jest.fn(),
+        getClass: jest.fn(),
         switchToHttp: () => ({
           getRequest: () => mockRequest,
         }),
@@ -58,6 +69,8 @@ describe('JwtAuthGuard', () => {
       };
 
       const mockContext = {
+        getHandler: jest.fn(),
+        getClass: jest.fn(),
         switchToHttp: () => ({
           getRequest: () => mockRequest,
         }),

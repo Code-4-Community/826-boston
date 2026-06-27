@@ -11,55 +11,44 @@ export async function seedInventoryHoldings(dataSource: DataSource) {
 
   console.log('Seeding inventory holdings...');
 
-  for (const {
-    anthologyTitle,
-    inventoryName,
-    numCopies,
-  } of InventoryHoldingsSeed) {
+  for (const inventoryHolding of InventoryHoldingsSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { title: anthologyTitle },
+      where: { id: inventoryHolding.anthology_id },
     });
 
     if (!anthology) {
       console.log(
-        `  - Anthology not found: "${anthologyTitle}", skipping holding`,
+        `  - Anthology with id ${inventoryHolding.anthology_id} not found, skipping holding`,
       );
       continue;
     }
 
     const inventory = await inventoryRepo.findOne({
-      where: { name: inventoryName },
+      where: { id: inventoryHolding.inventory_id },
     });
 
     if (!inventory) {
       console.log(
-        `  - Inventory not found: "${inventoryName}", skipping holding`,
+        `  - Inventory with id ${inventoryHolding.inventory_id} not found, skipping holding`,
       );
       continue;
     }
 
     const exists = await holdingRepo.findOne({
       where: {
-        inventoryId: inventory.id,
-        anthologyId: anthology.id,
+        inventory: { id: inventory.id },
+        anthology: { id: anthology.id },
       },
     });
 
     if (!exists) {
-      const entity = holdingRepo.create({
-        inventoryId: inventory.id,
-        inventory,
-        anthologyId: anthology.id,
-        anthology,
-        numCopies,
-      });
-      await holdingRepo.save(entity);
+      await holdingRepo.save(inventoryHolding);
       console.log(
-        `  ✓ Created holding: "${anthologyTitle}" @ "${inventoryName}" (${numCopies} copies)`,
+        `  ✓ Created holding: "Anthology ${anthology.title}" @ "${inventory.name}" (${inventoryHolding.numCopies} copies)`,
       );
     } else {
       console.log(
-        `  - Holding already exists: "${anthologyTitle}" @ "${inventoryName}"`,
+        `  - Holding already exists: "${anthology.title}" @ "${inventory.name}"`,
       );
     }
   }

@@ -3,6 +3,9 @@ import { Reflector } from '@nestjs/core';
 import { OmchaiGuard } from './omchai.guard';
 import { OMCHAI_ROLES } from '../roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
+import { User } from 'src/users/user.entity';
+import { Anthology } from 'src/anthology/anthology.entity';
+import { Role } from 'src/users/types';
 
 function makeContext(
   user: unknown,
@@ -17,13 +20,61 @@ function makeContext(
   } as unknown as ExecutionContext;
 }
 
-const baseUser = {
+const standardUser: User = {
   id: 1,
   email: 'test@example.com',
   omchaiAssignments: [
-    { anthologyId: 42, role: OmchaiRole.MANAGER },
-    { anthologyId: 99, role: OmchaiRole.HELPER },
+    {
+      anthology: { id: 42 } as Anthology,
+      role: OmchaiRole.MANAGER,
+      id: 0,
+      datetimeAssigned: new Date(),
+      user: new User(),
+    },
+    {
+      anthology: { id: 99 } as Anthology,
+      role: OmchaiRole.HELPER,
+      id: 0,
+      datetimeAssigned: new Date(),
+      user: new User(),
+    },
   ],
+  role: Role.STANDARD,
+  firstName: '',
+  lastName: '',
+};
+
+const noAssignmentsUser: User = {
+  id: 1,
+  email: 'test@example.com',
+  omchaiAssignments: [],
+  role: Role.ADMIN,
+  firstName: '',
+  lastName: '',
+};
+
+const insufficientRoleUser: User = {
+  id: 1,
+  email: 'test@example.com',
+  omchaiAssignments: [
+    {
+      anthology: { id: 42 } as Anthology,
+      role: OmchaiRole.HELPER,
+      id: 0,
+      datetimeAssigned: new Date(),
+      user: new User(),
+    },
+    {
+      anthology: { id: 99 } as Anthology,
+      role: OmchaiRole.APPROVER,
+      id: 0,
+      datetimeAssigned: new Date(),
+      user: new User(),
+    },
+  ],
+  role: Role.ADMIN,
+  firstName: '',
+  lastName: '',
 };
 
 describe('OmchaiGuard', () => {
@@ -37,13 +88,13 @@ describe('OmchaiGuard', () => {
 
   it('allows access when no roles are required', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(undefined);
-    const context = makeContext(baseUser, { id: '42' });
+    const context = makeContext(standardUser, { id: '42' });
     expect(guard.canActivate(context)).toBe(true);
   });
 
   it('allows access when required roles list is empty', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([]);
-    const context = makeContext(baseUser, { id: '42' });
+    const context = makeContext(standardUser, { id: '42' });
     expect(guard.canActivate(context)).toBe(true);
   });
 
@@ -51,10 +102,7 @@ describe('OmchaiGuard', () => {
     jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([OmchaiRole.MANAGER]);
-    const context = makeContext(
-      { id: 1, email: 'test@example.com' },
-      { id: '42' },
-    );
+    const context = makeContext(noAssignmentsUser, { id: '42' });
     expect(guard.canActivate(context)).toBe(false);
   });
 
@@ -63,7 +111,7 @@ describe('OmchaiGuard', () => {
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([OmchaiRole.MANAGER]);
     const warnSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation();
-    const context = makeContext(baseUser, {});
+    const context = makeContext(noAssignmentsUser, {});
 
     expect(guard.canActivate(context)).toBe(false);
     expect(warnSpy).toHaveBeenCalledWith(
@@ -75,7 +123,7 @@ describe('OmchaiGuard', () => {
     jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([OmchaiRole.OWNER, OmchaiRole.MANAGER]);
-    const context = makeContext(baseUser, { id: '42' });
+    const context = makeContext(standardUser, { id: '42' });
     expect(guard.canActivate(context)).toBe(true);
   });
 
@@ -83,7 +131,7 @@ describe('OmchaiGuard', () => {
     jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([OmchaiRole.OWNER, OmchaiRole.MANAGER]);
-    const context = makeContext(baseUser, { id: '99' });
+    const context = makeContext(insufficientRoleUser, { id: '99' });
     expect(guard.canActivate(context)).toBe(false);
   });
 
@@ -91,7 +139,7 @@ describe('OmchaiGuard', () => {
     jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([OmchaiRole.MANAGER]);
-    const context = makeContext(baseUser, { id: '7' });
+    const context = makeContext(insufficientRoleUser, { id: '7' });
     expect(guard.canActivate(context)).toBe(false);
   });
 
@@ -99,7 +147,7 @@ describe('OmchaiGuard', () => {
     jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue([OmchaiRole.MANAGER]);
-    const context = makeContext(baseUser, { anthologyId: '42' });
+    const context = makeContext(standardUser, { anthologyId: '42' });
     expect(guard.canActivate(context)).toBe(true);
   });
 
@@ -107,7 +155,7 @@ describe('OmchaiGuard', () => {
     const spy = jest
       .spyOn(reflector, 'getAllAndOverride')
       .mockReturnValue(undefined);
-    const context = makeContext(baseUser, { id: '42' });
+    const context = makeContext(standardUser, { id: '42' });
     guard.canActivate(context);
     expect(spy).toHaveBeenCalledWith(
       OMCHAI_ROLES,

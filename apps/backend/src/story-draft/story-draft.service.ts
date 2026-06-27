@@ -3,18 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { StoryDraft } from './story-draft.entity';
-import { Author } from '../author/author.entity';
 import { SubmissionRound, EditRound } from './types';
 
 @Injectable()
 export class StoryDraftService {
   constructor(
     @InjectRepository(StoryDraft) private repo: Repository<StoryDraft>,
-    @InjectRepository(Author) private authorRepo: Repository<Author>,
   ) {}
 
   async create(
-    authorId: number,
     docLink: string,
     submissionRound: SubmissionRound,
     studentConsent: boolean,
@@ -22,15 +19,9 @@ export class StoryDraftService {
     editRound: EditRound,
     proofread: boolean,
     notes: string[],
-    anthologyId: number, // add this
+    storyId: number, // assume story created before draft with other details, so we can link the draft to the story
   ) {
-    const author = await this.authorRepo.findOne({ where: { id: authorId } });
-    if (!author) {
-      throw new NotFoundException(`Author id ${authorId} not found`);
-    }
-
     const storyDraft = this.repo.create({
-      authorId,
       docLink,
       submissionRound,
       studentConsent,
@@ -38,7 +29,7 @@ export class StoryDraftService {
       editRound,
       proofread,
       notes,
-      anthologyId,
+      story: { id: storyId },
     });
 
     return await this.repo.save(storyDraft);
@@ -46,7 +37,6 @@ export class StoryDraftService {
 
   async edit(
     storyDraftId: number,
-    authorId?: number,
     docLink?: string,
     submissionRound?: SubmissionRound,
     studentConsent?: boolean,
@@ -56,25 +46,31 @@ export class StoryDraftService {
     notes?: string[],
   ) {
     const storyDraft = await this.repo.findOne({ where: { id: storyDraftId } });
-    if (!storyDraft)
+    if (!storyDraft) {
       throw new NotFoundException(`StoryDraft id ${storyDraftId} not found`);
-
-    if (authorId !== undefined) {
-      const author = await this.authorRepo.findOne({ where: { id: authorId } });
-      if (!author) {
-        throw new NotFoundException(`Author id ${authorId} not found`);
-      }
-      storyDraft.authorId = authorId;
     }
-    if (docLink !== undefined) storyDraft.docLink = docLink;
-    if (submissionRound !== undefined)
+
+    if (docLink !== undefined) {
+      storyDraft.docLink = docLink;
+    }
+    if (submissionRound !== undefined) {
       storyDraft.submissionRound = submissionRound;
-    if (studentConsent !== undefined)
+    }
+    if (studentConsent !== undefined) {
       storyDraft.studentConsent = studentConsent;
-    if (inManuscript !== undefined) storyDraft.inManuscript = inManuscript;
-    if (editRound !== undefined) storyDraft.editRound = editRound;
-    if (proofread !== undefined) storyDraft.proofread = proofread;
-    if (notes !== undefined) storyDraft.notes = notes;
+    }
+    if (inManuscript !== undefined) {
+      storyDraft.inManuscript = inManuscript;
+    }
+    if (editRound !== undefined) {
+      storyDraft.editRound = editRound;
+    }
+    if (proofread !== undefined) {
+      storyDraft.proofread = proofread;
+    }
+    if (notes !== undefined) {
+      storyDraft.notes = notes;
+    }
 
     return await this.repo.save(storyDraft);
   }
@@ -99,9 +95,5 @@ export class StoryDraftService {
     }
 
     return this.repo.remove(storyDraft);
-  }
-
-  async findByAnthology(anthologyId: number) {
-    return this.repo.findBy({ anthologyId });
   }
 }

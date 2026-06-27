@@ -3,8 +3,6 @@ interface InventorySeedItem {
   name: string;
 }
 
-// NOTE: inventoryHoldings uses the string literal "name"
-// to link foreign key
 export const InventoriesSeed: InventorySeedItem[] = [
   { id: 1, name: "O'Bryant Writers' Room" },
   { id: 2, name: 'Northeastern University' },

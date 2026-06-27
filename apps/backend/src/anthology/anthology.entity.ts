@@ -26,8 +26,8 @@ export class Anthology {
   @Column({ default: '' })
   byline: string;
 
-  @Column({ nullable: true })
-  subtitle: 'A College Essay Anthology';
+  @Column({ nullable: true, default: '' })
+  subtitle?: string;
 
   @Column()
   description: string;
@@ -44,11 +44,11 @@ export class Anthology {
   @Column({ type: 'date', nullable: true })
   publishedDate?: Date;
 
-  @Column({ type: 'simple-array', nullable: true })
-  programs?: string[];
+  @Column({ type: 'simple-array', default: [] })
+  programs: string[];
 
-  @Column({ type: 'simple-array', nullable: true })
-  sponsors?: string[];
+  @Column({ type: 'simple-array', default: [] })
+  sponsors: string[];
 
   @Column({ type: 'enum', enum: AnthologyStatus })
   status: AnthologyStatus;
@@ -65,17 +65,17 @@ export class Anthology {
     nullable: true,
     default: '',
   })
-  photoUrl: string;
+  photoUrl?: string;
 
   @Column({ nullable: true })
-  isbn: string;
+  isbn?: string;
 
   @Column({
     name: 'shopify_url',
     nullable: true,
     default: '',
   })
-  shopifyUrl: string;
+  shopifyUrl?: string;
 
   @OneToMany(() => Story, (story) => story.anthology)
   stories: Relation<Story[]>;

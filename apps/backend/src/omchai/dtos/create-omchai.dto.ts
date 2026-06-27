@@ -23,12 +23,4 @@ export class CreateOmchaiDto {
   @ApiProperty({ description: 'Date that the user was assigned' })
   @IsDateString()
   datetimeAssigned: Date;
-
-  @ApiProperty({description: 'user'})
-  @IsObject()
-  user: User;
-
-  @ApiProperty({description: 'anthology'})
-  @IsObject()
-  anthology: Anthology;
 }

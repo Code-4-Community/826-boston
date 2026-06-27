@@ -44,12 +44,14 @@ export class AuthorService {
     return this.repo.save(author);
   }
 
-  findOne(id: number) {
-    if (!id) {
-      return null;
+  async findOne(id: number): Promise<Author> {
+    const author = await this.repo.findOneBy({ id });
+
+    if (!author) {
+      throw new NotFoundException('Author not found');
     }
 
-    return this.repo.findOneBy({ id });
+    return author;
   }
 
   findAll() {

@@ -4,18 +4,19 @@ import { CreateOmchaiDto } from './dtos/create-omchai.dto';
 import { EditOmchaiDto } from './dtos/edit-omchai.dto';
 import { CreateOmchaiAssignmentsDto } from 'src/anthology/dtos/create-omchai-assignments-dto';
 import { OmchaiRole } from './omchai.entity';
-import { Anthology } from 'src/anthology/anthology.entity';
-import { User } from 'src/users/user.entity';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('omchai')
 export class OmchaiController {
   constructor(private readonly omchaiService: OmchaiService) {}
 
+  @ApiBearerAuth()
   @Post()
   create(@Body() createOmchaiDto: CreateOmchaiDto) {
     return this.omchaiService.create(createOmchaiDto);
   }
 
+  @ApiBearerAuth()
   @Post('batch-assignments')
   createBatchAssignments(
     @Body() createOmchaiAssignmentsDto: CreateOmchaiAssignmentsDto,
@@ -29,10 +30,6 @@ export class OmchaiController {
           userId: userId,
           role: role,
           datetimeAssigned: createOmchaiAssignmentsDto.datetime_assigned,
-          user: { id: userId } as User,
-          anthology: {
-            id: createOmchaiAssignmentsDto.anthology_id,
-          } as Anthology,
         });
       });
     }
@@ -62,16 +59,19 @@ export class OmchaiController {
     return this.omchaiService.createMany(createOmchaiDtos);
   }
 
+  @ApiBearerAuth()
   @Get()
   findAll() {
     return this.omchaiService.findAll();
   }
 
+  @ApiBearerAuth()
   @Get('anthology/:anthologyId')
   findByAnthologyId(@Param('anthologyId') anthologyId: string) {
     return this.omchaiService.findByAnthologyId(+anthologyId);
   }
 
+  @ApiBearerAuth()
   @Put(':id')
   update(@Param('id') id: string, @Body() editOmchaiDto: EditOmchaiDto) {
     return this.omchaiService.update(+id, editOmchaiDto);
