@@ -27,7 +27,7 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
 
   const isLibraryActive =
-    location.pathname.startsWith('/archive') || location.pathname === '/';
+    location.pathname.startsWith('/library') || location.pathname === '/';
   const isProjectsActive =
     location.pathname.startsWith('/projects') || location.pathname === '/';
   const isResourcesActive =
@@ -61,7 +61,7 @@ const Sidebar: React.FC = () => {
         <nav className="sidebar-nav">
           {/* Library - Expandable Section */}
           <div className="sidebar-library-section">
-            <NavLink to="/archive/published" className="sidebar-library-header">
+            <NavLink to="/library/published" className="sidebar-library-header">
               <div className="sidebar-library-header-content">
                 <div className="sidebar-library-header-left">
                   <img

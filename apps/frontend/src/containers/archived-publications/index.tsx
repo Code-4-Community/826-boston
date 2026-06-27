@@ -246,7 +246,7 @@ export default function ArchivedPublications({
           {mode === 'archive' && (
             <div className="publication-tabs">
               <NavLink
-                to="/archive/published"
+                to="/library/published"
                 className={({ isActive }) =>
                   `publication-tab ${isActive ? 'publication-tab--active' : ''}`
                 }
@@ -254,7 +254,7 @@ export default function ArchivedPublications({
                 Published
               </NavLink>
               <NavLink
-                to="/archive/archived"
+                to="/library/archived"
                 className={({ isActive }) =>
                   `publication-tab ${isActive ? 'publication-tab--active' : ''}`
                 }
@@ -327,7 +327,7 @@ export default function ArchivedPublications({
                   navigate(
                     mode === 'projects'
                       ? `/projects/publication/${pub.id}`
-                      : `/archive/publication/${pub.id}`,
+                      : `/library/publication/${pub.id}`,
                   )
                 }
               >

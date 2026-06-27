@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ roles }) => {
         <p>Sorry, an unexpected error has occurred.</p>
       </div>
     );
-  if (!user || !roles.includes(user.role)) return <Navigate to="/archive" />;
+  if (!user || !roles.includes(user.role)) return <Navigate to="/library" />;
 
   return <Outlet />;
 };

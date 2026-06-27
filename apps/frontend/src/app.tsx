@@ -26,14 +26,13 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       // public routes
-      { index: true, element: <Navigate to="/archive/published" replace /> },
+      { index: true, element: <Navigate to="/library/published" replace /> },
       {
-        // archive
-        path: 'archive',
+        path: 'library',
         children: [
           {
             index: true,
-            element: <Navigate to="/archive/published" replace />,
+            element: <Navigate to="/library/published" replace />,
           },
           {
             path: ':tab',

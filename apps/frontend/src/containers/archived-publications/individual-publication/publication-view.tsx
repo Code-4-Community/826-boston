@@ -10,7 +10,6 @@ import imgVector3 from '../../../assets/images/vector-3.svg';
 
 type TabType = 'publications' | 'assets' | 'production-details' | 'inventory';
 
-
 interface MetadataRowProps {
   label: string;
   tags: { label: string; className: string }[];
@@ -131,14 +130,10 @@ const PublicationView: React.FC = () => {
     ? anthology.programs.join(', ')
     : anthology.programs || 'Empty';
 
-
-
-
-
   const isProjectsView = location.pathname.startsWith('/projects/');
   const breadcrumbHref = isProjectsView
     ? '/projects/drafts'
-    : '/archive/published';
+    : '/library/published';
   const breadcrumbLabel = isProjectsView ? 'Projects' : 'Library';
 
   return (

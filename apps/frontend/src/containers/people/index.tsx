@@ -60,15 +60,15 @@ const People: React.FC = () => {
     <div className="people-wrapper">
       <div className="people-header">
         <h1 className="people-title-heading">People</h1>
-        {currentUser?.role === Role.ADMIN && (
-          <button
-            type="button"
-            className="people-create-btn"
-            onClick={() => setShowModal(true)}
-          >
-            + Create User
-          </button>
-        )}
+        {/* {currentUser?.role === Role.ADMIN && (
+          // <button
+          //   type="button"
+          //   className="people-create-btn"
+          //   onClick={() => setShowModal(true)}
+          // >
+          //   + Create User
+          // </button>
+        )} */}
       </div>
 
       <div className="people-table">
