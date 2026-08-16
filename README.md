@@ -3,6 +3,12 @@
 
 A lot of hard work and organization is required for publishing an anthology of student works! There are a lot of steps in betwen the students first writing drafts and the final production and sale of a bound book - plus a final celebratory author signing event.  There are many students, volunteers, educators, and community partners involved in this process. Code 4 Community is creating an internal administrative system to ease and organize the publishing process. Volunteers will be able to log on and see their upcoming tasks on different projects. 826 administrators will be able to create projects, delegate tasks, and track progress in real time.
 
+# Tech Stack
+- Front-end: React
+- Back-end: Typescript
+- Database: PostgreSQL
+- Cloud provider: AWS
+
 # Scaffolding
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
