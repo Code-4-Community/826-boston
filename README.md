@@ -39,9 +39,15 @@ nx serve backend
 nx run-many -t serve -p frontend backend
 ```
 
-## Test new migrations and seed data with yarn db:reset. You may need to reconnect to the database in pgadmin to see the cahnges
+## Test new migrations and seed data 
+```
+yarn db:reset.
+```
+You may need to reconnect to the database in pgadmin to see the changes
 
-Run `git submodule update --remote` to pull the latest changes from the component library
+## Pull the latest changes from the component library
+
+Run `git submodule update --remote`
 
 # Scaffolding
 
