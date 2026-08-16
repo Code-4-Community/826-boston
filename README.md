@@ -63,6 +63,14 @@ Organized by module, each with its own controller, service, entity, and DTO (Dat
 - `interceptors/` — cross-cutting request/response logic (e.g. `current-user.interceptor.ts` attaches the authenticated user to the request)
 - `strategies/` — cross-cutting configuration logic (e.g. `plural-naming.strategy.ts` defines how TypeORM derives table names from entity classes)
 
+## Frontend (`apps/frontend/src`)
+
+- `containers/` — route-level views (e.g. `auth/`, `people/`, `resources/`, `archived-publications/`, `projects-publication/`)
+- `components/` — shared UI components
+- `api/` — API client and shared DTOs - makes requests to backend
+- `hooks/` — custom React hooks
+- `assets/` — icons and images
+- `utils/` — helpers (e.g. `router.ts`, `mock-data.ts`)
 
 # Scaffolding
 
