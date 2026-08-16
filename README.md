@@ -49,6 +49,21 @@ You may need to reconnect to the database in pgadmin to see the changes
 
 Run `git submodule update --remote`
 
+# Folder Structure
+This is an Nx monorepo, like all c4c reops. The main app code lives in `apps/`.
+
+## Backend (`apps/backend/src`)
+
+Organized by module, each with its own controller, service, entity, and DTO (Data Transfer Object, that defines the shape of data being sent between the client and the API or between backend classes):
+
+- `anthology/`, `author/`, `story/`, `story-draft/`, `omchai/`, `inventory/`, `inventory-holding/`, `production-info/`, `users/`, `auth/` are all modules
+- `migrations/` — TypeORM migrations
+- `seeds/` — seed data and seed scripts (see `yarn db:reset` above)
+- `aws/` — AWS S3 integration (for seeding image data of anthology book covers)
+- `interceptors/` — cross-cutting request/response logic (e.g. `current-user.interceptor.ts` attaches the authenticated user to the request)
+- `strategies/` — cross-cutting configuration logic (e.g. `plural-naming.strategy.ts` defines how TypeORM derives table names from entity classes)
+
+
 # Scaffolding
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
