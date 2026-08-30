@@ -32,7 +32,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @Delete('/:id')
-  removeUser(@Param('id') id: string) {
-    return this.usersService.remove(parseInt(id));
+  removeUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.remove(id);
   }
 }

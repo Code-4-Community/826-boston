@@ -11,9 +11,10 @@ import { ProductionInfoService } from './production-info.service';
 import { CreateProductionInfoDto } from './dtos/create-production-info.dto';
 import { UpdateProductionInfoDto } from './dtos/update-production-info.dto';
 import { ProductionInfo } from './production-info.entity';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/roles.decorator';
 
+@ApiTags('Production Info')
 @Controller('production-info')
 export class ProductionInfoController {
   constructor(private readonly productionInfoService: ProductionInfoService) {}

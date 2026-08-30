@@ -74,7 +74,7 @@ export class ApiClient {
   public async getStoriesByAnthology(
     anthologyId: string | number,
   ): Promise<Story[]> {
-    return this.get(`/api/story/anthology/${anthologyId}`) as Promise<Story[]>;
+    return this.get(`/api/stories/anthology/${anthologyId}`) as Promise<Story[]>;
   }
 
   public async filterSortAnthologies(
@@ -85,7 +85,7 @@ export class ApiClient {
   }
 
   public async getAuthors(): Promise<Author[]> {
-    return this.get('/api/author/author') as Promise<Author[]>;
+    return this.get('/api/author') as Promise<Author[]>;
   }
 
   public async createAuthor(body: {
@@ -93,11 +93,11 @@ export class ApiClient {
     nameInBook?: string;
     classPeriod?: string;
   }): Promise<Author> {
-    return this.post('/api/author/author', body) as Promise<Author>;
+    return this.post('/api/author', body) as Promise<Author>;
   }
 
   public async getStoryDrafts(anthologyId: number) {
-    return this.get(`/api/story/anthology/${anthologyId}/story-drafts`) as Promise<
+    return this.get(`/api/stories/anthology/${anthologyId}/story-drafts`) as Promise<
       StoryDraft[]
     >;
   }
@@ -120,7 +120,7 @@ export class ApiClient {
       classPeriod?: string;
     },
   ): Promise<Author> {
-    return this.put(`/api/author/author/${authorId}`, body) as Promise<Author>;
+    return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
   }
 
   public async updateStoryDraft(
@@ -135,7 +135,7 @@ export class ApiClient {
       notes?: string[];
     },
   ): Promise<{ message: string }> {
-    return this.post(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
+    return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
       message: string;
     }>;
   }

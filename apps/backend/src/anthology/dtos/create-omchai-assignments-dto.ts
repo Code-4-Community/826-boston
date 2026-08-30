@@ -6,11 +6,11 @@ import { User } from '../../users/user.entity'; // Update the path based on your
 export class CreateOmchaiAssignmentsDto {
   @ApiProperty({ description: 'ID of the anthology' })
   @IsNumber()
-  anthology_id: number;
+  anthologyId: number;
 
   @ApiProperty({ description: 'Date that the user was assigned' })
   @IsDateString()
-  datetime_assigned: Date;
+  datetimeAssigned: Date;
 
   @ApiProperty({ description: 'Ids of owners of the anthology' })
   @IsArray()

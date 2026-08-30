@@ -17,7 +17,7 @@ import { AuthorService } from './author.service';
 import { Author } from './author.entity';
 import { CreateAuthorDto } from './dtos/create-author.dto';
 import { EditAuthorDto } from './dtos/edit-author.dto';
-import { Public, UserStatus } from 'src/auth/roles.decorator';
+import { Public } from 'src/auth/roles.decorator';
 
 @ApiTags('Author')
 @ApiBearerAuth()
@@ -33,7 +33,7 @@ export class AuthorController {
    * @returns author with given bio, name, and grade.
    */
   @ApiBearerAuth()
-  @Post('/author')
+  @Post()
   async createAuthor(
     @Body() createAuthorDto: CreateAuthorDto,
   ): Promise<Author> {
@@ -47,7 +47,7 @@ export class AuthorController {
    * @returns author with given id and updated fields
    */
   @ApiBearerAuth()
-  @Put('/author/:authorId')
+  @Put('/:authorId')
   async updateAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,
     @Body() editAuthorDto: EditAuthorDto,
@@ -61,7 +61,7 @@ export class AuthorController {
    * @returns author with given id
    */
   @Public()
-  @Get('/author/:authorId')
+  @Get('/:authorId')
   async getAuthor(@Param('authorId', ParseIntPipe) authorId: number) {
     return this.authorService.findOne(authorId);
   }
@@ -71,7 +71,7 @@ export class AuthorController {
    * @returns all authors in repository
    */
   @Public()
-  @Get('/author')
+  @Get()
   async getAuthors(): Promise<Author[]> {
     return this.authorService.findAll();
   }

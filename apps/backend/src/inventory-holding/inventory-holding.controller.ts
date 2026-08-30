@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { InventoryHoldingService } from './inventory-holding.service';
 import { CreateInventoryHoldingDto } from './dto/create-inventory-holding.dto';
 import { UpdateInventoryHoldingDto } from './dto/update-inventory-holding.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/roles.decorator';
 
+@ApiTags('Inventory Holding')
 @Controller('inventory-holding')
 export class InventoryHoldingController {
   constructor(
@@ -33,8 +35,8 @@ export class InventoryHoldingController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.inventoryHoldingService.findOne(+id);
+  findOne(@Param('anthidologyId', ParseIntPipe) id: number) {
+    return this.inventoryHoldingService.findOne(id);
   }
 
   @ApiBearerAuth()

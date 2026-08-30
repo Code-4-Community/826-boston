@@ -25,7 +25,7 @@ import { Public } from 'src/auth/roles.decorator';
 
 @ApiTags('Story')
 @ApiBearerAuth()
-@Controller('story')
+@Controller('stories')
 export class StoryController {
   constructor(
     private storyService: StoryService,
@@ -62,20 +62,17 @@ export class StoryController {
 
   @ApiBearerAuth()
   @Post('/library/anthology/:anthologyId/story')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new story in a specific anthology' })
-  @ApiResponse({
-    status: 201,
-    description: 'Story created successfully',
-    type: Story,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Anthology not found',
-  })
-  async createStory(@Body() createStoryDto: CreateStoryDto): Promise<Story> {
+  /**
+   * Create a new story in a specific anthology.
+   *
+   * @throws {NotFoundException} if the anthology or author does not exist.
+   */
+  async createStory(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Body() createStoryDto: CreateStoryDto,
+  ): Promise<Story> {
     const anthology = await this.anthologyService.findOne(
-      createStoryDto.anthologyId,
+      anthologyId
     );
     const author = await this.authorService.findOne(createStoryDto.authorId);
     if (!anthology || !author) {
@@ -83,7 +80,7 @@ export class StoryController {
     }
     return this.storyService.createStory(
       createStoryDto.title,
-      createStoryDto.anthologyId,
+      anthologyId,
       createStoryDto.authorId,
       createStoryDto.studentBio,
       createStoryDto.description,

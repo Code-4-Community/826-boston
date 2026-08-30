@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Put, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { OmchaiService } from './omchai.service';
 import { CreateOmchaiDto } from './dtos/create-omchai.dto';
 import { EditOmchaiDto } from './dtos/edit-omchai.dto';
 import { CreateOmchaiAssignmentsDto } from 'src/anthology/dtos/create-omchai-assignments-dto';
 import { OmchaiRole } from './omchai.entity';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Omchai')
 @Controller('omchai')
 export class OmchaiController {
   constructor(private readonly omchaiService: OmchaiService) {}
@@ -26,10 +35,10 @@ export class OmchaiController {
     function createOmchaiDtosByRole(userIds: number[], role: OmchaiRole) {
       userIds.forEach((userId) => {
         createOmchaiDtos.push({
-          anthologyId: createOmchaiAssignmentsDto.anthology_id,
+          anthologyId: createOmchaiAssignmentsDto.anthologyId,
           userId: userId,
           role: role,
-          datetimeAssigned: createOmchaiAssignmentsDto.datetime_assigned,
+          datetimeAssigned: createOmchaiAssignmentsDto.datetimeAssigned,
         });
       });
     }
@@ -67,13 +76,16 @@ export class OmchaiController {
 
   @ApiBearerAuth()
   @Get('anthology/:anthologyId')
-  findByAnthologyId(@Param('anthologyId') anthologyId: string) {
-    return this.omchaiService.findByAnthologyId(+anthologyId);
+  findByAnthologyId(@Param('anthologyId', ParseIntPipe) anthologyId: number) {
+    return this.omchaiService.findByAnthologyId(anthologyId);
   }
 
   @ApiBearerAuth()
   @Put(':id')
-  update(@Param('id') id: string, @Body() editOmchaiDto: EditOmchaiDto) {
-    return this.omchaiService.update(+id, editOmchaiDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() editOmchaiDto: EditOmchaiDto,
+  ) {
+    return this.omchaiService.update(id, editOmchaiDto);
   }
 }

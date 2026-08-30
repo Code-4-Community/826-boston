@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Body,
   Post,
+  Patch,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
@@ -45,7 +46,7 @@ export class StoryDraftController {
   }
 
   @ApiBearerAuth()
-  @Post('/:storyDraftId')
+  @Patch('/:storyDraftId')
   async editStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,
     @Body() updateStoryDraftDto: UpdateStoryDraftDto,

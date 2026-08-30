@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/roles.decorator';
 
+@ApiTags('Inventory')
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -31,22 +33,22 @@ export class InventoryController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.inventoryService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.inventoryService.findOne(id);
   }
 
   @ApiBearerAuth()
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateInventoryDto: UpdateInventoryDto,
   ) {
-    return this.inventoryService.update(+id, updateInventoryDto);
+    return this.inventoryService.update(id, updateInventoryDto);
   }
 
   @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.inventoryService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.inventoryService.remove(id);
   }
 }

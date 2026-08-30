@@ -3,6 +3,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   NotFoundException,
@@ -77,7 +78,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @UserStatus(Role.ADMIN)
-  @Post('/delete')
+  @Delete('/admin/users')
   async delete(@Body() body: DeleteUserDto): Promise<void> {
     const user = await this.usersService.findOne(body.userId);
 
