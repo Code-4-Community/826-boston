@@ -83,23 +83,16 @@ const ProjectPublicationView: React.FC = () => {
   const loadStoryDrafts = useCallback(async () => {
     if (!id) return;
     try {
-      const [drafts, authors] = await Promise.all([
-        apiClient.getStoryDrafts(Number(id)),
-        apiClient.getAuthors(),
-      ]);
-
-      const authorMap = new Map<number, Author>();
-      for (const author of authors) {
-        authorMap.set(author.id, author);
-      }
+      const drafts = await apiClient.getStoryDrafts(Number(id));
 
       setStoryDrafts(
         drafts.map((draft) => {
-          const author = authorMap.get(draft.authorId);
+          const author = draft.story?.author;
           const nameParts = author?.name?.split(' ') ?? [];
+
           return {
             storyDraftId: draft.id,
-            authorId: draft.authorId,
+            authorId: author?.id ?? 0,
             firstName: nameParts[0] ?? '',
             lastName: nameParts.slice(1).join(' '),
             nameInBook: author?.nameInBook ?? '',
@@ -110,7 +103,7 @@ const ProjectPublicationView: React.FC = () => {
             inManuscript: draft.inManuscript,
             editRound: draft.editRound,
             proofread: draft.proofread,
-            notes: draft.notes,
+            notes: draft.notes ?? [],
           };
         }),
       );

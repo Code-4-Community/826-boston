@@ -106,6 +106,7 @@ export class StoryDraftController {
       createStoryDraftDto.notes ?? [],
       createStoryDraftDto.storyId,
     );
+
     return { message: 'StoryDraft created successfully' };
   }
 

@@ -109,7 +109,22 @@ export class ApiClient {
     anthologyId: number;
     docLink: string;
   }): Promise<{ message: string }> {
-    return this.post('/api/story-drafts', body) as Promise<{
+    // NOTE: create story before story draft because story draft
+    // only keeps track of progress and story is main entity
+    const story = (await this.post(
+      `/api/stories/anthology/${body.anthologyId}`,
+      {
+        title: 'Untitled Story',
+        anthologyId: body.anthologyId,
+        authorId: body.authorId,
+        description: '',
+      },
+    )) as Story;
+
+    return this.post('/api/story-drafts', {
+      ...body,
+      storyId: story.id,
+    }) as Promise<{
       message: string;
     }>;
   }

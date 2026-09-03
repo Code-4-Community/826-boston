@@ -76,4 +76,39 @@ describe('StoryService', () => {
       });
     });
   });
+
+  describe('createStory', () => {
+    it('should create a story without a draft relation when no storyDraftId is passed', async () => {
+      const createdStory = {
+        id: 7,
+        title: 'Test story',
+        anthology: { id: 1 },
+        author: { id: 2 },
+        studentBio: 'Bio',
+        description: 'Desc',
+      } as Story;
+
+      mockRepository.create.mockReturnValue(createdStory);
+      mockRepository.save.mockResolvedValue(createdStory);
+
+      const result = await service.createStory(
+        'Test story',
+        1,
+        2,
+        'Bio',
+        'Desc',
+        'Theme'
+      );
+
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        title: 'Test story',
+        anthology: { id: 1 },
+        author: { id: 2 },
+        studentBio: 'Bio',
+        description: 'Desc',
+        theme: 'Theme',
+      });
+      expect(result).toEqual(createdStory);
+    });
+  });
 });

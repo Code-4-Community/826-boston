@@ -197,7 +197,7 @@ export class StoryController {
       },
     },
   })
-  @Post('/library/anthology/:anthologyId/story')
+  @Post('/anthology/:anthologyId')
   /**
    * Create a new story in a specific anthology.
    *
@@ -255,10 +255,17 @@ export class StoryController {
   async getStoryDraftsByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
   ) {
-    // get stories with given anthology id and map to get non-null story drafts
-    const stories = await this.getStoriesByAnthology(anthologyId);
+    const stories = await this.storyService.getStoriesByAnthology(anthologyId);
+
     return stories
-      .map((story) => story.storyDraft)
-      .filter((draft) => draft !== null);
+      .filter((story) => story.storyDraft)
+      .map((story) => ({
+        ...story.storyDraft,
+        story: {
+          id: story.id,
+          title: story.title,
+          author: story.author,
+        },
+      }));
   }
 }
