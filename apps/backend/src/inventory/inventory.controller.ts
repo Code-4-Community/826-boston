@@ -11,7 +11,15 @@ import {
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiCreatedResponse, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { Public } from 'src/auth/roles.decorator';
 
 @ApiTags('Inventory')
@@ -22,7 +30,8 @@ export class InventoryController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create a new inventory',
-    description: 'Creates a new inventory with provided details. Requires authentication.',
+    description:
+      'Creates a new inventory with provided details. Requires authentication.',
   })
   @ApiCreatedResponse({
     description: 'Inventory created successfully',
@@ -160,8 +169,7 @@ export class InventoryController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete an inventory',
-    description:
-      'Permanently removes an inventory. Requires authentication.',
+    description: 'Permanently removes an inventory. Requires authentication.',
   })
   @ApiOkResponse({
     description: 'Inventory deleted successfully',
