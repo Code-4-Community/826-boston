@@ -25,11 +25,6 @@ export class CreateStoryDto {
   @IsOptional()
   theme: string;
 
-  @ApiProperty({ description: 'ID of Anthology the story is in' })
-  @IsNumber()
-  @IsOptional()
-  anthologyId: number;
-
   @ApiProperty({ description: 'Author of story' })
   @IsNumber()
   authorId: number;

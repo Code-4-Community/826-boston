@@ -74,7 +74,9 @@ export class ApiClient {
   public async getStoriesByAnthology(
     anthologyId: string | number,
   ): Promise<Story[]> {
-    return this.get(`/api/story/anthology/${anthologyId}`) as Promise<Story[]>;
+    return this.get(`/api/stories/anthology/${anthologyId}`) as Promise<
+      Story[]
+    >;
   }
 
   public async filterSortAnthologies(
@@ -85,7 +87,7 @@ export class ApiClient {
   }
 
   public async getAuthors(): Promise<Author[]> {
-    return this.get('/api/author/author') as Promise<Author[]>;
+    return this.get('/api/author') as Promise<Author[]>;
   }
 
   public async createAuthor(body: {
@@ -93,13 +95,13 @@ export class ApiClient {
     nameInBook?: string;
     classPeriod?: string;
   }): Promise<Author> {
-    return this.post('/api/author/author', body) as Promise<Author>;
+    return this.post('/api/author', body) as Promise<Author>;
   }
 
   public async getStoryDrafts(anthologyId: number) {
-    return this.get(`/api/story/anthology/${anthologyId}/story-drafts`) as Promise<
-      StoryDraft[]
-    >;
+    return this.get(
+      `/api/stories/anthology/${anthologyId}/story-drafts`,
+    ) as Promise<StoryDraft[]>;
   }
 
   public async createStoryDraft(body: {
@@ -107,7 +109,22 @@ export class ApiClient {
     anthologyId: number;
     docLink: string;
   }): Promise<{ message: string }> {
-    return this.post('/api/story-drafts', body) as Promise<{
+    // NOTE: create story before story draft because story draft
+    // only keeps track of progress and story is main entity
+    const story = (await this.post(
+      `/api/stories/anthology/${body.anthologyId}`,
+      {
+        title: 'Untitled Story',
+        anthologyId: body.anthologyId,
+        authorId: body.authorId,
+        description: '',
+      },
+    )) as Story;
+
+    return this.post('/api/story-drafts', {
+      ...body,
+      storyId: story.id,
+    }) as Promise<{
       message: string;
     }>;
   }
@@ -120,7 +137,7 @@ export class ApiClient {
       classPeriod?: string;
     },
   ): Promise<Author> {
-    return this.put(`/api/author/author/${authorId}`, body) as Promise<Author>;
+    return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
   }
 
   public async updateStoryDraft(
@@ -135,7 +152,7 @@ export class ApiClient {
       notes?: string[];
     },
   ): Promise<{ message: string }> {
-    return this.post(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
+    return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
       message: string;
     }>;
   }

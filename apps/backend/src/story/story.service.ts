@@ -94,7 +94,9 @@ export class StoryService {
       studentBio,
       description,
       theme,
-      storyDraft: { id: storyDraftId } as StoryDraft,
+      ...(storyDraftId
+        ? { storyDraft: { id: storyDraftId } as StoryDraft }
+        : {}),
     });
 
     return this.repo.save(story);

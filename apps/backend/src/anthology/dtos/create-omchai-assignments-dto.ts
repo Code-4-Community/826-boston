@@ -1,16 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDateString, IsInt, IsNumber, IsObject, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsInt,
+  IsNumber,
+  IsObject,
+  IsString,
+} from 'class-validator';
 import { User } from '../../users/user.entity'; // Update the path based on your project structure
-
 
 export class CreateOmchaiAssignmentsDto {
   @ApiProperty({ description: 'ID of the anthology' })
   @IsNumber()
-  anthology_id: number;
+  anthologyId: number;
 
   @ApiProperty({ description: 'Date that the user was assigned' })
   @IsDateString()
-  datetime_assigned: Date;
+  datetimeAssigned: Date;
 
   @ApiProperty({ description: 'Ids of owners of the anthology' })
   @IsArray()

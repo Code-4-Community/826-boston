@@ -29,7 +29,9 @@ export async function seedOmchais(dataSource: DataSource) {
     const user = usersById.get(omchai.user_id);
 
     if (!user) {
-      console.log(`  - User with id not found: id=${omchai.user_id}, skipping omchai`);
+      console.log(
+        `  - User with id not found: id=${omchai.user_id}, skipping omchai`,
+      );
       continue;
     }
 

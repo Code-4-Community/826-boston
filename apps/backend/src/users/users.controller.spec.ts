@@ -77,7 +77,7 @@ describe('UsersController', () => {
     it('should remove a user', () => {
       mockUsersService.remove.mockReturnValue(mockUser);
 
-      const result = controller.removeUser('1');
+      const result = controller.removeUser(1);
 
       expect(service.remove).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockUser);

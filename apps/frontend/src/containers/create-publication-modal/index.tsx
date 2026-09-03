@@ -319,7 +319,7 @@ function Field({ label, required = false, children }: FieldProps) {
 export default function CreatePublicationModal({
   onClose,
   onSave,
-  setPublications
+  setPublications,
 }: CreatePublicationModalProps) {
   const [tab, setTab] = useState<0 | 1>(0);
   const [form, setForm] = useState<PublicationFormState>(INITIAL_FORM);
@@ -360,7 +360,10 @@ export default function CreatePublicationModal({
         createBatchOmchaiAssignmentsBody,
       );
 
-      setPublications((prev) => [...prev, { ...anthology, status: AnthologyStatus.DRAFT }]);
+      setPublications((prev) => [
+        ...prev,
+        { ...anthology, status: AnthologyStatus.DRAFT },
+      ]);
     } catch (err) {
       console.log(err);
     }

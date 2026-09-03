@@ -13,7 +13,8 @@ import { AwsS3Module } from '../aws/aws-s3.module';
   imports: [
     TypeOrmModule.forFeature([Anthology]),
     AuthModule,
-    UsersModule, OmchaiModule,
+    UsersModule,
+    OmchaiModule,
     AwsS3Module,
   ],
   controllers: [AnthologyController],

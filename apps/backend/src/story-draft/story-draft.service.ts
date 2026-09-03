@@ -46,6 +46,7 @@ export class StoryDraftService {
     notes?: string[],
   ) {
     const storyDraft = await this.repo.findOne({ where: { id: storyDraftId } });
+
     if (!storyDraft) {
       throw new NotFoundException(`StoryDraft id ${storyDraftId} not found`);
     }
