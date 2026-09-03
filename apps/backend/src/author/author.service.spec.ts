@@ -116,7 +116,7 @@ describe('AuthorService', () => {
 
     it('should raise not found exception when author not found', async () => {
       mockRepository.findOneBy.mockResolvedValue(null);
-      
+
       await expect(service.findOne(999)).rejects.toThrow(
         new NotFoundException('Author not found'),
       );

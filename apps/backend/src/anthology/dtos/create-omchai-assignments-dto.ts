@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDateString, IsInt, IsNumber, IsObject, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsInt,
+  IsNumber,
+  IsObject,
+  IsString,
+} from 'class-validator';
 import { User } from '../../users/user.entity'; // Update the path based on your project structure
-
 
 export class CreateOmchaiAssignmentsDto {
   @ApiProperty({ description: 'ID of the anthology' })

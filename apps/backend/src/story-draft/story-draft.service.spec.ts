@@ -5,7 +5,6 @@ import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
 import { StoryDraft } from './story-draft.entity';
 
-
 describe('StoryDraftService', () => {
   let service: StoryDraftService;
 

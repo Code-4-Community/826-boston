@@ -138,8 +138,8 @@ describe('UsersService', () => {
         id: 1,
         role: OmchaiRole.OWNER,
         datetimeAssigned: new Date(),
-        user: {id: 1} as User,
-        anthology: {id: 1} as Anthology,
+        user: { id: 1 } as User,
+        anthology: { id: 1 } as Anthology,
       };
 
       const userWithOneOmchai = {

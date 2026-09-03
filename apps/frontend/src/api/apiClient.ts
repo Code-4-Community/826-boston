@@ -74,7 +74,9 @@ export class ApiClient {
   public async getStoriesByAnthology(
     anthologyId: string | number,
   ): Promise<Story[]> {
-    return this.get(`/api/stories/anthology/${anthologyId}`) as Promise<Story[]>;
+    return this.get(`/api/stories/anthology/${anthologyId}`) as Promise<
+      Story[]
+    >;
   }
 
   public async filterSortAnthologies(
@@ -97,9 +99,9 @@ export class ApiClient {
   }
 
   public async getStoryDrafts(anthologyId: number) {
-    return this.get(`/api/stories/anthology/${anthologyId}/story-drafts`) as Promise<
-      StoryDraft[]
-    >;
+    return this.get(
+      `/api/stories/anthology/${anthologyId}/story-drafts`,
+    ) as Promise<StoryDraft[]>;
   }
 
   public async createStoryDraft(body: {

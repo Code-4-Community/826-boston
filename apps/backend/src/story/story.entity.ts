@@ -19,19 +19,18 @@ export class Story {
   @Column()
   title: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   description?: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   studentBio?: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   theme?: string;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.stories)
   @JoinColumn({ name: 'anthology_id' })
   anthology: Relation<Anthology>;
-
 
   @ManyToOne(() => Author, (author) => author.stories)
   @JoinColumn({ name: 'author_id' })

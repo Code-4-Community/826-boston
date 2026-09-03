@@ -12,7 +12,15 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { AuthorService } from './author.service';
 import { Author } from './author.entity';
 import { CreateAuthorDto } from './dtos/create-author.dto';
@@ -20,19 +28,41 @@ import { EditAuthorDto } from './dtos/edit-author.dto';
 import { Public } from 'src/auth/roles.decorator';
 
 @ApiTags('Author')
-@ApiBearerAuth()
 @Controller('author')
 @UseGuards(AuthGuard('jwt'))
 @UseInterceptors(CurrentUserInterceptor)
 export class AuthorController {
   constructor(private authorService: AuthorService) {}
 
-  /**
-   * Create author with bio, name, and grade.
-   * @param createAuthorDto frontend author data
-   * @returns author with given bio, name, and grade.
-   */
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create a new author',
+    description:
+      'Creates a new author with provided bio, name, and grade information. Requires authentication.',
+  })
+  @ApiCreatedResponse({
+    description: 'Author created successfully',
+    schema: {
+      example: {
+        id: 42,
+        name: 'Jane Doe',
+        bio: 'A young writer from Boston',
+        grade: '10th Grade',
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T10:30:00Z',
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid author data provided',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'Name is required',
+        error: 'Bad Request',
+      },
+    },
+  })
   @Post()
   async createAuthor(
     @Body() createAuthorDto: CreateAuthorDto,
@@ -40,13 +70,46 @@ export class AuthorController {
     return this.authorService.create(createAuthorDto);
   }
 
-  /**
-   * Update author with given id.
-   * @param authorId author id
-   * @param editAuthorDto bio, name, and/or grade of author that is being updated
-   * @returns author with given id and updated fields
-   */
+
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update an author',
+    description:
+      'Partially updates an author with new bio, name, and/or grade information. Requires authentication.',
+  })
+  @ApiOkResponse({
+    description: 'Author updated successfully',
+    schema: {
+      example: {
+        id: 42,
+        name: 'Jane Doe Updated',
+        bio: 'An experienced writer from Boston',
+        grade: '11th Grade',
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T11:00:00Z',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Author not found with the provided ID',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Author with ID 999 not found',
+        error: 'Not Found',
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid update data provided',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'Invalid grade format',
+        error: 'Bad Request',
+      },
+    },
+  })
   @Put('/:authorId')
   async updateAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,
@@ -55,33 +118,93 @@ export class AuthorController {
     return this.authorService.update(authorId, editAuthorDto);
   }
 
-  /**
-   * Get author with given id.
-   * @param authorId id of author
-   * @returns author with given id
-   */
+
   @Public()
+  @ApiOperation({
+    summary: 'Get an author by ID',
+    description: 'Retrieves a single author by their ID.',
+  })
+  @ApiOkResponse({
+    description: 'Author retrieved successfully',
+    schema: {
+      example: {
+        id: 42,
+        name: 'Jane Doe',
+        bio: 'A young writer from Boston',
+        grade: '10th Grade',
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T10:30:00Z',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Author not found with the provided ID',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Author with ID 999 not found',
+        error: 'Not Found',
+      },
+    },
+  })
   @Get('/:authorId')
   async getAuthor(@Param('authorId', ParseIntPipe) authorId: number) {
     return this.authorService.findOne(authorId);
   }
 
-  /**
-   * Get all authors.
-   * @returns all authors in repository
-   */
   @Public()
+  @ApiOperation({
+    summary: 'Get all authors',
+    description: 'Retrieves a list of all authors in the system.',
+  })
+  @ApiOkResponse({
+    description: 'Authors retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: 42,
+          name: 'Jane Doe',
+          bio: 'A young writer from Boston',
+          grade: '10th Grade',
+          createdAt: '2024-01-15T10:30:00Z',
+          updatedAt: '2024-01-15T10:30:00Z',
+        },
+      ],
+    },
+  })
   @Get()
   async getAuthors(): Promise<Author[]> {
     return this.authorService.findAll();
   }
 
-  /**
-   * Remove author with given id.
-   * @param authorId id of author to remove
-   * @returns removed author
-   */
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete an author',
+    description: 'Permanently removes an author. Requires authentication.',
+  })
+  @ApiOkResponse({
+    description: 'Author deleted successfully',
+    schema: {
+      example: {
+        id: 42,
+        name: 'Jane Doe',
+        bio: 'A young writer from Boston',
+        grade: '10th Grade',
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T10:30:00Z',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Author not found with the provided ID',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Author with ID 999 not found',
+        error: 'Not Found',
+      },
+    },
+  })
   @Delete('/:authorId')
   async removeAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,

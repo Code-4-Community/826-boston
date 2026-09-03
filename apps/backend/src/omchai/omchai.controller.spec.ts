@@ -49,7 +49,6 @@ describe('OmchaiController', () => {
 
   describe('create', () => {
     it('should create an omchai', () => {
-      
       mockOmchaiService.create.mockReturnValue('created');
 
       const result = controller.create(omchaiDto1);
@@ -76,7 +75,7 @@ describe('OmchaiController', () => {
         'omchai for anthology',
       );
 
-      const result = controller.findByAnthologyId('1');
+      const result = controller.findByAnthologyId(1);
 
       expect(service.findByAnthologyId).toHaveBeenCalledWith(1);
       expect(result).toBe('omchai for anthology');
@@ -90,7 +89,7 @@ describe('OmchaiController', () => {
       };
       mockOmchaiService.update.mockReturnValue('updated');
 
-      const result = controller.update('1', dto);
+      const result = controller.update(1, dto);
 
       expect(service.update).toHaveBeenCalledWith(1, dto);
       expect(result).toBe('updated');

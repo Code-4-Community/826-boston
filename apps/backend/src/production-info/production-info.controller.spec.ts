@@ -12,7 +12,7 @@ describe('ProductionInfoController', () => {
 
   const mockProductionInfo: ProductionInfo = {
     id: 0,
-    anthology: {id: 1} as Anthology
+    anthology: { id: 1 } as Anthology,
   };
 
   const mockService = {

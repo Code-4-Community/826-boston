@@ -8,8 +8,10 @@ import { Author } from 'src/author/author.entity';
 
 export const storyExample = {
   title: 'Standing at the Threshold',
-  description: 'A reflection on crossing borders — geographic, cultural, and emotional — and what it means to build a new home while carrying the old one.',
-  studentBio: 'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
+  description:
+    'A reflection on crossing borders — geographic, cultural, and emotional — and what it means to build a new home while carrying the old one.',
+  studentBio:
+    'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
   theme: 'Immigration and Belonging',
   anthology_id: 1,
   author_id: 1,
@@ -62,12 +64,14 @@ describe('StoryService', () => {
       const result1 = await service.getStoriesByAnthology(999);
       expect(result1).toEqual([storyExample]);
       expect(mockRepository.find).toHaveBeenCalledWith({
+        relations: ['storyDraft', 'author', 'anthology'],
         where: { anthology: { id: 999 } },
       });
 
       const result2 = await service.getStoriesByAnthology(1);
       expect(result2).toEqual([]);
       expect(mockRepository.find).toHaveBeenCalledWith({
+        relations: ['storyDraft', 'author', 'anthology'],
         where: { anthology: { id: 1 } },
       });
     });
