@@ -7,6 +7,7 @@ import {
   CreateBatchOmchaiAssignmentsDto,
   EditRound,
   OmchaiEntry,
+  ProductionInfo,
   Story,
   StoryDraft,
   SubmissionRound,
@@ -96,6 +97,18 @@ export class ApiClient {
     classPeriod?: string;
   }): Promise<Author> {
     return this.post('/api/author', body) as Promise<Author>;
+  }
+
+  public async getProductionInfo(
+    anthologyId: number,
+  ): Promise<ProductionInfo | null> {
+    try {
+      return (await this.get(
+        `/api/production-info/${anthologyId}`,
+      )) as ProductionInfo;
+    } catch {
+      return null;
+    }
   }
 
   public async getStoryDrafts(anthologyId: number) {

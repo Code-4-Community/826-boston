@@ -8,11 +8,12 @@ import EditStoryDraftModal, {
   EditableStoryDraft,
 } from './edit-story-draft-modal';
 import OmchaiView from './omchai-view';
+import ProductionInfoView from './production-info-view';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
 
-type Tab = 'omchai' | 'document-tracker';
+type Tab = 'omchai' | 'document-tracker' | 'production-info';
 
 interface StoryDraftRow {
   storyDraftId: number;
@@ -199,6 +200,15 @@ const ProjectPublicationView: React.FC = () => {
           >
             Document Tracker
           </button>
+          <button
+            type="button"
+            className={`publication-tab${
+              activeTab === 'production-info' ? ' publication-tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('production-info')}
+          >
+            Production Info
+          </button>
         </div>
 
         {activeTab === 'omchai' && (
@@ -274,6 +284,12 @@ const ProjectPublicationView: React.FC = () => {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {activeTab === 'production-info' && (
+          <div className="ppv-tab-content">
+            <ProductionInfoView anthologyId={anthology.id} />
           </div>
         )}
       </div>

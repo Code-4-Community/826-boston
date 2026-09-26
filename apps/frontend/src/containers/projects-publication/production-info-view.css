@@ -1,0 +1,28 @@
+.production-info-loading,
+.production-info-empty {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--neutral-400);
+  padding: 24px 0;
+}
+
+.production-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.production-info-table th,
+.production-info-table td {
+  text-align: left;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--neutral-300);
+  color: var(--neutral-600);
+}
+
+.production-info-table th {
+  width: 260px;
+  font-weight: 700;
+  background-color: var(--neutral-200);
+}
