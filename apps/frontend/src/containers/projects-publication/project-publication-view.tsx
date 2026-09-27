@@ -289,7 +289,11 @@ const ProjectPublicationView: React.FC = () => {
 
         {activeTab === 'production-info' && (
           <div className="ppv-tab-content">
-            <ProductionInfoView anthologyId={anthology.id} />
+            <ProductionInfoView
+              anthologyId={anthology.id}
+              shopifyUrl={anthology.shopify_url || anthology.shopifyUrl}
+              isbn={anthology.isbn}
+            />
           </div>
         )}
       </div>
