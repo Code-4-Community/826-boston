@@ -151,6 +151,7 @@ export interface Anthology {
   themes?: string[];
   isbn?: string;
   shopify_url?: string;
+  shopifyUrl?: string;
   subtitle?: string;
   byline?: string;
 }

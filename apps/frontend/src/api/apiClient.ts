@@ -26,16 +26,26 @@ export interface FilterSortAnthologyBody {
 const defaultBaseUrl =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
-/** Backend returns camelCase (`photoUrl`); UI expects `photo_url` in several places. */
+/** Backend returns camelCase (`photoUrl`, `shopifyUrl`); UI expects the snake_case
+ *  variants in several places, so both keys are populated on the returned object. */
 function normalizeAnthology(raw: unknown): Anthology {
   if (!raw || typeof raw !== 'object') {
     return raw as Anthology;
   }
   const o = raw as Record<string, unknown>;
-  const url =
+  const photoUrl =
     (typeof o.photo_url === 'string' ? o.photo_url : undefined) ??
     (typeof o.photoUrl === 'string' ? o.photoUrl : undefined);
-  return { ...(o as unknown as Anthology), photo_url: url, photoUrl: url };
+  const shopifyUrl =
+    (typeof o.shopify_url === 'string' ? o.shopify_url : undefined) ??
+    (typeof o.shopifyUrl === 'string' ? o.shopifyUrl : undefined);
+  return {
+    ...(o as unknown as Anthology),
+    photo_url: photoUrl,
+    photoUrl: photoUrl,
+    shopify_url: shopifyUrl,
+    shopifyUrl: shopifyUrl,
+  };
 }
 
 function normalizeAnthologies(raw: unknown): Anthology[] {
