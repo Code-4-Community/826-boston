@@ -104,14 +104,73 @@ const formFields = {
   },
 };
 
-const Login: React.FC = () => {
-  const navigate = useNavigate();
-  const { route, toSignUp } = useAuthenticator((context) => [
+interface FooterLinkProps {
+  text: string;
+  link: string;
+  onClick: () => void;
+}
+
+const FooterLink: React.FC<FooterLinkProps> = ({ text, link, onClick }) => (
+  <View className="auth-footer-link">
+    <Text>{text}</Text>
+    <Button variation="link" onClick={onClick}>
+      {link}
+    </Button>
+  </View>
+);
+
+const AuthFooter: React.FC = () => {
+  const { route, toSignIn, toSignUp } = useAuthenticator((context) => [
     context.route,
     context.toSignIn,
     context.toSignUp,
   ]);
-  const isSignUp = route === 'signUp';
+
+  let footerLinks: React.ReactNode;
+  switch (route) {
+    case 'signIn':
+      footerLinks = (
+        <FooterLink
+          text="Don't have an account?"
+          link="Register here."
+          onClick={toSignUp}
+        />
+      );
+      break;
+
+    case 'signUp':
+      footerLinks = (
+        <FooterLink
+          text="Have an account?"
+          link="Log in here."
+          onClick={toSignIn}
+        />
+      );
+      break;
+
+    case 'forgotPassword':
+      footerLinks = (
+        <>
+          <FooterLink
+            text="Remember your password?"
+            link="Log in here."
+            onClick={toSignIn}
+          />
+          <FooterLink
+            text="Don't have an account?"
+            link="Register here."
+            onClick={toSignUp}
+          />
+        </>
+      );
+      break;
+  }
+
+  return <View className="auth-footer">{footerLinks}</View>;
+};
+
+const Login: React.FC = () => {
+  const navigate = useNavigate();
 
   return (
     <div className="auth-container">
@@ -153,12 +212,7 @@ const Login: React.FC = () => {
             return <></>;
           }}
         </Authenticator>
-        <View className="auth-register-here">
-          <Text>Don't have an account?</Text>
-          <Button variation="link" onClick={toSignUp}>
-            Register here.
-          </Button>
-        </View>
+        <AuthFooter />
       </ThemeProvider>
     </div>
   );

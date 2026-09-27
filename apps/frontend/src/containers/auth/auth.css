@@ -137,13 +137,21 @@
     gap: 12px;
 }
 
-/* Style register here */
-.auth-register-here {
+/* Style footer */
+.auth-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+/* Style links in the footer */
+.auth-footer-link {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 4px;
-    margin-top: 20px;
     font-size: 14px;
     --amplify-components-text-color: var(--neutral-400);
     --amplify-components-button-font-size: 14px;
@@ -159,6 +167,6 @@
     --amplify-components-button-link-active-color: #e85100;
     --amplify-components-button-link-active-background-color: transparent;
 }
-.auth-register-here .amplify-button--link:hover {
+.auth-footer-link .amplify-button--link:hover {
     text-decoration: underline;
 }
