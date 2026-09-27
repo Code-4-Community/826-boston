@@ -45,6 +45,9 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
+  // TODO: temporary fix outside the scope of my ticket
+  // necessary to allow commits because this broke typechecking
+  story?: Story;
 }
 
 export interface Story {
