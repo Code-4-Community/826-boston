@@ -121,6 +121,30 @@ export class ApiClient {
     }
   }
 
+  public async createProductionInfo(
+    body: Partial<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
+  ): Promise<ProductionInfo> {
+    return this.post('/api/production-info', body) as Promise<ProductionInfo>;
+  }
+
+  public async updateProductionInfo(
+    id: number,
+    body: Partial<Omit<ProductionInfo, 'id'>>,
+  ): Promise<ProductionInfo> {
+    return this.put(
+      `/api/production-info/${id}`,
+      body,
+    ) as Promise<ProductionInfo>;
+  }
+
+  public async updateAnthology(
+    id: number,
+    body: Partial<{ shopify_url: string; isbn: string }>,
+  ): Promise<Anthology> {
+    const data = await this.patch(`/api/anthologies/${id}`, body);
+    return normalizeAnthology(data);
+  }
+
   public async getStoryDrafts(anthologyId: number) {
     return this.get(
       `/api/stories/anthology/${anthologyId}/story-drafts`,
