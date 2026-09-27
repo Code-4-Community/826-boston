@@ -31,32 +31,53 @@ const ProductionInfoView: React.FC<Props> = ({
 
   if (loading) return <div className="production-info-loading">Loading...</div>;
 
-  const rows: { label: string; value: React.ReactNode }[] = [
+  const rows: {
+    label: string;
+    value: React.ReactNode | null;
+    placeholder: string;
+  }[] = [
     {
       label: 'Shopify URL',
+      placeholder: 'Add URL.',
       value: shopifyUrl ? (
         <a href={shopifyUrl} target="_blank" rel="noreferrer">
           {shopifyUrl}
         </a>
-      ) : (
-        '—'
-      ),
+      ) : null,
     },
-    { label: 'Printer', value: productionInfo?.printed_by ?? '—' },
-    { label: 'Binding Type', value: productionInfo?.binding_type ?? '—' },
-    { label: 'Book Dimensions', value: productionInfo?.dimensions ?? '—' },
+    {
+      label: 'Printer',
+      placeholder: 'Add printer.',
+      value: productionInfo?.printed_by ?? null,
+    },
+    {
+      label: 'Binding Type',
+      placeholder: 'Add binding type.',
+      value: productionInfo?.binding_type ?? null,
+    },
+    {
+      label: 'Book Dimensions',
+      placeholder: 'Add book dimensions.',
+      value: productionInfo?.dimensions ?? null,
+    },
     {
       label: '# of Copies Printed',
-      value: productionInfo?.print_run ?? '—',
+      placeholder: 'Add # of copies.',
+      value: productionInfo?.print_run ?? null,
     },
     {
       label: 'Total Printing Cost',
+      placeholder: 'Add printing cost.',
       value:
         productionInfo?.printing_cost != null
           ? `$${productionInfo.printing_cost.toFixed(2)}`
-          : '—',
+          : null,
     },
-    { label: 'ISBN', value: isbn ?? '—' },
+    {
+      label: 'ISBN',
+      placeholder: 'Add ISBN.',
+      value: isbn ?? null,
+    },
   ];
 
   return (
@@ -71,7 +92,15 @@ const ProductionInfoView: React.FC<Props> = ({
           {rows.map((row) => (
             <tr key={row.label}>
               <th>{row.label}</th>
-              <td>{row.value}</td>
+              <td>
+                {row.value != null ? (
+                  row.value
+                ) : (
+                  <span className="production-info-placeholder">
+                    {row.placeholder}
+                  </span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
