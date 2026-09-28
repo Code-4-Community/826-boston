@@ -11,6 +11,8 @@ interface User {
 
   title: string;
 
+  pronouns?: string | null;
+
   role: Role;
 }
 
