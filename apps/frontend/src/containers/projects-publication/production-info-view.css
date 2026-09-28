@@ -1,5 +1,4 @@
-.production-info-loading,
-.production-info-empty {
+.production-info-loading {
   font-family: var(--font-body);
   font-size: 14px;
   color: var(--neutral-400);

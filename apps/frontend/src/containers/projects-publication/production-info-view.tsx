@@ -233,11 +233,6 @@ const ProductionInfoView: React.FC<Props> = ({
 
   return (
     <div>
-      {!productionInfo && (
-        <p className="production-info-empty">
-          No production info has been added for this anthology yet.
-        </p>
-      )}
       <table className="production-info-table">
         <tbody>
           {rows.map((row) => (
