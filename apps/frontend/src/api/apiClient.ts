@@ -165,6 +165,10 @@ export class ApiClient {
     >;
   }
 
+  public async getOmchaiByUser(userId: number): Promise<OmchaiEntry[]> {
+    return this.get(`/api/omchai/user/${userId}`) as Promise<OmchaiEntry[]>;
+  }
+
   public async uploadAnthologyCoverImage(
     anthologyId: number,
     file: File,

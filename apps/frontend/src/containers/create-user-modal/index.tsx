@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Role from '@api/dtos/role';
-import '../create-publication-modal/styles.css';
+import SearchIcon from '../../assets/icons/search.svg';
+import '../people/people.css';
 
 interface CreateUserFormState {
   firstName: string;
@@ -13,6 +14,7 @@ interface CreateUserFormState {
 interface CreateUserModalProps {
   onClose: () => void;
   onSave: (form: CreateUserFormState) => void;
+  positions: string[];
 }
 
 interface FieldProps {
@@ -25,7 +27,7 @@ function Field({ label, required = false, children }: FieldProps) {
   return (
     <div className="field">
       <label className="field__label">
-        {label} {required && <span className="field__required"></span>}
+        {label} {required && <span className="field__required">*</span>}
       </label>
       {children}
     </div>
@@ -43,8 +45,12 @@ const INITIAL_FORM: CreateUserFormState = {
 export default function CreateUserModal({
   onClose,
   onSave,
+  positions,
 }: CreateUserModalProps) {
   const [form, setForm] = useState<CreateUserFormState>(INITIAL_FORM);
+  const [positionSearch, setPositionSearch] = useState('');
+  const [positionOpen, setPositionOpen] = useState(false);
+  const positionRef = useRef<HTMLDivElement>(null);
 
   const set = <K extends keyof CreateUserFormState>(
     k: K,
@@ -60,32 +66,60 @@ export default function CreateUserModal({
     form.title.trim().length > 0 &&
     form.role !== '';
 
+  const filteredPositions = useMemo(() => {
+    const query = positionSearch.trim().toLowerCase();
+    return positions.filter((position) =>
+      position.toLowerCase().includes(query),
+    );
+  }, [positionSearch, positions]);
+
+  useEffect(() => {
+    const handleOutsidePointerDown = (event: PointerEvent) => {
+      if (!positionRef.current?.contains(event.target as Node)) {
+        setPositionOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsidePointerDown);
+    return () =>
+      document.removeEventListener('pointerdown', handleOutsidePointerDown);
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPositionOpen(false);
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
+
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <div className="modal__header">
-          <div className="modal__header-row">
-            <h1 className="modal__title">Create User</h1>
-            <button className="modal__close" onClick={onClose}>
+      <div className="people-modal">
+        <div className="people-modal__header">
+          <div className="people-modal__header-row">
+            <h1 className="people-modal__title">Add a member</h1>
+            <button className="people-modal__close" onClick={onClose}>
               ×
             </button>
           </div>
         </div>
 
-        <div className="modal__body">
-          <Field label="First Name" required>
+        <div className="people-modal__body">
+          <Field label="First name" required>
             <input
               className="input"
-              placeholder="Enter first name"
+              placeholder="Title"
               value={form.firstName}
               onChange={(e) => set('firstName', e.target.value)}
             />
           </Field>
 
-          <Field label="Last Name" required>
+          <Field label="Last name" required>
             <input
               className="input"
-              placeholder="Enter last name"
+              placeholder="Last name"
               value={form.lastName}
               onChange={(e) => set('lastName', e.target.value)}
             />
@@ -100,23 +134,50 @@ export default function CreateUserModal({
               onChange={(e) => set('email', e.target.value)}
             />
           </Field>
-          <Field label="Title" required>
-            <input
-              className="input"
-              placeholder="Enter title"
-              value={form.title}
-              onChange={(e) => set('title', e.target.value)}
-            />
+          <Field label="Position">
+            <div className="people-modal__position" ref={positionRef}>
+              <div className="people-modal__position-control">
+                <input
+                  className="people-modal__position-input"
+                  placeholder="Search for a position..."
+                  value={positionSearch || form.title}
+                  onFocus={() => setPositionOpen(true)}
+                  onChange={(event) => {
+                    setPositionSearch(event.target.value);
+                    if (event.target.value !== form.title) set('title', '');
+                    setPositionOpen(true);
+                  }}
+                />
+                <img src={SearchIcon} alt="" />
+              </div>
+              {positionOpen && (
+                <div className="people-modal__position-options">
+                  {filteredPositions.map((position) => (
+                    <button
+                      type="button"
+                      key={position}
+                      onClick={() => {
+                        set('title', position);
+                        setPositionSearch(position);
+                        setPositionOpen(false);
+                      }}
+                    >
+                      {position}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </Field>
 
-          <Field label="Status" required>
+          <Field label="Admin rights" required>
             <select
               className="input input--select"
               value={form.role}
               onChange={(e) => set('role', e.target.value as Role)}
             >
               <option value="" disabled>
-                Select a status
+                Select an option
               </option>
               <option value={Role.ADMIN}>Admin</option>
               <option value={Role.STANDARD}>Standard</option>
@@ -124,14 +185,17 @@ export default function CreateUserModal({
           </Field>
         </div>
 
-        <div className="modal__footer">
-          <div className="modal__footer-right">
+        <div className="people-modal__footer">
+          <div className="people-modal__footer-right">
+            <button className="people-modal__cancel" onClick={onClose}>
+              Cancel
+            </button>
             <button
-              className="btn btn--primary"
+              className="people-modal__add"
               onClick={() => onSave(form)}
               disabled={!isValid}
             >
-              Create User
+              Add
             </button>
           </div>
         </div>

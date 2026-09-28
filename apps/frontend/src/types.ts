@@ -45,6 +45,7 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
+  story?: Story;
 }
 
 export interface Story {
@@ -129,6 +130,7 @@ export interface OmchaiEntry {
   role: OmchaiRole;
   datetimeAssigned: string;
   user: OmchaiUser;
+  anthology?: Anthology;
 }
 
 export interface Anthology {
@@ -148,6 +150,8 @@ export interface Anthology {
   shopify_url?: string;
   subtitle?: string;
   byline?: string;
+  publishedDate?: string;
+  stories?: Story[];
 }
 
 export interface CreateAnthologyDto {
