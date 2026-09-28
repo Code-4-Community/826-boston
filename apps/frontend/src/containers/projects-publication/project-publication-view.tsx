@@ -207,7 +207,7 @@ const ProjectPublicationView: React.FC = () => {
             }`}
             onClick={() => setActiveTab('production-info')}
           >
-            Production Info
+            Production & Distribution
           </button>
         </div>
 
