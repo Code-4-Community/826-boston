@@ -18,21 +18,29 @@ export class ProductionInfoService {
   async create(
     createProductionInfoDto: CreateProductionInfoDto,
   ): Promise<ProductionInfo> {
+    const { anthology_id, ...productionInfoFields } = createProductionInfoDto;
+
     const anthology = await this.anthologyRepository.findOne({
-      where: { id: createProductionInfoDto.anthology_id },
+      where: { id: anthology_id },
     });
 
     if (!anthology) {
       throw new NotFoundException(
-        `Anthology with ID ${createProductionInfoDto.anthology_id} not found`,
+        `Anthology with ID ${anthology_id} not found`,
       );
     }
 
-    const productionInfo = this.productionInfoRepository.create({
-      ...createProductionInfoDto,
-    });
+    const productionInfo = await this.productionInfoRepository.save(
+      this.productionInfoRepository.create(productionInfoFields),
+    );
 
-    return this.productionInfoRepository.save(productionInfo);
+    // ProductionInfo is the inverse side of this relation. Anthology owns the
+    // foreign key column, so the link is only persisted by saving the anthology.
+    anthology.productionInfo = productionInfo;
+    await this.anthologyRepository.save(anthology);
+
+    productionInfo.anthology = anthology;
+    return productionInfo;
   }
 
   async findAll(): Promise<ProductionInfo[]> {
