@@ -39,7 +39,6 @@ export class ProductionInfoService {
     anthology.productionInfo = productionInfo;
     await this.anthologyRepository.save(anthology);
 
-    productionInfo.anthology = anthology;
     return productionInfo;
   }
 
