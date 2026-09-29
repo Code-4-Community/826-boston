@@ -7,67 +7,43 @@
   padding: 20px;
 }
 
-.auth-greeting {
-    text-align: center;
-    margin: 0 0 4px;
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--neutral-400);
-}
-
-.auth-heading {
-    text-align: center;
-    margin: 0 0 24px;
-    font-family: var(--font-heading);
-    font-size: 24px;
-    font-weight: 800;
-    color: #000000;
-}
-
 /* Amplify Theme Overrides */
 [data-amplify-theme] {
   /* Colors */
-  --amplify-colors-font-primary: var(--neutral-600);
-  --amplify-colors-font-secondary: var(--neutral-400);
+  --amplify-colors-brand-primary-80: #008566;
+  --amplify-colors-brand-primary-90: #006d54;
+  --amplify-colors-brand-primary-100: #006d54;
+  --amplify-colors-font-primary: #3b3330; /* neutral-600 */
+  --amplify-colors-font-secondary: #938b88; /* neutral-400 */
   
   /* Fonts */
   --amplify-fonts-default-variable: 'Open Sans', sans-serif;
   --amplify-fonts-heading: 'Roboto', sans-serif;
 
   /* Components - Router (Card) */
-  --amplify-components-authenticator-router-box-shadow: none;
+  --amplify-components-authenticator-router-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   --amplify-components-authenticator-router-border-width: 0;
-  --amplify-components-authenticator-form-padding: 0;
-  --amplify-components-authenticator-router-background-color: transparent;
+  --amplify-components-authenticator-router-background-color: #F3EEEA;
   
   /* Form Fields */
-  --amplify-components-field-label-color: #000;
+  --amplify-components-field-label-color: #938b88; /* neutral-400 */
   --amplify-components-field-control-border-color: transparent;
+  --amplify-components-field-control-border-radius: 8px;
+  --amplify-components-field-control-padding-block: 12px;
+  --amplify-components-field-control-padding-inline: 16px;
   --amplify-components-field-control-background-color: #FFFFFF;
-  --amplify-components-fieldcontrol-focus-border-color: var(--accent-500);
-  --amplify-components-fieldcontrol-focus-box-shadow: none;
-  .amplify-label {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    }
 
   /* Button */
   --amplify-components-button-border-radius: 8px;
-  --amplify-components-button-primary-background-color: var(--accent-500);
-  --amplify-components-button-primary-hover-background-color: #c77a07; /* Randomly chosen color for now since Figma didn't cover hover */
-  --amplify-components-button-primary-focus-background-color: var(--accent-500);
-  --amplify-components-button-primary-focus-box-shadow: none;
-  --amplify-components-button-primary-active-background-color: var(--accent-500);
-  --amplify-components-button-link-focus-background-color: transparent;
-  --amplify-components-button-link-focus-box-shadow: none;
-  --amplify-components-button-link-color: var(--accent-500);
+  --amplify-components-button-primary-background-color: #008566;
+  --amplify-components-button-primary-color: #FFFFFF;
 }
 
 /* Specific styling for the Authenticator Card */
-[data-amplify-authenticator] [data-amplify-container] {
+[data-amplify-authenticator] [data-amplify-router] {
     background-color: #F3EEEA;
     border-radius: 8px;
-    padding: 64px 32px;
+    padding: 0; /* Let internal padding handle spacing if possible, or adjust */
 }
 
 /* Remove default tabs if present (we only show one state usually) */
@@ -77,96 +53,16 @@
 
 /* Style form inputs */
 .amplify-input {
-    background-color: var(--amplify-components-field-control-background-color);
-    border-color: var(--amplify-components-field-control-border-color);
+    background-color: #ffffff;
+    border: 1px solid transparent;
+}
+.amplify-input:focus {
+    border-color: var(--accent-500);
+    box-shadow: none;
 }
 
-/* Style password visibility toggle */
-.amplify-field__show-password {
-  --amplify-components-button-background-color: var(
-    --amplify-components-field-control-background-color
-  );
-  --amplify-components-button-border-color: var(
-    --amplify-components-field-control-border-color
-  );
-  --amplify-components-button-focus-border-color: var(
-    --amplify-components-field-control-border-color
-  );
-  --amplify-components-button-focus-box-shadow: none;
-  --amplify-components-button-hover-background-color: var(
-    --amplify-components-field-control-background-color
-  );
-  --amplify-components-button-hover-border-color: var(
-    --amplify-components-field-control-border-color
-  );
-  --amplify-components-button-active-background-color: var(
-    --amplify-components-field-control-background-color
-  );
-  --amplify-components-button-active-border-color: var(
-    --amplify-components-field-control-border-color
-  );
-}
-
-/* Style forgot password */
-.auth-forgot-password {
-  order: -1;
-  text-align: right;
-  margin-bottom: 12px;
-  --amplify-components-button-font-size: 12px;
-  --amplify-components-button-font-weight: 400;
-  --amplify-components-button-padding-block-start: 0;
-  --amplify-components-button-padding-block-end: 0;
-  --amplify-components-button-padding-inline-start: 0;
-  --amplify-components-button-padding-inline-end: 0;
-  --amplify-components-button-link-color: var(--neutral-600);
-  --amplify-components-button-link-hover-color: var(--neutral-600);
-  --amplify-components-button-link-hover-background-color: transparent;
-  --amplify-components-button-link-focus-color: var(--neutral-600);
-  --amplify-components-button-link-active-color: var(--neutral-600);
-  --amplify-components-button-link-active-background-color: transparent;
-}
-.auth-forgot-password .amplify-button--link:hover {
-  text-decoration: underline;
-}
-
-/* Style sign in */
-[data-amplify-authenticator-signin] fieldset {
-    order: -2;
-}
-[data-amplify-authenticator-signin] > .amplify-flex {
-    gap: 12px;
-}
-
-/* Style footer */
-.auth-footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-top: 20px;
-}
-
-/* Style links in the footer */
-.auth-footer-link {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    --amplify-components-text-color: var(--neutral-400);
-    --amplify-components-button-font-size: 14px;
-    --amplify-components-button-font-weight: 600;
-    --amplify-components-button-padding-block-start: 0;
-    --amplify-components-button-padding-block-end: 0;
-    --amplify-components-button-padding-inline-start: 0;
-    --amplify-components-button-padding-inline-end: 0;
-    --amplify-components-button-link-color: #e85100;
-    --amplify-components-button-link-hover-color: #e85100;
-    --amplify-components-button-link-hover-background-color: transparent;
-    --amplify-components-button-link-focus-color: #e85100;
-    --amplify-components-button-link-active-color: #e85100;
-    --amplify-components-button-link-active-background-color: transparent;
-}
-.auth-footer-link .amplify-button--link:hover {
-    text-decoration: underline;
+/* Link Button styling override to ensure it looks like text link */
+.amplify-button--link {
+    color: #007B83;
+    font-weight: 600;
 }
