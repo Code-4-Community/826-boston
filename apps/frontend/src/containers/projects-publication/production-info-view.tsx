@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import apiClient from '../../api/apiClient';
 import { ProductionInfo } from '../../types';
 import './production-info-view.css';
@@ -7,6 +8,18 @@ interface Props {
   anthologyId: number;
   shopifyUrl?: string;
   isbn?: string;
+}
+
+function getErrorMessage(err: unknown): string {
+  if (axios.isAxiosError(err)) {
+    const message = (
+      err.response?.data as { message?: string | string[] } | undefined
+    )?.message;
+    if (Array.isArray(message)) return message.join(', ');
+    if (message) return message;
+    return err.message;
+  }
+  return 'Something went wrong.';
 }
 
 interface EditableCellProps {
@@ -54,8 +67,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
     try {
       await onSave(trimmed);
       setIsEditing(false);
-    } catch {
-      setError('Failed to save.');
+    } catch (err) {
+      setError(`Failed to save: ${getErrorMessage(err)}`);
     } finally {
       setSaving(false);
     }

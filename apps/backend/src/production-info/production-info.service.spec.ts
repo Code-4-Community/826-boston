@@ -120,7 +120,7 @@ describe('ProductionInfoService', () => {
           productionInfo: mockProductionInfo,
         }),
       );
-      expect(result.anthology).toEqual(mockAnthology);
+      expect(result).toEqual(mockProductionInfo);
     });
 
     it('should throw NotFoundException if anthology not found', async () => {
