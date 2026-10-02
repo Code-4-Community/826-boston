@@ -15,6 +15,9 @@ import {
 import User from './dtos/user.dto';
 import Role from './dtos/role';
 
+/** Allows explicitly clearing a field by sending `null` instead of omitting it. */
+type Nullable<T> = { [K in keyof T]?: T[K] | null };
+
 export interface FilterSortAnthologyBody {
   pubDateRange?: { start: string; end: string };
   pubLevels?: string[];
@@ -122,14 +125,14 @@ export class ApiClient {
   }
 
   public async createProductionInfo(
-    body: Partial<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
+    body: Nullable<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
   ): Promise<ProductionInfo> {
     return this.post('/api/production-info', body) as Promise<ProductionInfo>;
   }
 
   public async updateProductionInfo(
     id: number,
-    body: Partial<Omit<ProductionInfo, 'id'>>,
+    body: Nullable<Omit<ProductionInfo, 'id'>>,
   ): Promise<ProductionInfo> {
     return this.put(
       `/api/production-info/${id}`,
@@ -139,7 +142,7 @@ export class ApiClient {
 
   public async updateAnthology(
     id: number,
-    body: Partial<{ shopify_url: string; isbn: string }>,
+    body: Nullable<{ shopify_url: string; isbn: string }>,
   ): Promise<Anthology> {
     const data = await this.patch(`/api/anthologies/${id}`, body);
     return normalizeAnthology(data);

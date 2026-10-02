@@ -53,12 +53,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const commit = async () => {
     const trimmed = draft.trim();
 
-    if (trimmed === '' || trimmed === originalText) {
+    if (trimmed === originalText) {
       setIsEditing(false);
       return;
     }
 
-    if (type === 'number' && Number.isNaN(Number(trimmed))) {
+    if (type === 'number' && trimmed !== '' && Number.isNaN(Number(trimmed))) {
       setError('Enter a number.');
       return;
     }
@@ -149,14 +149,14 @@ const ProductionInfoView: React.FC<Props> = ({
 
   const saveShopifyUrl = async (value: string) => {
     const updated = await apiClient.updateAnthology(anthologyId, {
-      shopify_url: value,
+      shopify_url: value === '' ? null : value,
     });
     setShopifyUrl(updated.shopify_url || updated.shopifyUrl);
   };
 
   const saveIsbn = async (value: string) => {
     const updated = await apiClient.updateAnthology(anthologyId, {
-      isbn: value,
+      isbn: value === '' ? null : value,
     });
     setIsbn(updated.isbn);
   };
@@ -170,10 +170,9 @@ const ProductionInfoView: React.FC<Props> = ({
       | 'printing_cost',
     rawValue: string,
   ) => {
+    const isNumeric = field === 'print_run' || field === 'printing_cost';
     const value =
-      field === 'print_run' || field === 'printing_cost'
-        ? Number(rawValue)
-        : rawValue;
+      rawValue === '' ? null : isNumeric ? Number(rawValue) : rawValue;
 
     const updated = productionInfo
       ? await apiClient.updateProductionInfo(productionInfo.id, {
