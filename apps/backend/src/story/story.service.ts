@@ -6,6 +6,27 @@ import { Story } from './story.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { Author } from 'src/author/author.entity';
 import { StoryDraft } from 'src/story-draft/story-draft.entity';
+import {
+  PaginatedStoryDocuments,
+  StoryDocumentRow,
+} from './dtos/story-document-row.dto';
+
+// Author only stores a single `name`, so split on the last space.
+// TODO: split Author.name into first/last name columns.
+export function splitName(name: string): {
+  firstName: string;
+  lastName: string;
+} {
+  const trimmed = name.trim();
+  const idx = trimmed.lastIndexOf(' ');
+  if (idx === -1) {
+    return { firstName: trimmed, lastName: '' };
+  }
+  return {
+    firstName: trimmed.slice(0, idx),
+    lastName: trimmed.slice(idx + 1),
+  };
+}
 
 @Injectable()
 export class StoryService {
@@ -28,6 +49,34 @@ export class StoryService {
       where: { anthology: { id: anthologyId } },
       relations: ['storyDraft', 'author', 'anthology'],
     });
+  }
+
+  async getDocumentsByAnthology(
+    anthologyId: number,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedStoryDocuments> {
+    // TODO: confirm with the team whether this should only list stories that
+    // have a draft. For now every story in the anthology is shown.
+    const [stories, total] = await this.repo.findAndCount({
+      where: { anthology: { id: anthologyId } },
+      relations: ['author', 'storyDraft'],
+      order: { id: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const data: StoryDocumentRow[] = stories.map((story) => ({
+      storyId: story.id,
+      storyDraftId: story.storyDraft?.id ?? null,
+      authorId: story.author.id,
+      consent: story.storyDraft?.studentConsent ?? false,
+      ...splitName(story.author.name),
+      grade: story.author.grade ?? null,
+      docLink: story.storyDraft?.docLink ?? null,
+    }));
+
+    return { data, total, page };
   }
 
   findByTitle(title: string) {
