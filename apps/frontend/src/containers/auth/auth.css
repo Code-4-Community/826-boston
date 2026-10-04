@@ -2,67 +2,129 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   min-height: 100vh;
   background-color: var(--neutral-100);
-  padding: 20px;
 }
 
-/* Amplify Theme Overrides */
-[data-amplify-theme] {
-  /* Colors */
-  --amplify-colors-brand-primary-80: #008566;
-  --amplify-colors-brand-primary-90: #006d54;
-  --amplify-colors-brand-primary-100: #006d54;
-  --amplify-colors-font-primary: #3b3330; /* neutral-600 */
-  --amplify-colors-font-secondary: #938b88; /* neutral-400 */
-  
-  /* Fonts */
-  --amplify-fonts-default-variable: 'Open Sans', sans-serif;
-  --amplify-fonts-heading: 'Roboto', sans-serif;
-
-  /* Components - Router (Card) */
-  --amplify-components-authenticator-router-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  --amplify-components-authenticator-router-border-width: 0;
-  --amplify-components-authenticator-router-background-color: #F3EEEA;
-  
-  /* Form Fields */
-  --amplify-components-field-label-color: #938b88; /* neutral-400 */
-  --amplify-components-field-control-border-color: transparent;
-  --amplify-components-field-control-border-radius: 8px;
-  --amplify-components-field-control-padding-block: 12px;
-  --amplify-components-field-control-padding-inline: 16px;
-  --amplify-components-field-control-background-color: #FFFFFF;
-
-  /* Button */
-  --amplify-components-button-border-radius: 8px;
-  --amplify-components-button-primary-background-color: #008566;
-  --amplify-components-button-primary-color: #FFFFFF;
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 64px 32px;
+  border-radius: 12px;
+  background-color: var(--neutral-200);
+  width: 100%;
+  max-width: 525px;
 }
 
-/* Specific styling for the Authenticator Card */
-[data-amplify-authenticator] [data-amplify-router] {
-    background-color: #F3EEEA;
-    border-radius: 8px;
-    padding: 0; /* Let internal padding handle spacing if possible, or adjust */
+.auth-header__logo {
+  height: 94px;
+  margin-bottom: 20px;
 }
 
-/* Remove default tabs if present (we only show one state usually) */
-[data-amplify-authenticator] [data-amplify-router] [role="tablist"] {
-    display: none;
+.auth-header__greeting {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--neutral-400);
 }
 
-/* Style form inputs */
-.amplify-input {
-    background-color: #ffffff;
-    border: 1px solid transparent;
-}
-.amplify-input:focus {
-    border-color: var(--accent-500);
-    box-shadow: none;
+.auth-header__title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--black);
 }
 
-/* Link Button styling override to ensure it looks like text link */
-.amplify-button--link {
-    color: #007B83;
-    font-weight: 600;
+.auth-field {
+  width: 100%;
+}
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.field-input {
+  padding: 8px 20px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--neutral-600);
+  background-color: var(--neutral-100);
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+}
+
+.field-input::placeholder {
+  color: var(--neutral-500);
+}
+
+.field-input--error {
+  border-color: var(--error-red);
+}
+
+.field-error {
+  margin-top: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--error-red);
+}
+
+.forgot-password {
+  width: 100%;
+  margin-top: 8px;
+  text-align: right;
+}
+
+.forgot-password a {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--neutral-600);
+  text-decoration: none;
+}
+
+.sign-in {
+  width: 100%;
+  margin-top: 20px;
+  padding: 8px 24px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--accent-500);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.auth-footer {
+  margin-top: 20px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--neutral-400);
+}
+
+.auth-footer a {
+  font-weight: 600;
+  color: var(--accent-600);
+  text-decoration: none;
+}
+
+.forgot-password a:hover,
+.forgot-password a:focus-visible,
+.auth-footer a:hover,
+.auth-footer a:focus-visible {
+  text-decoration: underline;
 }

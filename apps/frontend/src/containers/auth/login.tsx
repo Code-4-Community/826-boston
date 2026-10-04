@@ -1,92 +1,111 @@
-import React from 'react';
-import {
-  Authenticator,
-  View,
-  Image,
-  Heading,
-  Text,
-} from '@aws-amplify/ui-react';
-import { fetchAuthSession } from 'aws-amplify/auth';
-import '@aws-amplify/ui-react/styles.css';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './auth.css';
-import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/icons/826-boston-logo.png';
-
-const components = {
-  Header() {
-    return (
-      <View textAlign="center" padding="large">
-        <Image
-          alt="826 Boston Logo"
-          src={logo}
-          height="40px"
-          marginBottom="medium"
-        />
-        <Text
-          variation="primary"
-          fontSize="14px"
-          color="var(--neutral-400)"
-          fontFamily="var(--font-body)"
-        >
-          Welcome Back
-        </Text>
-        <Heading
-          level={1}
-          fontSize="24px"
-          fontWeight="700"
-          fontFamily="var(--font-heading)"
-          color="#000000"
-          marginTop="small"
-        >
-          Log In
-        </Heading>
-      </View>
-    );
-  },
-};
+import AuthHeader from '@components/AuthHeader';
+import { fetchAuthSession, signIn } from 'aws-amplify/auth';
+import { useAuthenticator } from '@aws-amplify/ui-react';
+import AuthField from '@components/AuthField';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {},
+  );
+
+  useEffect(() => {
+    if (authStatus === 'authenticated') {
+      // log the token for testing
+      if (
+        import.meta.env.DEV &&
+        !sessionStorage.getItem('dev-auth-token-logged')
+      ) {
+        sessionStorage.setItem('dev-auth-token-logged', '1');
+        fetchAuthSession()
+          .then((session) => {
+            const idToken = session.tokens?.idToken?.toString();
+            console.log('[DEV] Use this bearer token for backend testing:', {
+              bearerToken: idToken ? `Bearer ${idToken}` : null,
+              idToken,
+            });
+          })
+          .catch((error) => {
+            console.error('[DEV] Failed to fetch auth session tokens', error);
+          });
+      }
+      navigate('/');
+    }
+  }, [authStatus, navigate]);
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const isValid = (name: string) =>
+      // checks if the field is empty or the wrong type
+      (e.currentTarget.elements.namedItem(name) as HTMLInputElement).validity
+        .valid;
+    const fieldErrors = {
+      email: isValid('email') ? undefined : 'Invalid Email.',
+      password: isValid('password') ? undefined : 'Invalid Password.',
+    };
+    setErrors(fieldErrors);
+    if (fieldErrors.email || fieldErrors.password) return;
+
+    try {
+      await signIn({ username: email, password });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if (error.name === 'UserAlreadyAuthenticatedException') {
+          navigate('/');
+        } else if (
+          error.name === 'UserNotFoundException' ||
+          error.name === 'NotAuthorizedException'
+        ) {
+          // Cognito does not disclose whether a user exists or not to prevent users from figuring out which emails are registered
+          const message = 'Incorrect email or password entered.';
+          setErrors({ email: message, password: message });
+        } else {
+          console.error(error);
+          const message = 'Something went wrong. Please try again.';
+          setErrors({ email: message, password: message });
+        }
+      }
+    }
+  };
 
   return (
     <div className="auth-container">
-      <Authenticator
-        hideSignUp
-        initialState="signIn"
-        components={components}
-        loginMechanisms={['email', 'phone_number', 'username']}
-      >
-        {({ user }) => {
-          if (user) {
-            if (
-              import.meta.env.DEV &&
-              !sessionStorage.getItem('dev-auth-token-logged')
-            ) {
-              sessionStorage.setItem('dev-auth-token-logged', '1');
-              fetchAuthSession()
-                .then((session) => {
-                  const idToken = session.tokens?.idToken?.toString();
-                  console.log(
-                    '[DEV] Use this bearer token for backend testing:',
-                    {
-                      bearerToken: idToken ? `Bearer ${idToken}` : null,
-                      idToken,
-                    },
-                  );
-                })
-                .catch((error) => {
-                  console.error(
-                    '[DEV] Failed to fetch auth session tokens',
-                    error,
-                  );
-                });
-            }
-            setTimeout(() => navigate('/'), 0);
-            return <div>Loading...</div>;
-          }
-          return <></>;
-        }}
-      </Authenticator>
+      <form className="auth-card" noValidate onSubmit={handleLogin}>
+        <AuthHeader greeting="Welcome Back" title="Log In"></AuthHeader>
+        <AuthField
+          label="Email"
+          name="email"
+          error={errors.email}
+          required
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        ></AuthField>
+        <AuthField
+          label="Password"
+          name="password"
+          error={errors.password}
+          required
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        ></AuthField>
+        <div className="forgot-password">
+          <Link to="/forgot-password">Forgot Password?</Link>
+        </div>
+        <button className="sign-in" type="submit">
+          Sign In
+        </button>
+      </form>
+      <p className="auth-footer">
+        Don’t have an account? <Link to="/register">Register here.</Link>
+      </p>
     </div>
   );
 };
