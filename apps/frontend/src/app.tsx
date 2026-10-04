@@ -11,13 +11,13 @@ import Root from '@containers/root';
 import NotFound from '@containers/404';
 import ArchivedPublications from '@containers/archived-publications';
 import PublicationView from '@containers/archived-publications/individual-publication/publication-view';
-import Login from '@containers/auth/login';
+import Login from '@containers/auth/Login';
 import ProtectedRoute from '@containers/auth/ProtectedRoute';
 import People from '@containers/people';
 import Resources from '@containers/resources';
 import Role from '@api/dtos/role';
-import CreatePublicationModal from '@containers/create-publication-modal';
 import ProjectPublicationView from '@containers/projects-publication/project-publication-view';
+import SignUp from '@containers/auth/SignUp';
 
 const router = createBrowserRouter([
   {
@@ -95,6 +95,7 @@ const router = createBrowserRouter([
     ],
   },
   { path: 'login', element: <Login /> },
+  { path: 'register', element: <SignUp /> },
 ]);
 
 export const App: React.FC = () => {
