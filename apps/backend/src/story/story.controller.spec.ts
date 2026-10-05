@@ -100,6 +100,13 @@ describe('StoryController', () => {
       expect(mockService.getDocumentsByAnthology).not.toHaveBeenCalled();
     });
 
+    it('throws BadRequestException when page is too large for an offset', async () => {
+      await expect(
+        controller.getStoryDocumentsByAnthology(5, 1e20, 10),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockService.getDocumentsByAnthology).not.toHaveBeenCalled();
+    });
+
     it('throws BadRequestException for non-positive page or limit', async () => {
       await expect(
         controller.getStoryDocumentsByAnthology(5, 0, 10),

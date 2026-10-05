@@ -140,6 +140,10 @@ export class StoryController {
     if (page < 1 || limit < 1) {
       throw new BadRequestException('page and limit must be positive integers');
     }
+    // Keeps the row offset within what the database can handle
+    if (!Number.isSafeInteger(page * MAX_DOCUMENTS_PAGE_SIZE)) {
+      throw new BadRequestException('page is too large');
+    }
 
     const anthology = await this.anthologyService.findOne(anthologyId);
     if (!anthology) {
