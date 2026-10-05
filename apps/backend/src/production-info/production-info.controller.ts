@@ -138,7 +138,8 @@ export class ProductionInfoController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update production info',
-    description: 'Updates the production information for a given record. Requires authentication.',
+    description:
+      'Updates the production information for a given record. Requires authentication.',
   })
   @ApiOkResponse({
     description: 'Production info updated successfully',

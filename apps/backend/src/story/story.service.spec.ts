@@ -97,7 +97,7 @@ describe('StoryService', () => {
         2,
         'Bio',
         'Desc',
-        'Theme'
+        'Theme',
       );
 
       expect(mockRepository.create).toHaveBeenCalledWith({
