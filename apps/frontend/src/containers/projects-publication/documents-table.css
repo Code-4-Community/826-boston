@@ -1,0 +1,114 @@
+.documents-toolbar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.documents-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 43px;
+  padding: 0 16px;
+  border: 1px solid var(--neutral-600);
+  border-radius: 8px;
+  background: var(--neutral-100);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+.documents-filter-btn:hover {
+  background-color: var(--neutral-150);
+}
+
+.documents-filter-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.documents-consent-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.documents-add-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--neutral-400);
+  cursor: pointer;
+}
+
+.documents-add-btn:hover {
+  color: var(--neutral-600);
+}
+
+.documents-doc-col {
+  text-align: right;
+}
+
+.documents-doc-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.documents-delete-btn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #d92d20;
+  cursor: pointer;
+}
+
+.documents-delete-btn:hover {
+  color: #b42318;
+}
+
+.documents-no-link {
+  color: var(--neutral-400);
+}
+
+.documents-empty {
+  text-align: center;
+  color: var(--neutral-400);
+  padding: 24px;
+}
+
+.documents-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  color: var(--neutral-600);
+}
+
+.documents-pagination button {
+  min-width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: none;
+  font-size: 16px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.documents-pagination button:disabled {
+  color: var(--neutral-300);
+  cursor: default;
+}
+
+.documents-pagination .documents-page--active {
+  border-color: var(--neutral-600);
+}
