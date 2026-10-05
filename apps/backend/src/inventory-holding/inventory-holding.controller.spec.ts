@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InventoryHoldingController } from './inventory-holding.controller';
 import { InventoryHoldingService } from './inventory-holding.service';
+import { CreateInventoryHoldingDto } from './dto/create-inventory-holding.dto';
+import { UpdateInventoryHoldingDto } from './dto/update-inventory-holding.dto';
 
 describe('InventoryHoldingController', () => {
   let controller: InventoryHoldingController;
@@ -45,7 +47,9 @@ describe('InventoryHoldingController', () => {
     const result = { id: 1, ...dto };
     service.create.mockResolvedValue(result);
 
-    await expect(controller.create(dto as any)).resolves.toEqual(result);
+    await expect(
+      controller.create(dto as CreateInventoryHoldingDto),
+    ).resolves.toEqual(result);
     expect(service.create).toHaveBeenCalledWith(dto);
   });
 
@@ -82,7 +86,9 @@ describe('InventoryHoldingController', () => {
     };
     service.update.mockResolvedValue(result);
 
-    await expect(controller.update(7, dto as any)).resolves.toEqual(result);
+    await expect(
+      controller.update(7, dto as UpdateInventoryHoldingDto),
+    ).resolves.toEqual(result);
     expect(service.update).toHaveBeenCalledWith(7, dto);
   });
 
