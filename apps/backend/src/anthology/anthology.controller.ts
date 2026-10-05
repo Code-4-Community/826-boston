@@ -299,7 +299,17 @@ export class AnthologyController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAnthologyDto: UpdateAnthologyDto,
   ): Promise<Anthology> {
-    return this.anthologyService.update(id, updateAnthologyDto);
+    const { photo_url, shopify_url, pub_level, ...rest } = updateAnthologyDto;
+    const attrs: Partial<Anthology> = { ...rest };
+
+    // DTO fields use snake_case to match the create payload, but the entity's
+    // TS properties (and therefore what TypeORM actually persists) are camelCase.
+    if (photo_url !== undefined) attrs.photoUrl = photo_url;
+    if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
+    if (pub_level !== undefined)
+      attrs.pubLevel = pub_level as AnthologyPubLevel;
+
+    return this.anthologyService.update(id, attrs);
   }
 
   @ApiBearerAuth()

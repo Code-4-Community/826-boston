@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { InventoryHoldingService } from './inventory-holding.service';
 import { InventoryHolding } from './inventory-holding.entity';
+import { CreateInventoryHoldingDto } from './dto/create-inventory-holding.dto';
+import { UpdateInventoryHoldingDto } from './dto/update-inventory-holding.dto';
 
 describe('InventoryHoldingService', () => {
   let service: InventoryHoldingService;
@@ -49,7 +51,9 @@ describe('InventoryHoldingService', () => {
     mockRepository.create.mockReturnValue(created);
     mockRepository.save.mockResolvedValue(created);
 
-    const result = await service.create(dto as any);
+    const result = await service.create(
+      dto as unknown as CreateInventoryHoldingDto,
+    );
 
     expect(result).toEqual(created);
     expect(mockRepository.create).toHaveBeenCalledWith(dto);
@@ -108,7 +112,9 @@ describe('InventoryHoldingService', () => {
     mockRepository.findOne.mockResolvedValue(existing);
     mockRepository.save.mockResolvedValue(updated);
 
-    const result = await service.update(1, { numCopies: 8 } as any);
+    const result = await service.update(1, {
+      numCopies: 8,
+    } as unknown as UpdateInventoryHoldingDto);
 
     expect(result).toEqual(updated);
     expect(mockRepository.save).toHaveBeenCalledWith(updated);
