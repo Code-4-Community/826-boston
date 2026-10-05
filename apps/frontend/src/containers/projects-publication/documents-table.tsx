@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import apiClient, { type StoryDocumentRow } from '../../api/apiClient';
-import FilterIcon from '../../assets/icons/filter.svg';
 import NewStoryDraftModal from './new-story-draft-modal';
 import './documents-table.css';
 
@@ -37,9 +36,13 @@ function getPageItems(current: number, totalPages: number): (number | null)[] {
 
 interface DocumentsTableProps {
   anthologyId: number;
+  onRowClick?: (row: StoryDocumentRow) => void;
 }
 
-const DocumentsTable: React.FC<DocumentsTableProps> = ({ anthologyId }) => {
+const DocumentsTable: React.FC<DocumentsTableProps> = ({
+  anthologyId,
+  onRowClick,
+}) => {
   const [documents, setDocuments] = useState<StoryDocumentRow[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -99,7 +102,18 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({ anthologyId }) => {
       <div className="documents-toolbar">
         {/* TODO: open the filter modal once it is built */}
         <button type="button" className="documents-filter-btn">
-          <img src={FilterIcon} alt="" className="documents-filter-icon" />
+          <svg
+            className="documents-filter-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+          </svg>
           <span>Filters</span>
         </button>
       </div>
@@ -135,26 +149,21 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({ anthologyId }) => {
             </tr>
           ) : (
             documents.map((row) => (
-              <tr key={row.storyId}>
+              <tr
+                key={row.storyId}
+                className="documents-row"
+                onClick={() => onRowClick?.(row)}
+              >
                 <td>
-                  <input
-                    type="checkbox"
-                    checked={row.consent}
-                    disabled={row.storyDraftId === null}
-                    aria-label={`Consent for ${row.firstName} ${row.lastName}`}
-                    onChange={() => handleConsentToggle(row)}
-                  />
-                </td>
-                <td>{row.firstName}</td>
-                <td>{row.lastName}</td>
-                <td>{formatGrade(row.grade)}</td>
-                <td className="documents-doc-col">
-                  <div className="documents-doc-cell">
+                  <div className="documents-consent-cell">
                     <button
                       type="button"
                       className="documents-delete-btn"
                       aria-label={`Delete document for ${row.firstName} ${row.lastName}`}
-                      onClick={() => handleDelete(row)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(row);
+                      }}
                     >
                       <svg
                         width="16"
@@ -173,14 +182,32 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({ anthologyId }) => {
                         <path d="M10 11v6M14 11v6" />
                       </svg>
                     </button>
-                    {row.docLink ? (
-                      <a href={row.docLink} target="_blank" rel="noreferrer">
-                        {row.docLink}
-                      </a>
-                    ) : (
-                      <span className="documents-no-link">—</span>
-                    )}
+                    <input
+                      type="checkbox"
+                      checked={row.consent}
+                      disabled={row.storyDraftId === null}
+                      aria-label={`Consent for ${row.firstName} ${row.lastName}`}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={() => handleConsentToggle(row)}
+                    />
                   </div>
+                </td>
+                <td>{row.firstName}</td>
+                <td>{row.lastName}</td>
+                <td>{formatGrade(row.grade)}</td>
+                <td className="documents-doc-col">
+                  {row.docLink ? (
+                    <a
+                      href={row.docLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {row.docLink}
+                    </a>
+                  ) : (
+                    <span className="documents-no-link">—</span>
+                  )}
                 </td>
               </tr>
             ))

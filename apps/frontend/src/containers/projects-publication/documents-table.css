@@ -58,16 +58,22 @@
   text-align: right;
 }
 
-.documents-doc-cell {
+.documents-consent-cell {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 12px;
+}
+
+/* Same width so the bin lines up under the + in the header */
+.documents-add-btn,
+.documents-delete-btn {
+  width: 20px;
 }
 
 .documents-delete-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   padding: 0;
@@ -77,6 +83,15 @@
 
 .documents-delete-btn:hover {
   color: #b42318;
+}
+
+.documents-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.documents-row:hover {
+  background-color: var(--neutral-200);
 }
 
 .documents-no-link {
