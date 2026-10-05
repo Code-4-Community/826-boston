@@ -2,20 +2,27 @@
    Global Styles - 826 Boston
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;600;700;800&display=swap');
 
 /* CSS Variables - Design Tokens from Figma */
 :root {
+  --black: #000000;
+
   /* Neutral Palette */
   --neutral-100: #fdfcfb;
   --neutral-150: #faf6f3;
-  --neutral-200: #f9f6f5;
+  --neutral-200: #f0ebe9;
   --neutral-300: #cac3c0;
   --neutral-400: #938b88;
+  --neutral-500: #58504c;
   --neutral-600: #3b3330;
 
   /* Accent */
   --accent-500: #ec9209;
+  --accent-600: #e85100;
+
+  /* Status */
+  --error-red: #d7002e;
 
   /* Typography */
   --font-heading: 'Roboto', sans-serif;
