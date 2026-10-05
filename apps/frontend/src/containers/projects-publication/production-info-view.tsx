@@ -27,6 +27,7 @@ interface EditableCellProps {
   placeholder: string;
   type?: 'text' | 'number';
   format?: (value: string | number) => string;
+  requireNonNegative?: boolean;
   onSave: (newValue: string) => Promise<void>;
 }
 
@@ -35,6 +36,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   placeholder,
   type = 'text',
   format,
+  requireNonNegative,
   onSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -58,9 +60,18 @@ const EditableCell: React.FC<EditableCellProps> = ({
       return;
     }
 
-    if (type === 'number' && trimmed !== '' && Number.isNaN(Number(trimmed))) {
-      setError('Enter a number.');
-      return;
+    if (type === 'number' && trimmed !== '') {
+      const parsed = Number(trimmed);
+
+      if (Number.isNaN(parsed)) {
+        setError('Enter a number.');
+        return;
+      }
+
+      if (requireNonNegative && parsed < 0) {
+        setError('Number must be non-negative.');
+        return;
+      }
     }
 
     setSaving(true);
@@ -194,6 +205,7 @@ const ProductionInfoView: React.FC<Props> = ({
     value: string | number | null;
     type?: 'text' | 'number';
     format?: (value: string | number) => string;
+    requireNonNegative?: boolean;
     onSave: (value: string) => Promise<void>;
   }[] = [
     {
@@ -225,6 +237,7 @@ const ProductionInfoView: React.FC<Props> = ({
       placeholder: 'Add # of copies.',
       value: productionInfo?.print_run ?? null,
       type: 'number',
+      requireNonNegative: true,
       onSave: (value) => saveProductionInfoField('print_run', value),
     },
     {
@@ -232,6 +245,7 @@ const ProductionInfoView: React.FC<Props> = ({
       placeholder: 'Add printing cost.',
       value: productionInfo?.printing_cost ?? null,
       type: 'number',
+      requireNonNegative: true,
       format: (value) => `$${Number(value).toFixed(2)}`,
       onSave: (value) => saveProductionInfoField('printing_cost', value),
     },
@@ -256,6 +270,7 @@ const ProductionInfoView: React.FC<Props> = ({
                   placeholder={row.placeholder}
                   type={row.type}
                   format={row.format}
+                  requireNonNegative={row.requireNonNegative}
                   onSave={row.onSave}
                 />
               </td>
