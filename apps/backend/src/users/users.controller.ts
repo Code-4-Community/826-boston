@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   ApiBearerAuth,
@@ -81,7 +75,8 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete a user',
-    description: 'Permanently removes a user from the system. Requires authentication.',
+    description:
+      'Permanently removes a user from the system. Requires authentication.',
   })
   @ApiOkResponse({
     description: 'User deleted successfully',

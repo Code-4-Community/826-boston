@@ -5,11 +5,12 @@ import { Anthology } from '../../types';
 import imgFrame69 from '../../assets/images/frame-69.png';
 import DocumentsTable from './documents-table';
 import OmchaiView from './omchai-view';
+import ProductionInfoView from './production-info-view';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
 
-type Tab = 'omchai' | 'documents';
+type Tab = 'omchai' | 'documents' | 'production-info';
 
 const ProjectPublicationView: React.FC = () => {
   const [, , currentUser] = useAuth();
@@ -139,6 +140,15 @@ const ProjectPublicationView: React.FC = () => {
           >
             Documents
           </button>
+          <button
+            type="button"
+            className={`publication-tab${
+              activeTab === 'production-info' ? ' publication-tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('production-info')}
+          >
+            Production & Distribution
+          </button>
         </div>
 
         {activeTab === 'omchai' && (
@@ -150,6 +160,16 @@ const ProjectPublicationView: React.FC = () => {
         {activeTab === 'documents' && (
           <div className="ppv-tab-content">
             <DocumentsTable anthologyId={anthology.id} />
+          </div>
+        )}
+
+        {activeTab === 'production-info' && (
+          <div className="ppv-tab-content">
+            <ProductionInfoView
+              anthologyId={anthology.id}
+              shopifyUrl={anthology.shopify_url || anthology.shopifyUrl}
+              isbn={anthology.isbn}
+            />
           </div>
         )}
       </div>

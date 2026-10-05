@@ -45,9 +45,9 @@ describe('InventoryController', () => {
     const result = { id: 1, name: 'Hardcover', holdings: [] };
     service.create.mockResolvedValue(result);
 
-    await expect(controller.create(dto as CreateInventoryDto)).resolves.toEqual(
-      result,
-    );
+    await expect(
+      controller.create(dto as unknown as CreateInventoryDto),
+    ).resolves.toEqual(result);
     expect(service.create).toHaveBeenCalledWith(dto);
   });
 
@@ -73,7 +73,7 @@ describe('InventoryController', () => {
     service.update.mockResolvedValue(result);
 
     await expect(
-      controller.update(2, dto as UpdateInventoryDto),
+      controller.update(2, dto as unknown as UpdateInventoryDto),
     ).resolves.toEqual(result);
     expect(service.update).toHaveBeenCalledWith(2, dto);
   });

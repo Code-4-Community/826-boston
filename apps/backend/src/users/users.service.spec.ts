@@ -127,7 +127,7 @@ describe('UsersService', () => {
 
       expect(repo.find).toHaveBeenCalledWith({
         where: { email: 'john@example.com' },
-        relations: { omchaiAssignments: true },
+        relations: { omchaiAssignments: { anthology: true } },
       });
       expect(result).toEqual([userWithoutOmchai]);
       expect(result[0].omchaiAssignments).toHaveLength(0);
@@ -152,7 +152,7 @@ describe('UsersService', () => {
 
       expect(repo.find).toHaveBeenCalledWith({
         where: { email: 'john@example.com' },
-        relations: { omchaiAssignments: true },
+        relations: { omchaiAssignments: { anthology: true } },
       });
       expect(result).toEqual([userWithOneOmchai]);
       expect(result[0].omchaiAssignments).toHaveLength(1);
@@ -194,7 +194,7 @@ describe('UsersService', () => {
 
       expect(repo.find).toHaveBeenCalledWith({
         where: { email: 'john@example.com' },
-        relations: { omchaiAssignments: true },
+        relations: { omchaiAssignments: { anthology: true } },
       });
       expect(result).toEqual([userWithManyOmchai]);
       expect(result[0].omchaiAssignments).toHaveLength(3);

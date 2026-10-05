@@ -45,6 +45,11 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
+  story?: {
+    id: number;
+    title: string;
+    author?: Author;
+  };
 }
 
 export interface Story {
@@ -146,6 +151,7 @@ export interface Anthology {
   themes?: string[];
   isbn?: string;
   shopify_url?: string;
+  shopifyUrl?: string;
   subtitle?: string;
   byline?: string;
 }
@@ -163,6 +169,19 @@ export interface CreateAnthologyDto {
   isbn: string;
   shopifyUrl?: string;
   inventory?: number;
+}
+
+export interface ProductionInfo {
+  id: number;
+  design_files_link?: string;
+  cover_image_file_link?: string;
+  binding_type?: string;
+  dimensions?: string;
+  printing_cost?: number;
+  print_run?: number;
+  weight_in_grams?: number;
+  page_count?: number;
+  printed_by?: string;
 }
 
 export interface CreateBatchOmchaiAssignmentsDto {

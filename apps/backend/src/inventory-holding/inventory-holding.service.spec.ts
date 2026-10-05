@@ -51,7 +51,9 @@ describe('InventoryHoldingService', () => {
     mockRepository.create.mockReturnValue(created);
     mockRepository.save.mockResolvedValue(created);
 
-    const result = await service.create(dto as CreateInventoryHoldingDto);
+    const result = await service.create(
+      dto as unknown as CreateInventoryHoldingDto,
+    );
 
     expect(result).toEqual(created);
     expect(mockRepository.create).toHaveBeenCalledWith(dto);
@@ -112,7 +114,7 @@ describe('InventoryHoldingService', () => {
 
     const result = await service.update(1, {
       numCopies: 8,
-    } as UpdateInventoryHoldingDto);
+    } as unknown as UpdateInventoryHoldingDto);
 
     expect(result).toEqual(updated);
     expect(mockRepository.save).toHaveBeenCalledWith(updated);

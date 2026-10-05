@@ -46,7 +46,7 @@ describe('InventoryService', () => {
     mockRepository.create.mockReturnValue(created);
     mockRepository.save.mockResolvedValue(created);
 
-    const result = await service.create(dto as CreateInventoryDto);
+    const result = await service.create(dto as unknown as CreateInventoryDto);
 
     expect(result).toEqual(created);
     expect(mockRepository.create).toHaveBeenCalledWith({ name: 'Hardcover' });
@@ -95,7 +95,7 @@ describe('InventoryService', () => {
 
     const result = await service.update(7, {
       name: 'New Name',
-    } as UpdateInventoryDto);
+    } as unknown as UpdateInventoryDto);
 
     expect(result).toEqual(updated);
     expect(mockRepository.save).toHaveBeenCalledWith(updated);
