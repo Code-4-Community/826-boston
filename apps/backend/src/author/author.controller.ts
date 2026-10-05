@@ -70,7 +70,6 @@ export class AuthorController {
     return this.authorService.create(createAuthorDto);
   }
 
-
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update an author',
@@ -117,7 +116,6 @@ export class AuthorController {
   ): Promise<Author> {
     return this.authorService.update(authorId, editAuthorDto);
   }
-
 
   @Public()
   @ApiOperation({
