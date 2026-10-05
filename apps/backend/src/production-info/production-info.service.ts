@@ -74,20 +74,31 @@ export class ProductionInfoService {
       throw new NotFoundException(`Production info with ID ${id} not found`);
     }
 
-    if (updateProductionInfoDto.anthology_id) {
-      const anthology = await this.anthologyRepository.findOne({
-        where: { id: updateProductionInfoDto.anthology_id },
+    const { anthology_id, ...productionInfoFields } = updateProductionInfoDto;
+
+    if (anthology_id) {
+      const newAnthology = await this.anthologyRepository.findOne({
+        where: { id: anthology_id },
       });
 
-      if (!anthology) {
+      if (!newAnthology) {
         throw new NotFoundException(
-          `Anthology with ID ${updateProductionInfoDto.anthology_id} not found`,
+          `Anthology with ID ${anthology_id} not found`,
         );
       }
-      productionInfo.anthology.id = anthology.id;
+
+      const previousAnthology = productionInfo.anthology;
+      if (previousAnthology && previousAnthology.id !== newAnthology.id) {
+        previousAnthology.productionInfo = null;
+        await this.anthologyRepository.save(previousAnthology);
+      }
+
+      newAnthology.productionInfo = productionInfo;
+      await this.anthologyRepository.save(newAnthology);
+      productionInfo.anthology = newAnthology;
     }
 
-    Object.assign(productionInfo, updateProductionInfoDto);
+    Object.assign(productionInfo, productionInfoFields);
 
     return this.productionInfoRepository.save(productionInfo);
   }
