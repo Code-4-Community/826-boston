@@ -45,6 +45,11 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
+  /**
+   * Attached by GET /stories/anthology/:id/story-drafts, which returns each
+   * draft alongside a trimmed version of its parent story.
+   */
+  story?: Pick<Story, 'id' | 'title'> & { author?: Author };
 }
 
 export interface Story {
@@ -148,6 +153,24 @@ export interface Anthology {
   shopify_url?: string;
   subtitle?: string;
   byline?: string;
+  /** camelCase fields as returned by the backend anthology endpoints. */
+  pubLevel?: AnthologyPubLevel;
+  publishedDate?: string;
+  sponsors?: string[];
+  triggers?: string[];
+}
+
+export interface AnthologyInventoryLocation {
+  inventoryId: number;
+  name: string;
+  /** 0 when the location holds no copies of this anthology. */
+  numCopies: number;
+}
+
+export interface AnthologyInventory {
+  anthology: Anthology;
+  locations: AnthologyInventoryLocation[];
+  totalCopies: number;
 }
 
 export interface CreateAnthologyDto {

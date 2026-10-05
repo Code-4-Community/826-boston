@@ -9,7 +9,7 @@ export interface OmchaiSeedItem {
 }
 
 export const OmchaiSeed: OmchaiSeedItem[] = [
-  // Anthology 1 (Voices From the Threshold) — all 6 roles
+  // Anthology 1 (Walk a Mile in Our Shoes) — all 6 roles
   {
     anthology_id: 1,
     user_id: 1,
@@ -47,7 +47,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-01-15'),
   },
 
-  // Anthology 2 (The Color of Saturday) — all 6 roles
+  // Anthology 2 (Utopia vs. Dystopia) — all 6 roles
   {
     anthology_id: 2,
     user_id: 2,
@@ -85,7 +85,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-02-01'),
   },
 
-  // Anthology 3 (What the River Carries) — all 6 roles
+  // Anthology 3 (I'll Light Up My Own Sky) — all 6 roles
   {
     anthology_id: 3,
     user_id: 3,
@@ -123,7 +123,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-02-15'),
   },
 
-  // Anthology 4 (Prism Literary Magazine #14) — all 6 roles
+  // Anthology 4 (To The People Like Us) — all 6 roles
   {
     anthology_id: 4,
     user_id: 1,
@@ -161,7 +161,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-03-01'),
   },
 
-  // Anthology 5 (Snapshots at 3AM) — partial
+  // Anthology 5 (I Am Bravery Itself) — partial
   {
     anthology_id: 5,
     user_id: 2,
@@ -181,7 +181,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-10-01'),
   },
 
-  // Anthology 8 (I'll Light Up My Own Sky) — all 6 roles
+  // Anthology 8 (Who Are You?) — all 6 roles
   {
     anthology_id: 8,
     user_id: 1,
@@ -219,7 +219,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-09-01'),
   },
 
-  // Anthology 9 (Rubix Literary Magazine #12 - Futures) — partial
+  // Anthology 9 (The Great Cost of Freedom) — partial
   {
     anthology_id: 9,
     user_id: 4,
@@ -239,7 +239,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-01-10'),
   },
 
-  // Anthology 12 (Not Guilty) — partial
+  // Anthology 12 (I Closed My Eyes and Imagined) — partial
   {
     anthology_id: 12,
     user_id: 5,
@@ -265,7 +265,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-11-01'),
   },
 
-  // Anthology 13 (Unlocked) — partial
+  // Anthology 13 (All Kinds of Flavor) — partial
   {
     anthology_id: 13,
     user_id: 6,
@@ -285,7 +285,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-01-20'),
   },
 
-  // Anthology 14 (Utopia vs. Dystopia) — partial
+  // Anthology 14 (It’s Not The Stone That Brings You Strength) — partial
   {
     anthology_id: 14,
     user_id: 1,
@@ -305,7 +305,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-10-15'),
   },
 
-  // Anthology 6 (How to Survive a Cafeteria)
+  // Anthology 6 (In Everday Things)
   {
     anthology_id: 6,
     user_id: 3,
@@ -325,7 +325,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-02-01'),
   },
 
-  // Anthology 7 (Letters to Nobody)
+  // Anthology 7 (Nothing Suspicious Was Going On)
   {
     anthology_id: 7,
     user_id: 7,
@@ -345,7 +345,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-11-15'),
   },
 
-  // Anthology 10 (Tomorrow's Almanac)
+  // Anthology 10 (Us, From the Inside and Out)
   {
     anthology_id: 10,
     user_id: 4,
@@ -365,7 +365,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-12-01'),
   },
 
-  // Anthology 11 (Prism Literary Magazine #15: Memory Palace)
+  // Anthology 11 (Rubix Literay Magazine #12 - Futures)
   {
     anthology_id: 11,
     user_id: 5,
@@ -385,7 +385,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-09-01'),
   },
 
-  // Anthology 15 (Civic Creatures)
+  // Anthology 15 (Like the Sun in Dark Spaces)
   {
     anthology_id: 15,
     user_id: 8,
@@ -405,7 +405,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-12-10'),
   },
 
-  // Anthology 16 (The Weight of a Suitcase)
+  // Anthology 16 (With a Crunch and a Slurp)
   {
     anthology_id: 16,
     user_id: 9,
@@ -425,7 +425,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-08-01'),
   },
 
-  // Anthology 17 (Walk a Mile in Our Shoes)
+  // Anthology 17 (A Long Walk To Healthy)
   {
     anthology_id: 17,
     user_id: 10,
@@ -445,7 +445,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-01-05'),
   },
 
-  // Anthology 18 (The Night Kitchen)
+  // Anthology 18 (Before This Place Filled with Zombies)
   {
     anthology_id: 18,
     user_id: 6,
@@ -465,7 +465,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2024-10-20'),
   },
 
-  // Anthology 19 (Hard Pivot)
+  // Anthology 19 (I’m a Flame You Can’t Put Out)
   {
     anthology_id: 19,
     user_id: 7,
@@ -485,7 +485,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-01-08'),
   },
 
-  // Anthology 20 (The Space Between Languages)
+  // Anthology 20 (My Generation Can)
   {
     anthology_id: 20,
     user_id: 3,
@@ -505,7 +505,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-02-10'),
   },
 
-  // Anthology 21 (Hallway Dispatches) — new ZINE
+  // Anthology 21 (What if the World Needs You?)
   {
     anthology_id: 21,
     user_id: 2,
@@ -519,7 +519,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-07-01'),
   },
 
-  // Anthology 22 (Field Notes From the T) — new ZINE
+  // Anthology 22 (85 Cents Might Not Sound Like a Lot)
   {
     anthology_id: 22,
     user_id: 4,
@@ -533,7 +533,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-07-15'),
   },
 
-  // Anthology 5 — full set of roles with multi-user entries
+  // Anthology 5 (I Am Bravery Itself) — full set of roles with multi-user entries
   {
     anthology_id: 5,
     user_id: 1,
