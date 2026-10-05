@@ -8,6 +8,7 @@ interface AuthFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const AuthField: React.FC<AuthFieldProps> = ({
   label,
   error,
+  children,
   ...inputProps
 }) => {
   return (
@@ -15,12 +16,17 @@ const AuthField: React.FC<AuthFieldProps> = ({
       <label className="field-label">
         {label}
         <input
-          {...inputProps}
           placeholder={label}
           className={error ? 'field-input field-input--error' : 'field-input'}
+          {...inputProps}
         />
       </label>
-      {error && <p className="field-error">{error}</p>}
+      {(error || children) && (
+        <div className="field-footer">
+          {error && <p className="field-error">{error}</p>}
+          {children}
+        </div>
+      )}
     </div>
   );
 };

@@ -18,6 +18,7 @@ import Resources from '@containers/resources';
 import Role from '@api/dtos/role';
 import ProjectPublicationView from '@containers/projects-publication/project-publication-view';
 import SignUp from '@containers/auth/SignUp';
+import ForgotPassword from '@containers/auth/ForgotPassword';
 
 const router = createBrowserRouter([
   {
@@ -96,6 +97,7 @@ const router = createBrowserRouter([
   },
   { path: 'login', element: <Login /> },
   { path: 'register', element: <SignUp /> },
+  { path: 'forgot-password', element: <ForgotPassword /> },
 ]);
 
 export const App: React.FC = () => {

@@ -95,10 +95,11 @@ const Login: React.FC = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-        ></AuthField>
-        <div className="forgot-password">
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </div>
+        >
+          <Link className="forgot-password" to="/forgot-password">
+            Forgot Password?
+          </Link>
+        </AuthField>
         <button className="submit-button" type="submit">
           Sign In
         </button>

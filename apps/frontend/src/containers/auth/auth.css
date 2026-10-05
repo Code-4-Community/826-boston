@@ -72,8 +72,13 @@
   border-color: var(--error-red);
 }
 
-.field-error {
+.field-footer {
+  display: flex;
+  justify-content: space-between;
   margin-top: 8px;
+}
+
+.field-error {
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 400;
@@ -81,12 +86,7 @@
 }
 
 .forgot-password {
-  width: 100%;
-  margin-top: 8px;
-  text-align: right;
-}
-
-.forgot-password a {
+  margin-left: auto;
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 400;
@@ -116,15 +116,77 @@
   color: var(--neutral-400);
 }
 
+.auth-footer + .auth-footer {
+  margin-top: 8px;
+}
+
 .auth-footer a {
   font-weight: 600;
   color: var(--accent-600);
   text-decoration: none;
 }
 
-.forgot-password a:hover,
-.forgot-password a:focus-visible,
+.forgot-password:hover,
+.forgot-password:focus-visible,
 .auth-footer a:hover,
-.auth-footer a:focus-visible {
+.auth-footer a:focus-visible,
+.resend-code:hover,
+.resend-code:focus-visible {
   text-decoration: underline;
+}
+
+.auth-card--forgot {
+  padding: 96px 32px;
+}
+
+.auth-card--forgot .submit-button {
+  margin-top: 12px; /* + 4px card gap = 16px */
+}
+
+.otp {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.otp-field__label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--black);
+}
+
+.otp-container {
+  gap: 13px;
+}
+
+.otp-input {
+  flex: 1;
+  min-width: 0;
+  height: 85px;
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--black);
+  background-color: var(--neutral-100);
+  border: 1px solid var(--neutral-300);
+  border-radius: 10px;
+}
+
+.otp-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.resend-code {
+  margin-left: auto;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--accent-600);
+  background: none;
+  border: none;
+  cursor: pointer;
 }
