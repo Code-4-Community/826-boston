@@ -49,7 +49,12 @@
   color: var(--neutral-600);
 }
 
-.documents-doc-col {
+.document-tracker-table thead th {
+  background-color: transparent;
+}
+
+.document-tracker-table th.documents-doc-col,
+.document-tracker-table td.documents-doc-col {
   text-align: right;
 }
 
