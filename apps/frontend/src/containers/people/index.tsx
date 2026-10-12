@@ -304,13 +304,15 @@ const People: React.FC = () => {
               </div>
             )}
           </div>
-          <button
-            type="button"
-            className="people-create-btn"
-            onClick={() => setShowModal(true)}
-          >
-            Add member
-          </button>
+          {canManageMembers && (
+            <button
+              type="button"
+              className="people-create-btn"
+              onClick={() => setShowModal(true)}
+            >
+              Add member
+            </button>
+          )}
         </div>
       </div>
 

@@ -178,7 +178,7 @@
   height: 36px;
   margin-left: 36px;
   padding: 8px 24px;
-  background: #39869d;
+  background: #e85100;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -186,7 +186,7 @@
 
 .people-grid {
   display: grid;
-  grid-template-columns: repeat(4, 232px);
+  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
   gap: 32px 24px;
   align-items: start;
 }
@@ -545,17 +545,11 @@
 }
 
 @media (max-width: 1450px) {
-  .people-grid {
-    grid-template-columns: repeat(3, 232px);
-  }
   .people-search {
     width: min(360px, 28vw);
   }
 }
 @media (max-width: 1120px) {
-  .people-grid {
-    grid-template-columns: repeat(2, 232px);
-  }
   .people-header {
     align-items: flex-start;
     flex-direction: column;
@@ -679,6 +673,11 @@
 }
 .people-modal__body .input::placeholder {
   color: #938b88;
+}
+.people-modal__body .input--select {
+  box-sizing: border-box;
+  padding: 0 20px;
+  line-height: normal;
 }
 .people-modal__position {
   position: relative;
