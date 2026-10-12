@@ -158,6 +158,23 @@ export interface Anthology {
   publishedDate?: string;
   sponsors?: string[];
   triggers?: string[];
+  ageCategories?: string[];
+}
+
+/** Production metadata for an anthology, from GET /production-info/:anthologyId. */
+export interface ProductionInfo {
+  id: number;
+  design_files_link?: string | null;
+  cover_image_file_link?: string | null;
+  binding_type?: string | null;
+  dimensions?: string | null;
+  printing_cost?: number | null;
+  print_run?: number | null;
+  weight_in_grams?: number | null;
+  page_count?: number | null;
+  printed_by?: string | null;
+  foreword_author?: string | null;
+  number_of_students?: number | null;
 }
 
 export interface AnthologyInventoryLocation {

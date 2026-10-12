@@ -8,6 +8,7 @@ import {
   CreateBatchOmchaiAssignmentsDto,
   EditRound,
   OmchaiEntry,
+  ProductionInfo,
   Story,
   StoryDraft,
   SubmissionRound,
@@ -82,6 +83,16 @@ export class ApiClient {
     return this.get(
       `/api/anthologies/${id}/inventory`,
     ) as Promise<AnthologyInventory>;
+  }
+
+  /** Production metadata for an anthology. Resolves to null when none exists. */
+  public async getProductionInfo(
+    anthologyId: string | number,
+  ): Promise<ProductionInfo | null> {
+    return this.get(`/api/production-info/${anthologyId}`).then(
+      (data) => data as ProductionInfo,
+      () => null,
+    );
   }
 
   public async getStoriesByAnthology(

@@ -18,6 +18,7 @@ export const mockAnthology: Anthology = {
   genres: [],
   themes: [],
   triggers: [],
+  ageCategories: [],
   publishedDate: undefined,
   status: AnthologyStatus.ARCHIVED,
   pubLevel: AnthologyPubLevel.ZINE,

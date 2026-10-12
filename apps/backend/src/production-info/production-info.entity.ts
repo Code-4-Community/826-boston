@@ -40,6 +40,12 @@ export class ProductionInfo {
   @Column({ nullable: true })
   printed_by?: string;
 
+  @Column({ nullable: true })
+  foreword_author?: string;
+
+  @Column('int', { nullable: true })
+  number_of_students?: number;
+
   @OneToOne(() => Anthology, (anthology) => anthology.productionInfo)
   anthology: Relation<Anthology>;
 }
