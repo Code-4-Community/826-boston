@@ -45,7 +45,7 @@ export class UsersService {
   findWithOmchai(email: string) {
     return this.repo.find({
       where: { email },
-      relations: { omchaiAssignments: true },
+      relations: { omchaiAssignments: { anthology: true } },
     });
   }
 

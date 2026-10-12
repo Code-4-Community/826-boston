@@ -1,0 +1,63 @@
+.production-info-loading {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--neutral-400);
+  padding: 24px 0;
+}
+
+.production-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.production-info-table th,
+.production-info-table td {
+  text-align: left;
+  padding: 16px 20px;
+  color: var(--neutral-600);
+}
+
+.production-info-table th {
+  width: 260px;
+  font-weight: 700;
+  background-color: transparent;
+}
+
+.production-info-placeholder {
+  color: var(--neutral-400);
+}
+
+.production-info-cell {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.production-info-cell:hover {
+  text-decoration: underline;
+}
+
+.production-info-input {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.production-info-error {
+  display: block;
+  font-size: 12px;
+  color: #d32f2f;
+  margin-top: 4px;
+}
