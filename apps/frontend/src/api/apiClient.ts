@@ -26,6 +26,23 @@ export interface FilterSortAnthologyBody {
   sortBy?: string;
 }
 
+export interface StoryDocumentRow {
+  storyId: number;
+  storyDraftId: number | null;
+  authorId: number;
+  consent: boolean;
+  firstName: string;
+  lastName: string;
+  grade: number | null;
+  docLink: string | null;
+}
+
+export interface PaginatedStoryDocuments {
+  data: StoryDocumentRow[];
+  total: number;
+  page: number;
+}
+
 const defaultBaseUrl =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
@@ -91,6 +108,16 @@ export class ApiClient {
     return this.get(`/api/stories/anthology/${anthologyId}`) as Promise<
       Story[]
     >;
+  }
+
+  public async getStoryDocuments(
+    anthologyId: string | number,
+    page = 1,
+    limit = 10,
+  ): Promise<PaginatedStoryDocuments> {
+    return this.get(
+      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}`,
+    ) as Promise<PaginatedStoryDocuments>;
   }
 
   public async filterSortAnthologies(

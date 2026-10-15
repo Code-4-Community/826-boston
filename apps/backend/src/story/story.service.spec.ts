@@ -1,7 +1,7 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Story } from './story.entity';
-import { StoryService } from './story.service';
+import { StoryService, splitName } from './story.service';
 import { StoriesSeed } from '../seeds/stories.seed';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { Author } from 'src/author/author.entity';
@@ -26,6 +26,7 @@ describe('StoryService', () => {
     save: jest.fn(),
     findOneBy: jest.fn(),
     find: jest.fn(),
+    findAndCount: jest.fn(),
     count: jest.fn(),
     remove: jest.fn(),
   };
@@ -73,6 +74,90 @@ describe('StoryService', () => {
       expect(mockRepository.find).toHaveBeenCalledWith({
         relations: ['storyDraft', 'author', 'anthology'],
         where: { anthology: { id: 1 } },
+      });
+    });
+  });
+
+  describe('splitName', () => {
+    it('splits on the last space', () => {
+      expect(splitName('John Doe')).toEqual({
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+      expect(splitName('Mary Ann Smith')).toEqual({
+        firstName: 'Mary Ann',
+        lastName: 'Smith',
+      });
+    });
+
+    it('handles single-word and padded names', () => {
+      expect(splitName('Madonna')).toEqual({
+        firstName: 'Madonna',
+        lastName: '',
+      });
+      expect(splitName('  John Doe ')).toEqual({
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+    });
+  });
+
+  describe('getDocumentsByAnthology', () => {
+    it('maps stories to document rows and paginates', async () => {
+      mockRepository.findAndCount.mockResolvedValue([
+        [
+          {
+            id: 1,
+            author: { id: 10, name: 'John Doe', grade: 6 },
+            storyDraft: {
+              id: 3,
+              studentConsent: true,
+              docLink: 'https://x.com/a',
+            },
+          },
+          {
+            id: 2,
+            author: { id: 11, name: 'Risa Tuffaha', grade: null },
+            storyDraft: null,
+          },
+        ],
+        12,
+      ]);
+
+      const result = await service.getDocumentsByAnthology(7, 2, 5);
+
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
+        where: { anthology: { id: 7 } },
+        relations: ['author', 'storyDraft'],
+        order: { id: 'ASC' },
+        skip: 5,
+        take: 5,
+      });
+      expect(result).toEqual({
+        total: 12,
+        page: 2,
+        data: [
+          {
+            storyId: 1,
+            storyDraftId: 3,
+            authorId: 10,
+            consent: true,
+            firstName: 'John',
+            lastName: 'Doe',
+            grade: 6,
+            docLink: 'https://x.com/a',
+          },
+          {
+            storyId: 2,
+            storyDraftId: null,
+            authorId: 11,
+            consent: false,
+            firstName: 'Risa',
+            lastName: 'Tuffaha',
+            grade: null,
+            docLink: null,
+          },
+        ],
       });
     });
   });

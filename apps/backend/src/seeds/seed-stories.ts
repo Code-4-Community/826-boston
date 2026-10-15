@@ -56,9 +56,9 @@ export async function seedStories(dataSource: DataSource) {
           const draftEntity = draftRepo.create({
             id: data.story_draft_id,
             story: { id: storyEntity.id },
-            docLink: 'http://docs.google.com',
+            docLink: data.doc_link ?? 'http://docs.google.com',
             submissionRound: SubmissionRound.ONE,
-            studentConsent: false,
+            studentConsent: data.student_consent ?? false,
             inManuscript: false,
             editRound: EditRound.ONE,
             proofread: false,
@@ -77,4 +77,11 @@ export async function seedStories(dataSource: DataSource) {
       console.log(`  - Story already exists: ${data.title}`);
     }
   }
+
+  // Drafts are seeded with explicit ids, so move the id sequence past them.
+  // Otherwise creating a draft through the app would reuse an existing id.
+  const { tableName } = draftRepo.metadata;
+  await dataSource.query(
+    `SELECT setval(pg_get_serial_sequence('"${tableName}"', 'id'), COALESCE((SELECT MAX(id) FROM "${tableName}"), 1))`,
+  );
 }
