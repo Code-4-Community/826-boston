@@ -4,6 +4,7 @@
     "outDir": "../../dist/out-tsc",
     "paths": {
       "@api/*": ["api/*"],
+      "@components/*": ["components/*"],
       "@containers/*": ["containers/*"],
       "@utils/*": ["utils/*"]
     },
