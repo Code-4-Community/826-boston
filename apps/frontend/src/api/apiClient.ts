@@ -148,9 +148,11 @@ export class ApiClient {
     return normalizeAnthology(data);
   }
 
-  public async getStoryDrafts(anthologyId: number) {
+  public async getStoryDrafts(anthologyId: number, isManuscript?: boolean) {
+    const query =
+      isManuscript === undefined ? '' : `?isManuscript=${isManuscript}`;
     return this.get(
-      `/api/stories/anthology/${anthologyId}/story-drafts`,
+      `/api/stories/anthology/${anthologyId}/story-drafts${query}`,
     ) as Promise<StoryDraft[]>;
   }
 
