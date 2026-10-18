@@ -9,7 +9,7 @@ interface Props {
   onSaved: () => void;
 }
 
-// TODO: confirm with the ticket author which fields count as checkpoints.
+// Confirm with the aaron which fields count as checkpoints.
 function getUnmetCheckpoints(draft: StoryDraft): string[] {
   const unmet: string[] = [];
   if (!draft.proofread) unmet.push('Proofreading');
@@ -28,7 +28,7 @@ export default function AddDocumentModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Only drafts that are not approved yet (inManuscript = false)
+  // Only drafts that are not approved yet (isManuscript = false)
   useEffect(() => {
     apiClient
       .getStoryDrafts(anthologyId, false)

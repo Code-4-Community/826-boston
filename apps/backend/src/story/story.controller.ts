@@ -7,6 +7,8 @@ import {
   Post,
   Body,
   NotFoundException,
+  Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { StoryService } from './story.service';
 import { Story } from './story.entity';
@@ -18,6 +20,7 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiCreatedResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AnthologyService } from '../anthology/anthology.service';
 import { AuthorService } from '../author/author.service';
@@ -251,14 +254,28 @@ export class StoryController {
       },
     },
   })
+  @ApiQuery({
+    name: 'isManuscript',
+    required: false,
+    type: Boolean,
+    description:
+      'Optional. If true, only approved drafts (inManuscript = true) are returned. If false, only drafts that are not approved yet. If omitted, all drafts are returned.',
+  })
   @Get('/anthology/:anthologyId/story-drafts')
   async getStoryDraftsByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Query('inManuscript', new ParseBoolPipe({ optional: true }))
+    inManuscript?: boolean,
   ) {
     const stories = await this.storyService.getStoriesByAnthology(anthologyId);
 
     return stories
       .filter((story) => story.storyDraft)
+      .filter(
+        (story) =>
+          inManuscript === undefined ||
+          story.storyDraft?.inManuscript === inManuscript,
+      )
       .map((story) => ({
         ...story.storyDraft,
         story: {
