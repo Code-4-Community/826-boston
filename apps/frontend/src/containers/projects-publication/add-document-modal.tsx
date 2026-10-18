@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import '../../containers/create-publication-modal/styles.css';
 import apiClient from '../../api/apiClient';
 import { StoryDraft } from '../../types';
+import SearchIcon from '../../assets/icons/search.svg';
+import './add-document-modal.css';
 
 interface Props {
   anthologyId: number;
@@ -14,6 +16,13 @@ function getUnmetCheckpoints(draft: StoryDraft): string[] {
   const unmet: string[] = [];
   if (!draft.proofread) unmet.push('Proofreading');
   return unmet;
+}
+
+function ordinal(n: number): string {
+  const lastTwo = n % 100;
+  if (lastTwo >= 11 && lastTwo <= 13) return `${n}th`;
+  const suffix = { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th';
+  return `${n}${suffix}`;
 }
 
 export default function AddDocumentModal({
@@ -39,18 +48,26 @@ export default function AddDocumentModal({
       .finally(() => setLoading(false));
   }, [anthologyId]);
 
-  // The frontend variable: drafts filtered by the author's name
+  // Drafts whose author name has a word starting with the query (e.g. "b" -> Bhuvan, Brenda)
   const filteredDrafts = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     return drafts.filter((d) =>
-      (d.story?.author?.name ?? '').toLowerCase().includes(q),
+      (d.story?.author?.name ?? '')
+        .toLowerCase()
+        .split(/\s+/)
+        .some((word) => word.startsWith(q)),
     );
   }, [drafts, query]);
 
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSelectedDraft(null);
+  };
+
   const handleSelect = (draft: StoryDraft) => {
     setSelectedDraft(draft);
-    setQuery('');
+    setQuery(draft.story?.author?.name ?? '');
   };
 
   const handleAdd = async () => {
@@ -75,11 +92,15 @@ export default function AddDocumentModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className="modal add-doc">
         <div className="modal__header">
           <div className="modal__header-row">
             <h1 className="modal__title">Search for a student draft</h1>
-            <button className="modal__close" onClick={onClose}>
+            <button
+              className="modal__close"
+              onClick={onClose}
+              aria-label="Close"
+            >
               ×
             </button>
           </div>
@@ -92,58 +113,69 @@ export default function AddDocumentModal({
             </div>
           )}
 
+          {/* Ask Aaron about what to do for css/design here */}
           <div className="field">
-            <input
-              className="input"
-              placeholder="Search by student name"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              disabled={loading || saving}
-            />
-            {query.trim() && (
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                {filteredDrafts.length === 0 ? (
-                  <li style={{ padding: '8px' }}>No matching drafts</li>
-                ) : (
-                  filteredDrafts.map((d) => (
-                    <li key={d.id}>
-                      <button
-                        type="button"
-                        style={{
-                          width: '100%',
-                          textAlign: 'left',
-                          padding: '8px',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => handleSelect(d)}
-                      >
-                        {d.story?.author?.name}
-                      </button>
-                    </li>
-                  ))
-                )}
-              </ul>
-            )}
+            <label className="field__label">Student</label>
+            <div className="add-doc__search">
+              <input
+                className="input"
+                placeholder="Search for a student..."
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                disabled={loading || saving}
+              />
+              <img src={SearchIcon} alt="" className="add-doc__search-icon" />
+              {query.trim() && !selectedDraft && (
+                <ul className="add-doc__results">
+                  {filteredDrafts.length === 0 ? (
+                    <li className="add-doc__empty">No matching drafts</li>
+                  ) : (
+                    filteredDrafts.map((d) => (
+                      <li key={d.id}>
+                        <button
+                          type="button"
+                          className="add-doc__result-btn"
+                          onClick={() => handleSelect(d)}
+                        >
+                          {d.story?.author?.name}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
           </div>
 
           {selectedDraft && (
-            <div className="field">
-              <strong>{author?.name}</strong>
-              <div>{author?.bio ?? 'No bio'}</div>
-              <div>Grade: {author?.grade ?? '—'}</div>
-              <a
-                href={selectedDraft.docLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Document
-              </a>
+            <div className="add-doc__card">
+              <h2 className="add-doc__card-name">{author?.name}</h2>
+              <p className="add-doc__card-bio">{author?.bio ?? 'No bio'}</p>
+              <div className="add-doc__card-row">
+                <span className="add-doc__card-label">Grade</span>
+                {author?.grade != null ? ordinal(author.grade) : '—'}
+              </div>
+              <div className="add-doc__card-row">
+                <span className="add-doc__card-label">Document</span>
+                <a
+                  href={selectedDraft.docLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {selectedDraft.docLink}
+                </a>
+              </div>
               {unmet.length > 0 && (
-                <div style={{ color: 'var(--error, #d32f2f)' }}>
-                  Checkpoints {unmet.join(', ')} have not been met yet.
-                </div>
+                <p className="add-doc__card-warning">
+                  Checkpoints{' '}
+                  {unmet.map((checkpoint, i) => (
+                    <span key={checkpoint}>
+                      {i > 0 && ', '}
+                      <strong>{checkpoint}</strong>
+                    </span>
+                  ))}{' '}
+                  have not been met yet.
+                </p>
               )}
             </div>
           )}
@@ -151,13 +183,6 @@ export default function AddDocumentModal({
 
         <div className="modal__footer">
           <div className="modal__footer-right">
-            <button
-              className="btn btn--secondary"
-              onClick={onClose}
-              disabled={saving}
-            >
-              Cancel
-            </button>
             <button
               className="btn btn--primary"
               onClick={handleAdd}

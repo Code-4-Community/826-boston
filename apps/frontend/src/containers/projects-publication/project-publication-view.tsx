@@ -9,11 +9,16 @@ import EditStoryDraftModal, {
 } from './edit-story-draft-modal';
 import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
+import AddDocumentModal from './add-document-modal';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
 
-type Tab = 'omchai' | 'document-tracker' | 'production-info';
+type Tab =
+  | 'omchai'
+  | 'document-tracker'
+  | 'approved-documents'
+  | 'production-info';
 
 interface StoryDraftRow {
   storyDraftId: number;
@@ -39,6 +44,7 @@ const ProjectPublicationView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('omchai');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
   const [editingDraft, setEditingDraft] = useState<StoryDraftRow | null>(null);
   const [storyDrafts, setStoryDrafts] = useState<StoryDraftRow[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -203,6 +209,17 @@ const ProjectPublicationView: React.FC = () => {
           <button
             type="button"
             className={`publication-tab${
+              activeTab === 'approved-documents'
+                ? ' publication-tab--active'
+                : ''
+            }`}
+            onClick={() => setActiveTab('approved-documents')}
+          >
+            Approved Documents
+          </button>
+          <button
+            type="button"
+            className={`publication-tab${
               activeTab === 'production-info' ? ' publication-tab--active' : ''
             }`}
             onClick={() => setActiveTab('production-info')}
@@ -287,6 +304,22 @@ const ProjectPublicationView: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'approved-documents' && (
+          <div className="ppv-tab-content">
+            {/* TEMPORARY: replace with the approved documents table */}
+            <div>
+              <button
+                type="button"
+                className="add-doc__plus-btn"
+                aria-label="Add document"
+                onClick={() => setIsAddDocumentOpen(true)}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'production-info' && (
           <div className="ppv-tab-content">
             <ProductionInfoView
@@ -297,6 +330,14 @@ const ProjectPublicationView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {isAddDocumentOpen && (
+        <AddDocumentModal
+          anthologyId={anthology.id}
+          onClose={() => setIsAddDocumentOpen(false)}
+          onSaved={() => {}}
+        />
+      )}
 
       {isModalOpen && (
         <NewStoryDraftModal
