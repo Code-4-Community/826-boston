@@ -28,7 +28,7 @@ export default function AddDocumentModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Only drafts that are not approved yet (isManuscript = false)
+  // Only drafts that are not approved yet (inManuscript = false)
   useEffect(() => {
     apiClient
       .getStoryDrafts(anthologyId, false)

@@ -255,7 +255,7 @@ export class StoryController {
     },
   })
   @ApiQuery({
-    name: 'isManuscript',
+    name: 'inManuscript',
     required: false,
     type: Boolean,
     description:
