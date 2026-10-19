@@ -6,7 +6,7 @@ import imgFrame69 from '../../assets/images/frame-69.png';
 import DocumentsTable from './documents-table';
 import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
-import AddDocumentModal from './add-document-modal';
+import ApprovedDocumentsView from './approved-documents-view';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
@@ -20,7 +20,6 @@ const ProjectPublicationView: React.FC = () => {
   const [anthology, setAnthology] = useState<Anthology | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('omchai');
-  const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -178,17 +177,7 @@ const ProjectPublicationView: React.FC = () => {
 
         {activeTab === 'approved-documents' && (
           <div className="ppv-tab-content">
-            {/* TEMPORARY: replace with the approved documents table */}
-            <div>
-              <button
-                type="button"
-                className="add-doc__plus-btn"
-                aria-label="Add document"
-                onClick={() => setIsAddDocumentOpen(true)}
-              >
-                +
-              </button>
-            </div>
+            <ApprovedDocumentsView anthologyId={anthology.id} />
           </div>
         )}
 
@@ -202,14 +191,6 @@ const ProjectPublicationView: React.FC = () => {
           </div>
         )}
       </div>
-
-      {isAddDocumentOpen && (
-        <AddDocumentModal
-          anthologyId={anthology.id}
-          onClose={() => setIsAddDocumentOpen(false)}
-          onSaved={() => {}}
-        />
-      )}
     </div>
   );
 };

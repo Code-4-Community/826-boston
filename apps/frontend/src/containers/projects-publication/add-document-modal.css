@@ -157,17 +157,3 @@
   font-size: 18px;
   font-weight: 700;
 }
-
-.add-doc__plus-btn {
-  border: none;
-  background: none;
-  padding: 0 8px;
-  color: #7a7371;
-  font-size: 28px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.add-doc__plus-btn:hover {
-  color: #e85100;
-}
