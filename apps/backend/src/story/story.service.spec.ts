@@ -162,6 +162,20 @@ describe('StoryService', () => {
         ],
       });
     });
+
+    it('filters by draft inManuscript when given', async () => {
+      mockRepository.findAndCount.mockResolvedValue([[], 0]);
+
+      await service.getDocumentsByAnthology(7, 1, 5, true);
+
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
+        where: { anthology: { id: 7 }, storyDraft: { inManuscript: true } },
+        relations: ['author', 'storyDraft'],
+        order: { id: 'ASC' },
+        skip: 0,
+        take: 5,
+      });
+    });
   });
 
   describe('findByAnthologyAndId', () => {

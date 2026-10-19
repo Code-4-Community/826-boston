@@ -76,6 +76,7 @@ describe('StoryController', () => {
         5,
         2,
         10,
+        undefined,
       );
     });
 
@@ -88,6 +89,20 @@ describe('StoryController', () => {
         5,
         1,
         100,
+        undefined,
+      );
+    });
+
+    it('passes the inManuscript filter to the service', async () => {
+      mockAnthologyService.findOne.mockResolvedValue({ id: 5 });
+      mockService.getDocumentsByAnthology.mockResolvedValue(page);
+
+      await controller.getStoryDocumentsByAnthology(5, 1, 10, true);
+      expect(mockService.getDocumentsByAnthology).toHaveBeenCalledWith(
+        5,
+        1,
+        10,
+        true,
       );
     });
 
