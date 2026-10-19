@@ -79,9 +79,9 @@
 }
 .people-filter__button {
   height: 38px;
-  min-width: 168px;
+  min-width: 112px;
   gap: 8px;
-  padding: 8px 20px;
+  padding: 8px 12px;
   border: 1px solid #000;
   border-radius: 8px;
   background: transparent;
@@ -177,7 +177,6 @@
 
 .people-create-btn {
   height: 36px;
-  margin-left: 36px;
   padding: 8px 24px;
   background: #e85100;
   color: #fff;

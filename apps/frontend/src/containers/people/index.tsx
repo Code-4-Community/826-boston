@@ -301,7 +301,7 @@ const People: React.FC = () => {
               onClick={() => setFilterOpen((open) => !open)}
             >
               <img src={FilterIcon} alt="" />
-              <span>All positions</span>
+              <span>Filters</span>
             </button>
             {filterOpen && (
               <div className="people-filter__menu">
