@@ -4,9 +4,9 @@ import apiClient from '../../api/apiClient';
 import { Anthology, Author, SubmissionRound, EditRound } from '../../types';
 import imgFrame69 from '../../assets/images/frame-69.png';
 import NewStoryDraftModal from './new-story-draft-modal';
-import EditStoryDraftModal, {
-  EditableStoryDraft,
-} from './edit-story-draft-modal';
+import StoryDraftDetailPanel, {
+  StoryDraftDetail,
+} from './story-draft-detail-panel';
 import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
 import useAuth from '../../hooks/useAuth';
@@ -15,16 +15,9 @@ import './project-publication-view.css';
 
 type Tab = 'omchai' | 'document-tracker' | 'production-info';
 
-interface StoryDraftRow {
-  storyDraftId: number;
-  authorId: number;
-  firstName: string;
-  lastName: string;
-  nameInBook: string;
+interface StoryDraftRow extends StoryDraftDetail {
   classPeriod: string;
-  docLink: string;
   submissionRound: SubmissionRound;
-  studentConsent: boolean;
   inManuscript: boolean;
   editRound: EditRound;
   proofread: boolean;
@@ -39,7 +32,9 @@ const ProjectPublicationView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('omchai');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingDraft, setEditingDraft] = useState<StoryDraftRow | null>(null);
+  const [selectedDraft, setSelectedDraft] = useState<StoryDraftRow | null>(
+    null,
+  );
   const [storyDrafts, setStoryDrafts] = useState<StoryDraftRow[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -96,9 +91,12 @@ const ProjectPublicationView: React.FC = () => {
             authorId: author?.id ?? 0,
             firstName: nameParts[0] ?? '',
             lastName: nameParts.slice(1).join(' '),
+            bio: author?.bio ?? '',
+            grade: author?.grade ?? null,
             nameInBook: author?.nameInBook ?? '',
             classPeriod: author?.classPeriod ?? '',
             docLink: draft.docLink,
+            checkpoints: draft.checkpoints ?? {},
             submissionRound: draft.submissionRound,
             studentConsent: draft.studentConsent,
             inManuscript: draft.inManuscript,
@@ -237,14 +235,13 @@ const ProjectPublicationView: React.FC = () => {
                   <th>Name in Book</th>
                   <th>Class Period</th>
                   <th>Document Link</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {storyDrafts.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={5}
                       style={{
                         textAlign: 'center',
                         color: 'var(--neutral-400)',
@@ -256,7 +253,23 @@ const ProjectPublicationView: React.FC = () => {
                   </tr>
                 ) : (
                   storyDrafts.map((draft) => (
-                    <tr key={draft.storyDraftId}>
+                    <tr
+                      key={draft.storyDraftId}
+                      className={`document-tracker-row${
+                        selectedDraft?.storyDraftId === draft.storyDraftId
+                          ? ' document-tracker-row--selected'
+                          : ''
+                      }`}
+                      tabIndex={0}
+                      aria-label={`Open details for ${draft.firstName} ${draft.lastName}`}
+                      onClick={() => setSelectedDraft(draft)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedDraft(draft);
+                        }
+                      }}
+                    >
                       <td>{draft.firstName}</td>
                       <td>{draft.lastName}</td>
                       <td>{draft.nameInBook}</td>
@@ -266,18 +279,10 @@ const ProjectPublicationView: React.FC = () => {
                           href={draft.docLink}
                           target="_blank"
                           rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           Open
                         </a>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="document-tracker-edit-btn"
-                          onClick={() => setEditingDraft(draft)}
-                        >
-                          Edit
-                        </button>
                       </td>
                     </tr>
                   ))
@@ -306,10 +311,11 @@ const ProjectPublicationView: React.FC = () => {
         />
       )}
 
-      {editingDraft && (
-        <EditStoryDraftModal
-          draft={editingDraft as EditableStoryDraft}
-          onClose={() => setEditingDraft(null)}
+      {selectedDraft && (
+        <StoryDraftDetailPanel
+          key={selectedDraft.storyDraftId}
+          draft={selectedDraft}
+          onClose={() => setSelectedDraft(null)}
           onSaved={loadStoryDrafts}
         />
       )}

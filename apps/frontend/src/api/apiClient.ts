@@ -185,6 +185,9 @@ export class ApiClient {
       name?: string;
       nameInBook?: string;
       classPeriod?: string;
+      bio?: string;
+      /** null clears the stored grade. */
+      grade?: number | null;
     },
   ): Promise<Author> {
     return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
@@ -200,6 +203,7 @@ export class ApiClient {
       editRound?: EditRound;
       proofread?: boolean;
       notes?: string[];
+      checkpoints?: Record<string, boolean>;
     },
   ): Promise<{ message: string }> {
     return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{

@@ -1,0 +1,250 @@
+.sdp {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  width: 560px;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 40px 40px;
+  overflow-y: auto;
+  background: #fff;
+  border-left: 1px solid var(--neutral-300);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+  font-family: var(--font-body);
+  color: var(--neutral-600);
+}
+
+.sdp__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sdp__collapse {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.sdp__collapse:hover {
+  color: #e85100;
+}
+
+.sdp__status {
+  font-size: 12px;
+  color: var(--neutral-400);
+}
+
+.sdp__error {
+  margin: 0;
+  font-size: 13px;
+  color: #d32f2f;
+}
+
+/* --- Header --- */
+
+.sdp__name {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.sdp__name-input {
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 1 auto;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: none;
+  padding: 2px 0;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--neutral-600);
+}
+
+.sdp__name-sep {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.sdp__bio {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: none;
+  padding: 2px 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--neutral-600);
+}
+
+/* --- Fields --- */
+
+.sdp__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.sdp__field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sdp__label {
+  flex: 0 0 150px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--neutral-600);
+}
+
+.sdp__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sdp__input {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: none;
+  padding: 2px 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--neutral-600);
+}
+
+.sdp__input--link {
+  color: #1a73e8;
+}
+
+.sdp__value-button {
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: none;
+  padding: 2px 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--neutral-600);
+  cursor: text;
+  text-align: left;
+}
+
+.sdp__doc-open {
+  flex: 0 0 auto;
+  text-decoration: none;
+  font-size: 14px;
+  color: #1a73e8;
+}
+
+/* Inputs read as plain text until the staff member interacts with them. */
+.sdp__name-input:hover,
+.sdp__bio:hover,
+.sdp__input:hover,
+.sdp__value-button:hover {
+  border-bottom-color: var(--neutral-300);
+}
+
+.sdp__name-input:focus,
+.sdp__bio:focus,
+.sdp__input:focus {
+  outline: none;
+  border-bottom-color: #e85100;
+}
+
+.sdp__name-input::placeholder,
+.sdp__input::placeholder {
+  color: var(--neutral-400);
+}
+
+.sdp__bio::placeholder {
+  color: var(--neutral-400);
+}
+
+.sdp__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #e85100;
+  cursor: pointer;
+}
+
+/* --- Tabs --- */
+
+.sdp__tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  border-bottom: 1px solid var(--neutral-300);
+}
+
+.sdp__tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.sdp__tab--active {
+  color: #aa5e00;
+  border-bottom-color: #aa5e00;
+}
+
+.sdp__tab-panel {
+  padding-top: 8px;
+}
+
+.sdp__checkpoints {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.sdp__checkpoint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sdp__checkpoint-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.sdp__empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--neutral-400);
+}
