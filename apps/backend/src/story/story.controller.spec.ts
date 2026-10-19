@@ -117,5 +117,58 @@ describe('StoryController', () => {
     });
   });
 
+  describe('get story drafts by anthology', () => {
+    const author = { id: 10, name: 'John Doe' };
+    const stories = [
+      {
+        id: 1,
+        title: 'Approved',
+        author,
+        storyDraft: { id: 3, inManuscript: true },
+      },
+      {
+        id: 2,
+        title: 'Not Approved',
+        author,
+        storyDraft: { id: 4, inManuscript: false },
+      },
+      { id: 3, title: 'No Draft', author, storyDraft: null },
+    ];
+
+    beforeEach(() => {
+      mockService.getStoriesByAnthology.mockResolvedValue(stories);
+    });
+
+    it('returns every draft with its story when inManuscript is omitted', async () => {
+      const result = await controller.getStoryDraftsByAnthology(5);
+
+      expect(mockService.getStoriesByAnthology).toHaveBeenCalledWith(5);
+      expect(result).toEqual([
+        {
+          id: 3,
+          inManuscript: true,
+          story: { id: 1, title: 'Approved', author },
+        },
+        {
+          id: 4,
+          inManuscript: false,
+          story: { id: 2, title: 'Not Approved', author },
+        },
+      ]);
+    });
+
+    it('returns only approved drafts when inManuscript is true', async () => {
+      const result = await controller.getStoryDraftsByAnthology(5, true);
+
+      expect(result.map((draft) => draft.id)).toEqual([3]);
+    });
+
+    it('returns only unapproved drafts when inManuscript is false', async () => {
+      const result = await controller.getStoryDraftsByAnthology(5, false);
+
+      expect(result.map((draft) => draft.id)).toEqual([4]);
+    });
+  });
+
   // todo: other tests
 });
