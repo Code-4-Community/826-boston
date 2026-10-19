@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, type ReactNode } from 'react';
 import apiClient, { type StoryDocumentRow } from '../../api/apiClient';
 import NewStoryDraftModal from './new-story-draft-modal';
 import './documents-table.css';
@@ -36,12 +36,18 @@ function getPageItems(current: number, totalPages: number): (number | null)[] {
 
 interface DocumentsTableProps {
   anthologyId: number;
+  // Only show stories whose draft has this inManuscript value
+  inManuscript?: boolean;
   onRowClick?: (row: StoryDocumentRow) => void;
+  // Modal opened by the + button. Defaults to NewStoryDraftModal.
+  renderAddModal?: (onClose: () => void, onSaved: () => void) => ReactNode;
 }
 
 const DocumentsTable: React.FC<DocumentsTableProps> = ({
   anthologyId,
+  inManuscript,
   onRowClick,
+  renderAddModal,
 }) => {
   const [documents, setDocuments] = useState<StoryDocumentRow[]>([]);
   const [page, setPage] = useState(1);
@@ -57,6 +63,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
           anthologyId,
           pageToLoad,
           PAGE_SIZE,
+          inManuscript,
         );
         setDocuments(result.data);
         setTotal(result.total);
@@ -65,7 +72,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         // Documents will remain as-is on fetch failure
       }
     },
-    [anthologyId],
+    [anthologyId, inManuscript],
   );
 
   useEffect(() => {
@@ -251,13 +258,19 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         </nav>
       )}
 
-      {isModalOpen && (
-        <NewStoryDraftModal
-          anthologyId={anthologyId}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={() => loadDocuments(page)}
-        />
-      )}
+      {isModalOpen &&
+        (renderAddModal ? (
+          renderAddModal(
+            () => setIsModalOpen(false),
+            () => loadDocuments(page),
+          )
+        ) : (
+          <NewStoryDraftModal
+            anthologyId={anthologyId}
+            onClose={() => setIsModalOpen(false)}
+            onSaved={() => loadDocuments(page)}
+          />
+        ))}
     </>
   );
 };

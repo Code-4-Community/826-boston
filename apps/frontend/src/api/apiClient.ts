@@ -114,9 +114,12 @@ export class ApiClient {
     anthologyId: string | number,
     page = 1,
     limit = 10,
+    inManuscript?: boolean,
   ): Promise<PaginatedStoryDocuments> {
+    const filter =
+      inManuscript === undefined ? '' : `&inManuscript=${inManuscript}`;
     return this.get(
-      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}`,
+      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}${filter}`,
     ) as Promise<PaginatedStoryDocuments>;
   }
 
