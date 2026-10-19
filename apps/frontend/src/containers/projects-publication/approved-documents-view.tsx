@@ -13,6 +13,7 @@ const ApprovedDocumentsView: React.FC<ApprovedDocumentsViewProps> = ({
   <DocumentsTable
     anthologyId={anthologyId}
     inManuscript
+    showFilters={false}
     renderAddModal={(onClose, onSaved) => (
       <AddDocumentModal
         anthologyId={anthologyId}
