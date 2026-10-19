@@ -79,6 +79,7 @@
 }
 .people-filter__button {
   height: 38px;
+  min-width: 168px;
   gap: 8px;
   padding: 8px 20px;
   border: 1px solid #000;
@@ -741,6 +742,12 @@
 }
 .people-modal__position-options button:hover {
   background: #f9f5f4;
+}
+.people-modal__error {
+  width: 501px;
+  margin: 0;
+  color: #d7002e;
+  font: 400 14px/19px 'Open Sans', sans-serif;
 }
 .people-modal__footer {
   display: flex;

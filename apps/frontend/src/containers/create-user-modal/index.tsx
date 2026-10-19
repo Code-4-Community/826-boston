@@ -15,6 +15,7 @@ interface CreateUserModalProps {
   onClose: () => void;
   onSave: (form: CreateUserFormState) => void;
   positions: string[];
+  errorMessage?: string;
 }
 
 interface FieldProps {
@@ -46,6 +47,7 @@ export default function CreateUserModal({
   onClose,
   onSave,
   positions,
+  errorMessage,
 }: CreateUserModalProps) {
   const [form, setForm] = useState<CreateUserFormState>(INITIAL_FORM);
   const [positionSearch, setPositionSearch] = useState('');
@@ -184,6 +186,12 @@ export default function CreateUserModal({
             </select>
           </Field>
         </div>
+
+        {errorMessage && (
+          <p className="people-modal__error" role="alert">
+            {errorMessage}
+          </p>
+        )}
 
         <div className="people-modal__footer">
           <div className="people-modal__footer-right">

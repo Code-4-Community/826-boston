@@ -15,6 +15,19 @@ import './people.css';
 const hasAdminRole = (role: Role | string | null | undefined) =>
   String(role).toUpperCase() === 'ADMIN';
 
+const DEFAULT_POSITIONS = [
+  'Publishing Manager',
+  'Volunteer Manager',
+  'Program Manager',
+  'Community Partner',
+  'Director of Communications',
+  'Director of Programs',
+  'Operations Manager',
+  'Event Coordinator',
+  'School Partner',
+  'Development Manager',
+];
+
 const PersonCard: React.FC<{
   user: User;
   onOpen: (user: User) => void;
@@ -217,9 +230,11 @@ const People: React.FC = () => {
     () =>
       Array.from(
         new Set(
-          (users ?? [])
-            .map((user) => user.title)
-            .filter((title): title is string => Boolean(title)),
+          DEFAULT_POSITIONS.concat(
+            (users ?? [])
+              .map((user) => user.title)
+              .filter((title): title is string => Boolean(title)),
+          ),
         ),
       ),
     [users],
@@ -282,12 +297,11 @@ const People: React.FC = () => {
             <button
               type="button"
               className="people-filter__button"
+              aria-pressed={positionsSelected.length > 0}
               onClick={() => setFilterOpen((open) => !open)}
             >
               <img src={FilterIcon} alt="" />
-              <span>
-                {positionsSelected.length === 0 ? 'All positions' : 'Position'}
-              </span>
+              <span>All positions</span>
             </button>
             {filterOpen && (
               <div className="people-filter__menu">
@@ -365,6 +379,11 @@ const People: React.FC = () => {
       {showModal && (
         <CreateUserModal
           positions={positions}
+          errorMessage={
+            createUserMutation.isError
+              ? 'Unable to save this member. Please try again.'
+              : undefined
+          }
           onClose={() => setShowModal(false)}
           onSave={(form) =>
             createUserMutation.mutate(
