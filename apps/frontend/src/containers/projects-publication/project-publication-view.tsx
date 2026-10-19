@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
-import { Anthology, Author, SubmissionRound, EditRound } from '../../types';
+import { Anthology } from '../../types';
 import imgFrame69 from '../../assets/images/frame-69.png';
-import NewStoryDraftModal from './new-story-draft-modal';
-import EditStoryDraftModal, {
-  EditableStoryDraft,
-} from './edit-story-draft-modal';
+import DocumentsTable from './documents-table';
 import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
 import AddDocumentModal from './add-document-modal';
@@ -14,27 +11,7 @@ import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
 
-type Tab =
-  | 'omchai'
-  | 'document-tracker'
-  | 'approved-documents'
-  | 'production-info';
-
-interface StoryDraftRow {
-  storyDraftId: number;
-  authorId: number;
-  firstName: string;
-  lastName: string;
-  nameInBook: string;
-  classPeriod: string;
-  docLink: string;
-  submissionRound: SubmissionRound;
-  studentConsent: boolean;
-  inManuscript: boolean;
-  editRound: EditRound;
-  proofread: boolean;
-  notes: string[];
-}
+type Tab = 'omchai' | 'documents' | 'approved-documents' | 'production-info';
 
 const ProjectPublicationView: React.FC = () => {
   const [, , currentUser] = useAuth();
@@ -43,10 +20,7 @@ const ProjectPublicationView: React.FC = () => {
   const [anthology, setAnthology] = useState<Anthology | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('omchai');
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
-  const [editingDraft, setEditingDraft] = useState<StoryDraftRow | null>(null);
-  const [storyDrafts, setStoryDrafts] = useState<StoryDraftRow[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -87,38 +61,6 @@ const ProjectPublicationView: React.FC = () => {
     }
   };
 
-  const loadStoryDrafts = useCallback(async () => {
-    if (!id) return;
-    try {
-      const drafts = await apiClient.getStoryDrafts(Number(id));
-
-      setStoryDrafts(
-        drafts.map((draft) => {
-          const author = draft.story?.author;
-          const nameParts = author?.name?.split(' ') ?? [];
-
-          return {
-            storyDraftId: draft.id,
-            authorId: author?.id ?? 0,
-            firstName: nameParts[0] ?? '',
-            lastName: nameParts.slice(1).join(' '),
-            nameInBook: author?.nameInBook ?? '',
-            classPeriod: author?.classPeriod ?? '',
-            docLink: draft.docLink,
-            submissionRound: draft.submissionRound,
-            studentConsent: draft.studentConsent,
-            inManuscript: draft.inManuscript,
-            editRound: draft.editRound,
-            proofread: draft.proofread,
-            notes: draft.notes ?? [],
-          };
-        }),
-      );
-    } catch {
-      // Story drafts will remain as-is on fetch failure
-    }
-  }, [id]);
-
   useEffect(() => {
     if (id) {
       apiClient
@@ -130,12 +72,6 @@ const ProjectPublicationView: React.FC = () => {
         .catch(() => setLoading(false));
     }
   }, [id]);
-
-  useEffect(() => {
-    if (activeTab === 'document-tracker') {
-      loadStoryDrafts();
-    }
-  }, [activeTab, loadStoryDrafts]);
 
   if (loading) return <div className="ppv-wrapper">Loading...</div>;
   if (!anthology)
@@ -200,11 +136,11 @@ const ProjectPublicationView: React.FC = () => {
           <button
             type="button"
             className={`publication-tab${
-              activeTab === 'document-tracker' ? ' publication-tab--active' : ''
+              activeTab === 'documents' ? ' publication-tab--active' : ''
             }`}
-            onClick={() => setActiveTab('document-tracker')}
+            onClick={() => setActiveTab('documents')}
           >
-            Document Tracker
+            Documents
           </button>
           <button
             type="button"
@@ -234,73 +170,9 @@ const ProjectPublicationView: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'document-tracker' && (
+        {activeTab === 'documents' && (
           <div className="ppv-tab-content">
-            <div className="document-tracker-header">
-              <button
-                type="button"
-                className="publication-create-btn"
-                onClick={() => setIsModalOpen(true)}
-              >
-                New Story Draft
-              </button>
-            </div>
-
-            <table className="document-tracker-table">
-              <thead>
-                <tr>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Name in Book</th>
-                  <th>Class Period</th>
-                  <th>Document Link</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {storyDrafts.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      style={{
-                        textAlign: 'center',
-                        color: 'var(--neutral-400)',
-                        padding: '24px',
-                      }}
-                    >
-                      No story drafts yet.
-                    </td>
-                  </tr>
-                ) : (
-                  storyDrafts.map((draft) => (
-                    <tr key={draft.storyDraftId}>
-                      <td>{draft.firstName}</td>
-                      <td>{draft.lastName}</td>
-                      <td>{draft.nameInBook}</td>
-                      <td>{draft.classPeriod}</td>
-                      <td>
-                        <a
-                          href={draft.docLink}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Open
-                        </a>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="document-tracker-edit-btn"
-                          onClick={() => setEditingDraft(draft)}
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            <DocumentsTable anthologyId={anthology.id} />
           </div>
         )}
 
@@ -336,22 +208,6 @@ const ProjectPublicationView: React.FC = () => {
           anthologyId={anthology.id}
           onClose={() => setIsAddDocumentOpen(false)}
           onSaved={() => {}}
-        />
-      )}
-
-      {isModalOpen && (
-        <NewStoryDraftModal
-          anthologyId={anthology.id}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={loadStoryDrafts}
-        />
-      )}
-
-      {editingDraft && (
-        <EditStoryDraftModal
-          draft={editingDraft as EditableStoryDraft}
-          onClose={() => setEditingDraft(null)}
-          onSaved={loadStoryDrafts}
         />
       )}
     </div>

@@ -1,27 +1,6 @@
 /* Root Layout - 826 Boston Admin Dashboard */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;600;700&display=swap');
 
-/* CSS Variables */
-:root {
-  /* Neutral Palette */
-  --neutral-100: #fdfcfb;
-  --neutral-150: #faf6f3;
-  --neutral-200: #f9f6f5;
-  --neutral-300: #cac3c0;
-  --neutral-400: #938b88;
-  --neutral-600: #3b3330;
-
-  /* Accent */
-  --accent-500: #ec9209;
-
-  /* Typography */
-  --font-heading: 'Roboto', sans-serif;
-  --font-body: 'Open Sans', sans-serif;
-
-  /* Spacing */
-  --sidebar-width: 322px;
-}
-
 .root-shell {
   display: flex;
   height: 100vh;
