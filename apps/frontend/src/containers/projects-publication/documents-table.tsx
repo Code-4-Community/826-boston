@@ -47,6 +47,9 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteRow, setDeleteRow] = useState<StoryDocumentRow | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -93,8 +96,29 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   };
 
   const handleDelete = (row: StoryDocumentRow) => {
-    // TODO: open the delete confirmation modal once it is built
-    console.log('delete requested for story', row.storyId);
+    setDeleteRow(row);
+    setDeleteError(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteRow) return;
+
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await apiClient.deleteStory(deleteRow.storyId);
+      setDocuments((prev) =>
+        prev.filter((document) => document.storyId !== deleteRow.storyId),
+      );
+      setTotal((prev) => Math.max(0, prev - 1));
+      setDeleteRow(null);
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? err.message : 'Failed to delete document.',
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -257,6 +281,107 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
           onClose={() => setIsModalOpen(false)}
           onSaved={() => loadDocuments(page)}
         />
+      )}
+
+      {deleteRow && (
+        <div className="documents-modal-overlay">
+          <div
+            className="documents-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="documents-delete-title"
+          >
+            <div className="documents-delete-modal-header">
+              <h2 id="documents-delete-title">Confirm deletion</h2>
+              <button
+                type="button"
+                className="documents-delete-modal-close"
+                aria-label="Close confirmation modal"
+                onClick={() => setDeleteRow(null)}
+                disabled={isDeleting}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z"
+                    fill="#1C1B1F"
+                  />
+                </svg>
+              </button>
+            </div>
+            <p className="documents-delete-modal-message">
+              Are you sure you want to delete this document? This action cannot
+              be undone.
+            </p>
+            <div className="documents-delete-student">
+              <h3>
+                {deleteRow.lastName}, {deleteRow.firstName}
+              </h3>
+              <p className="documents-delete-description">
+                {deleteRow.description || 'No description available.'}
+              </p>
+              <dl>
+                <div>
+                  <dt>Grade</dt>
+                  <dd>{formatGrade(deleteRow.grade) || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Name in Book</dt>
+                  <dd>{deleteRow.nameInBook || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Consent on file</dt>
+                  <dd>{deleteRow.consent ? 'Yes' : 'No'}</dd>
+                </div>
+                <div>
+                  <dt>Document</dt>
+                  <dd>
+                    {deleteRow.docLink ? (
+                      <a
+                        href={deleteRow.docLink}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {deleteRow.docLink}
+                      </a>
+                    ) : (
+                      '—'
+                    )}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+            {deleteError && (
+              <p className="documents-delete-error" role="alert">
+                {deleteError}
+              </p>
+            )}
+            <div className="documents-delete-modal-footer">
+              <button
+                type="button"
+                className="documents-delete-cancel"
+                onClick={() => setDeleteRow(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="documents-delete-confirm"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

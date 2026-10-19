@@ -79,6 +79,12 @@
   padding: 0;
   color: #d92d20;
   cursor: pointer;
+  visibility: hidden;
+}
+
+.documents-row:hover .documents-delete-btn,
+.documents-delete-btn:focus-visible {
+  visibility: visible;
 }
 
 .documents-delete-btn:hover {
@@ -102,6 +108,208 @@
   text-align: center;
   color: var(--neutral-400);
   padding: 24px;
+}
+
+.documents-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.documents-delete-modal {
+  display: flex;
+  width: min(100%, 546px);
+  height: auto;
+  max-height: calc(100vh - 48px);
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #d6d1ce;
+  border-radius: 12px;
+  padding: 28px 24px 18px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  box-sizing: border-box;
+}
+
+.documents-delete-modal-header,
+.documents-delete-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.documents-delete-modal-header h2 {
+  margin: 0;
+  color: var(--neutral-600);
+  font-family: Roboto, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.documents-delete-modal-close {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  background: transparent;
+  color: var(--neutral-600);
+  padding: 0;
+  opacity: 1;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.documents-delete-modal-message {
+  margin: 12px 0 16px;
+  color: var(--neutral-600);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.documents-delete-student {
+  border: 1px solid #d6d1ce;
+  border-radius: 6px;
+  padding: 16px;
+  color: var(--neutral-600);
+}
+
+.documents-delete-student h3 {
+  margin: 0 0 16px;
+  font-family: Roboto, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.documents-delete-description {
+  margin: 0 0 16px;
+  color: var(--neutral-400);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.documents-delete-student dl {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.documents-delete-student dl > div {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+}
+
+.documents-delete-student dt {
+  white-space: nowrap;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.documents-delete-student dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.documents-delete-student a {
+  color: #3d9bb8;
+}
+
+.documents-delete-error {
+  margin: 12px 0 0;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.documents-delete-modal-footer {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.documents-delete-cancel,
+.documents-delete-confirm {
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.documents-delete-cancel {
+  width: 74px;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--neutral-400);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--neutral-600);
+  padding: 8px 12px;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.documents-delete-confirm {
+  display: flex;
+  width: 70px;
+  height: 36px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #d7002e;
+  color: #fff;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.documents-delete-cancel:disabled,
+.documents-delete-confirm:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .documents-pagination {

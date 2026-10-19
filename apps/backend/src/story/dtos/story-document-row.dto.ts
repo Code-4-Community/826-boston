@@ -6,6 +6,8 @@ export interface StoryDocumentRow {
   firstName: string;
   lastName: string;
   grade: number | null;
+  nameInBook: string | null;
+  description: string | null;
   docLink: string | null;
 }
 

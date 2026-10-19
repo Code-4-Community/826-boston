@@ -108,7 +108,13 @@ describe('StoryService', () => {
         [
           {
             id: 1,
-            author: { id: 10, name: 'John Doe', grade: 6 },
+            author: {
+              id: 10,
+              name: 'John Doe',
+              nameInBook: 'John Doe',
+              grade: 6,
+            },
+            studentBio: 'A student description.',
             storyDraft: {
               id: 3,
               studentConsent: true,
@@ -145,6 +151,8 @@ describe('StoryService', () => {
             firstName: 'John',
             lastName: 'Doe',
             grade: 6,
+            nameInBook: 'John Doe',
+            description: 'A student description.',
             docLink: 'https://x.com/a',
           },
           {
@@ -155,6 +163,8 @@ describe('StoryService', () => {
             firstName: 'Risa',
             lastName: 'Tuffaha',
             grade: null,
+            nameInBook: null,
+            description: null,
             docLink: null,
           },
         ],

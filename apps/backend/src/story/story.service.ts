@@ -73,6 +73,8 @@ export class StoryService {
       consent: story.storyDraft?.studentConsent ?? false,
       ...splitName(story.author.name),
       grade: story.author.grade ?? null,
+      nameInBook: story.author.nameInBook ?? null,
+      description: story.studentBio ?? story.description ?? null,
       docLink: story.storyDraft?.docLink ?? null,
     }));
 

@@ -34,6 +34,8 @@ export interface StoryDocumentRow {
   firstName: string;
   lastName: string;
   grade: number | null;
+  nameInBook: string | null;
+  description: string | null;
   docLink: string | null;
 }
 
@@ -232,6 +234,10 @@ export class ApiClient {
     return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
       message: string;
     }>;
+  }
+
+  public async deleteStory(storyId: number): Promise<Story> {
+    return this.delete(`/api/stories/${storyId}`) as Promise<Story>;
   }
 
   public async getOmchaiByAnthology(
