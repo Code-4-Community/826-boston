@@ -170,6 +170,30 @@ describe('StoryService', () => {
         ],
       });
     });
+
+    it('applies grade and checkpoint filters before pagination', async () => {
+      mockRepository.findAndCount.mockResolvedValue([[], 0]);
+
+      await service.getDocumentsByAnthology(7, 1, 5, {
+        grades: [5, 6],
+        checkpoints: [
+          'draft1',
+          'draft2',
+          'consent',
+          'authorApproval',
+          'copyedit',
+          'proofread',
+        ],
+      });
+
+      const query = mockRepository.findAndCount.mock.calls[0][0];
+      expect(query.where.author.grade.value).toEqual([5, 6]);
+      expect(query.where.storyDraft.submissionRound.value).toEqual([0, 1]);
+      expect(query.where.storyDraft.studentConsent).toBe(true);
+      expect(query.where.storyDraft.inManuscript).toBe(true);
+      expect(query.where.storyDraft.editRound).toBe(1);
+      expect(query.where.storyDraft.proofread).toBe(true);
+    });
   });
 
   describe('createStory', () => {

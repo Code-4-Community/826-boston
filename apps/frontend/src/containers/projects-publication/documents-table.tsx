@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import apiClient, { type StoryDocumentRow } from '../../api/apiClient';
+import apiClient, {
+  type StoryDocumentRow,
+  type StoryDocumentsFilters,
+} from '../../api/apiClient';
 import NewStoryDraftModal from './new-story-draft-modal';
+import DocumentsFilterModal from './documents-filter-modal';
 import './documents-table.css';
 
 const PAGE_SIZE = 14;
@@ -47,6 +51,11 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<StoryDocumentsFilters>({
+    grades: [],
+    checkpoints: [],
+  });
   const [deleteRow, setDeleteRow] = useState<StoryDocumentRow | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -54,12 +63,16 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const loadDocuments = useCallback(
-    async (pageToLoad: number) => {
+    async (
+      pageToLoad: number,
+      filters: StoryDocumentsFilters = appliedFilters,
+    ) => {
       try {
         const result = await apiClient.getStoryDocuments(
           anthologyId,
           pageToLoad,
           PAGE_SIZE,
+          filters,
         );
         setDocuments(result.data);
         setTotal(result.total);
@@ -68,7 +81,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         // Documents will remain as-is on fetch failure
       }
     },
-    [anthologyId],
+    [anthologyId, appliedFilters],
   );
 
   useEffect(() => {
@@ -121,11 +134,22 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
     }
   };
 
+  const activeFilterCount =
+    appliedFilters.grades.length + appliedFilters.checkpoints.length;
+
+  const applyFilters = (filters: StoryDocumentsFilters) => {
+    setAppliedFilters(filters);
+    setIsFilterModalOpen(false);
+  };
+
   return (
     <>
       <div className="documents-toolbar">
-        {/* TODO: open the filter modal once it is built */}
-        <button type="button" className="documents-filter-btn">
+        <button
+          type="button"
+          className="documents-filter-btn"
+          onClick={() => setIsFilterModalOpen(true)}
+        >
           <svg
             className="documents-filter-icon"
             viewBox="0 0 24 24"
@@ -139,6 +163,9 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
             <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
           </svg>
           <span>Filters</span>
+          {activeFilterCount > 0 && (
+            <span className="documents-filter-count">{activeFilterCount}</span>
+          )}
         </button>
       </div>
 
@@ -280,6 +307,14 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
           anthologyId={anthologyId}
           onClose={() => setIsModalOpen(false)}
           onSaved={() => loadDocuments(page)}
+        />
+      )}
+
+      {isFilterModalOpen && (
+        <DocumentsFilterModal
+          initialFilters={appliedFilters}
+          onClose={() => setIsFilterModalOpen(false)}
+          onApply={applyFilters}
         />
       )}
 

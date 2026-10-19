@@ -16,3 +16,17 @@ export interface PaginatedStoryDocuments {
   total: number;
   page: number;
 }
+
+export type DocumentCheckpoint =
+  | 'draft1'
+  | 'draft2'
+  | 'draft3'
+  | 'consent'
+  | 'authorApproval'
+  | 'copyedit'
+  | 'proofread';
+
+export interface StoryDocumentsFilters {
+  grades?: number[];
+  checkpoints?: DocumentCheckpoint[];
+}

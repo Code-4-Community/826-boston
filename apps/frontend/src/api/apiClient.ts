@@ -45,6 +45,20 @@ export interface PaginatedStoryDocuments {
   page: number;
 }
 
+export type DocumentCheckpoint =
+  | 'draft1'
+  | 'draft2'
+  | 'draft3'
+  | 'consent'
+  | 'authorApproval'
+  | 'copyedit'
+  | 'proofread';
+
+export interface StoryDocumentsFilters {
+  grades: number[];
+  checkpoints: DocumentCheckpoint[];
+}
+
 const defaultBaseUrl =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
@@ -116,9 +130,20 @@ export class ApiClient {
     anthologyId: string | number,
     page = 1,
     limit = 10,
+    filters?: StoryDocumentsFilters,
   ): Promise<PaginatedStoryDocuments> {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (filters?.grades.length) {
+      params.set('grades', filters.grades.join(','));
+    }
+    if (filters?.checkpoints.length) {
+      params.set('checkpoints', filters.checkpoints.join(','));
+    }
     return this.get(
-      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}`,
+      `/api/stories/anthology/${anthologyId}/documents?${params.toString()}`,
     ) as Promise<PaginatedStoryDocuments>;
   }
 
