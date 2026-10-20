@@ -39,7 +39,8 @@ interface DocumentsTableProps {
   // Only show stories whose draft has this inManuscript value
   inManuscript?: boolean;
   showFilters?: boolean;
-  onRowClick?: (row: StoryDocumentRow) => void;
+  // reload refetches the current page, e.g. after the row is edited
+  onRowClick?: (row: StoryDocumentRow, reload: () => void) => void;
   // Modal opened by the + button. Defaults to NewStoryDraftModal.
   renderAddModal?: (onClose: () => void, onSaved: () => void) => ReactNode;
 }
@@ -163,7 +164,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
               <tr
                 key={row.storyId}
                 className="documents-row"
-                onClick={() => onRowClick?.(row)}
+                onClick={() => onRowClick?.(row, () => loadDocuments(page))}
               >
                 <td>
                   <div className="documents-consent-cell">

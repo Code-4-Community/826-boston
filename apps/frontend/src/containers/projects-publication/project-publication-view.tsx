@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import apiClient, { type StoryDocumentRow } from '../../api/apiClient';
 import { Anthology } from '../../types';
 import imgFrame69 from '../../assets/images/frame-69.png';
 import DocumentsTable from './documents-table';
+import StoryDraftDetailPanel, {
+  StoryDraftDetail,
+} from './story-draft-detail-panel';
 import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
 import ApprovedDocumentsView from './approved-documents-view';
@@ -20,6 +23,11 @@ const ProjectPublicationView: React.FC = () => {
   const [anthology, setAnthology] = useState<Anthology | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('omchai');
+  // Draft open in the detail panel, plus a reload for the table it came from
+  const [selectedDraft, setSelectedDraft] = useState<{
+    draft: StoryDraftDetail;
+    reload: () => void;
+  } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,6 +65,35 @@ const ProjectPublicationView: React.FC = () => {
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Table rows lack bio, name in book and checkpoints, so fetch the full draft
+  const openDraftDetail = async (row: StoryDocumentRow, reload: () => void) => {
+    if (row.storyDraftId === null || !anthology) return;
+    try {
+      const drafts = await apiClient.getStoryDrafts(anthology.id);
+      const draft = drafts.find((d) => d.id === row.storyDraftId);
+      if (!draft) return;
+      const author = draft.story?.author;
+
+      setSelectedDraft({
+        draft: {
+          storyDraftId: draft.id,
+          authorId: row.authorId,
+          firstName: row.firstName,
+          lastName: row.lastName,
+          bio: author?.bio ?? '',
+          grade: author?.grade ?? null,
+          nameInBook: author?.nameInBook ?? '',
+          studentConsent: draft.studentConsent,
+          docLink: draft.docLink,
+          checkpoints: draft.checkpoints ?? {},
+        },
+        reload,
+      });
+    } catch {
+      // Panel stays closed on fetch failure
     }
   };
 
@@ -171,13 +208,19 @@ const ProjectPublicationView: React.FC = () => {
 
         {activeTab === 'documents' && (
           <div className="ppv-tab-content">
-            <DocumentsTable anthologyId={anthology.id} />
+            <DocumentsTable
+              anthologyId={anthology.id}
+              onRowClick={openDraftDetail}
+            />
           </div>
         )}
 
         {activeTab === 'approved-documents' && (
           <div className="ppv-tab-content">
-            <ApprovedDocumentsView anthologyId={anthology.id} />
+            <ApprovedDocumentsView
+              anthologyId={anthology.id}
+              onRowClick={openDraftDetail}
+            />
           </div>
         )}
 
@@ -191,6 +234,15 @@ const ProjectPublicationView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {selectedDraft && (
+        <StoryDraftDetailPanel
+          key={selectedDraft.draft.storyDraftId}
+          draft={selectedDraft.draft}
+          onClose={() => setSelectedDraft(null)}
+          onSaved={selectedDraft.reload}
+        />
+      )}
     </div>
   );
 };

@@ -47,6 +47,7 @@ export class StoryDraftController {
           editRound: 'ROUND_ONE',
           proofread: false,
           notes: ['Initial submission'],
+          checkpoints: { draftOneSubmitted: true },
           createdAt: '2024-01-15T10:30:00Z',
           updatedAt: '2024-01-15T10:30:00Z',
         },
@@ -105,6 +106,7 @@ export class StoryDraftController {
       createStoryDraftDto.proofread ?? false,
       createStoryDraftDto.notes ?? [],
       createStoryDraftDto.storyId,
+      createStoryDraftDto.checkpoints ?? {},
     );
 
     return { message: 'StoryDraft created successfully' };
@@ -158,6 +160,7 @@ export class StoryDraftController {
       updateStoryDraftDto.editRound,
       updateStoryDraftDto.proofread,
       updateStoryDraftDto.notes,
+      updateStoryDraftDto.checkpoints,
     );
     return {
       message: `StoryDraft with id ${storyDraftId} updated successfully`,

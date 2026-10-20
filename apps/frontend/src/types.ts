@@ -45,6 +45,8 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
+  /** Keyed by checkpoint id - see STORY_DRAFT_CHECKPOINTS. */
+  checkpoints?: Record<string, boolean>;
   story?: {
     id: number;
     title: string;

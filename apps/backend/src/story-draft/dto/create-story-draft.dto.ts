@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsEnum,
   IsArray,
+  IsObject,
   IsOptional,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -61,4 +62,14 @@ export class CreateStoryDraftDto {
   @IsString({ each: true })
   @IsOptional()
   notes?: string[];
+
+  @ApiPropertyOptional({
+    description:
+      'Checkpoint completion keyed by checkpoint id, e.g. { "copyedit": true }',
+    type: 'object',
+    additionalProperties: { type: 'boolean' },
+  })
+  @IsObject()
+  @IsOptional()
+  checkpoints?: Record<string, boolean>;
 }
