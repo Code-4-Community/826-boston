@@ -9,6 +9,7 @@ import {
   Post,
   Body,
   NotFoundException,
+  ParseBoolPipe,
   BadRequestException,
 } from '@nestjs/common';
 import { StoryService } from './story.service';
@@ -97,6 +98,13 @@ export class StoryController {
     example: 10,
     description: 'Rows per page (max 100)',
   })
+  @ApiQuery({
+    name: 'inManuscript',
+    required: false,
+    type: Boolean,
+    description:
+      'Optional. If true, only stories with an approved draft (inManuscript = true) are returned. If false, only stories with a draft that is not approved yet. If omitted, every story is returned.',
+  })
   @ApiOkResponse({
     description: 'Story documents retrieved successfully',
     schema: {
@@ -136,6 +144,8 @@ export class StoryController {
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('inManuscript', new ParseBoolPipe({ optional: true }))
+    inManuscript?: boolean,
   ): Promise<PaginatedStoryDocuments> {
     if (page < 1 || limit < 1) {
       throw new BadRequestException('page and limit must be positive integers');
@@ -154,6 +164,7 @@ export class StoryController {
       anthologyId,
       page,
       Math.min(limit, MAX_DOCUMENTS_PAGE_SIZE),
+      inManuscript,
     );
   }
 
@@ -332,14 +343,28 @@ export class StoryController {
       },
     },
   })
+  @ApiQuery({
+    name: 'inManuscript',
+    required: false,
+    type: Boolean,
+    description:
+      'Optional. If true, only approved drafts (inManuscript = true) are returned. If false, only drafts that are not approved yet. If omitted, all drafts are returned.',
+  })
   @Get('/anthology/:anthologyId/story-drafts')
   async getStoryDraftsByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Query('inManuscript', new ParseBoolPipe({ optional: true }))
+    inManuscript?: boolean,
   ) {
     const stories = await this.storyService.getStoriesByAnthology(anthologyId);
 
     return stories
       .filter((story) => story.storyDraft)
+      .filter(
+        (story) =>
+          inManuscript === undefined ||
+          story.storyDraft?.inManuscript === inManuscript,
+      )
       .map((story) => ({
         ...story.storyDraft,
         story: {

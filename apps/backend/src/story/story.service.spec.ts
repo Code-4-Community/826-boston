@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { TestingModule, Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Story } from './story.entity';
@@ -25,6 +26,7 @@ describe('StoryService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOneBy: jest.fn(),
+    findOne: jest.fn(),
     find: jest.fn(),
     findAndCount: jest.fn(),
     count: jest.fn(),
@@ -159,6 +161,61 @@ describe('StoryService', () => {
           },
         ],
       });
+    });
+
+    it('filters by draft inManuscript when given', async () => {
+      mockRepository.findAndCount.mockResolvedValue([[], 0]);
+
+      await service.getDocumentsByAnthology(7, 1, 5, true);
+
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
+        where: { anthology: { id: 7 }, storyDraft: { inManuscript: true } },
+        relations: ['author', 'storyDraft'],
+        order: { id: 'ASC' },
+        skip: 0,
+        take: 5,
+      });
+    });
+  });
+
+  describe('findByAnthologyAndId', () => {
+    it('returns the story when it belongs to the anthology', async () => {
+      mockRepository.findOne.mockResolvedValue(storyExample);
+
+      const result = await service.findByAnthologyAndId(1, 1);
+
+      expect(result).toEqual(storyExample);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, anthology: { id: 1 } },
+      });
+    });
+
+    it('throws NotFoundException when the story is not in the anthology', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findByAnthologyAndId(2, 1)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('remove', () => {
+    it('removes the story when it exists', async () => {
+      mockRepository.findOneBy.mockResolvedValue(storyExample);
+      mockRepository.remove.mockResolvedValue(storyExample);
+
+      const result = await service.remove(1);
+
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+      expect(mockRepository.remove).toHaveBeenCalledWith(storyExample);
+      expect(result).toEqual(storyExample);
+    });
+
+    it('throws NotFoundException and removes nothing when the story does not exist', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+      expect(mockRepository.remove).not.toHaveBeenCalled();
     });
   });
 

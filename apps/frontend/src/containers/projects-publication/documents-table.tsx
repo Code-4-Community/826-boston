@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, type ReactNode } from 'react';
 import apiClient, { type StoryDocumentRow } from '../../api/apiClient';
 import NewStoryDraftModal from './new-story-draft-modal';
 import './documents-table.css';
@@ -36,12 +36,21 @@ function getPageItems(current: number, totalPages: number): (number | null)[] {
 
 interface DocumentsTableProps {
   anthologyId: number;
-  onRowClick?: (row: StoryDocumentRow) => void;
+  // Only show stories whose draft has this inManuscript value
+  inManuscript?: boolean;
+  showFilters?: boolean;
+  // reload refetches the current page, e.g. after the row is edited
+  onRowClick?: (row: StoryDocumentRow, reload: () => void) => void;
+  // Modal opened by the + button. Defaults to NewStoryDraftModal.
+  renderAddModal?: (onClose: () => void, onSaved: () => void) => ReactNode;
 }
 
 const DocumentsTable: React.FC<DocumentsTableProps> = ({
   anthologyId,
+  inManuscript,
+  showFilters = true,
   onRowClick,
+  renderAddModal,
 }) => {
   const [documents, setDocuments] = useState<StoryDocumentRow[]>([]);
   const [page, setPage] = useState(1);
@@ -57,6 +66,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
           anthologyId,
           pageToLoad,
           PAGE_SIZE,
+          inManuscript,
         );
         setDocuments(result.data);
         setTotal(result.total);
@@ -65,7 +75,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         // Documents will remain as-is on fetch failure
       }
     },
-    [anthologyId],
+    [anthologyId, inManuscript],
   );
 
   useEffect(() => {
@@ -99,24 +109,26 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
 
   return (
     <>
-      <div className="documents-toolbar">
-        {/* TODO: open the filter modal once it is built */}
-        <button type="button" className="documents-filter-btn">
-          <svg
-            className="documents-filter-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
-          </svg>
-          <span>Filters</span>
-        </button>
-      </div>
+      {showFilters && (
+        <div className="documents-toolbar">
+          {/* TODO: open the filter modal once it is built */}
+          <button type="button" className="documents-filter-btn">
+            <svg
+              className="documents-filter-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+            </svg>
+            <span>Filters</span>
+          </button>
+        </div>
+      )}
 
       <table className="document-tracker-table">
         <thead>
@@ -152,7 +164,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
               <tr
                 key={row.storyId}
                 className="documents-row"
-                onClick={() => onRowClick?.(row)}
+                onClick={() => onRowClick?.(row, () => loadDocuments(page))}
               >
                 <td>
                   <div className="documents-consent-cell">
@@ -251,13 +263,19 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         </nav>
       )}
 
-      {isModalOpen && (
-        <NewStoryDraftModal
-          anthologyId={anthologyId}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={() => loadDocuments(page)}
-        />
-      )}
+      {isModalOpen &&
+        (renderAddModal ? (
+          renderAddModal(
+            () => setIsModalOpen(false),
+            () => loadDocuments(page),
+          )
+        ) : (
+          <NewStoryDraftModal
+            anthologyId={anthologyId}
+            onClose={() => setIsModalOpen(false)}
+            onSaved={() => loadDocuments(page)}
+          />
+        ))}
     </>
   );
 };

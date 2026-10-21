@@ -114,9 +114,12 @@ export class ApiClient {
     anthologyId: string | number,
     page = 1,
     limit = 10,
+    inManuscript?: boolean,
   ): Promise<PaginatedStoryDocuments> {
+    const filter =
+      inManuscript === undefined ? '' : `&inManuscript=${inManuscript}`;
     return this.get(
-      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}`,
+      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}${filter}`,
     ) as Promise<PaginatedStoryDocuments>;
   }
 
@@ -175,9 +178,11 @@ export class ApiClient {
     return normalizeAnthology(data);
   }
 
-  public async getStoryDrafts(anthologyId: number) {
+  public async getStoryDrafts(anthologyId: number, inManuscript?: boolean) {
+    const query =
+      inManuscript === undefined ? '' : `?inManuscript=${inManuscript}`;
     return this.get(
-      `/api/stories/anthology/${anthologyId}/story-drafts`,
+      `/api/stories/anthology/${anthologyId}/story-drafts${query}`,
     ) as Promise<StoryDraft[]>;
   }
 
@@ -212,6 +217,9 @@ export class ApiClient {
       name?: string;
       nameInBook?: string;
       classPeriod?: string;
+      bio?: string;
+      /** null clears the stored grade. */
+      grade?: number | null;
     },
   ): Promise<Author> {
     return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
@@ -227,6 +235,7 @@ export class ApiClient {
       editRound?: EditRound;
       proofread?: boolean;
       notes?: string[];
+      checkpoints?: Record<string, boolean>;
     },
   ): Promise<{ message: string }> {
     return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
