@@ -3,6 +3,7 @@ import '../../containers/create-publication-modal/styles.css';
 import apiClient from '../../api/apiClient';
 import { StoryDraft } from '../../types';
 import SearchIcon from '../../assets/icons/search.svg';
+import { STORY_DRAFT_CHECKPOINTS } from './checkpoints';
 import './add-document-modal.css';
 
 interface Props {
@@ -11,11 +12,10 @@ interface Props {
   onSaved: () => void;
 }
 
-// Confirm with the aaron which fields count as checkpoints.
 function getUnmetCheckpoints(draft: StoryDraft): string[] {
-  const unmet: string[] = [];
-  if (!draft.proofread) unmet.push('Proofreading');
-  return unmet;
+  return STORY_DRAFT_CHECKPOINTS.filter(
+    (checkpoint) => !draft.checkpoints?.[checkpoint.id],
+  ).map((checkpoint) => checkpoint.label);
 }
 
 function ordinal(n: number): string {
