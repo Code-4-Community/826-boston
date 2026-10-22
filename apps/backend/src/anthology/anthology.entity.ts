@@ -14,6 +14,7 @@ import { Story } from '../story/story.entity';
 import { InventoryHolding } from '../inventory-holding/inventory-holding.entity';
 import { ProductionInfo } from '../production-info/production-info.entity';
 import { Omchai } from 'src/omchai/omchai.entity';
+import { Task } from 'src/task/task.entity';
 
 @Entity()
 export class Anthology {
@@ -89,4 +90,7 @@ export class Anthology {
 
   @OneToMany(() => Omchai, (omchai) => omchai.anthology)
   omchaiAssignments: Relation<Omchai[]>;
+
+  @OneToMany(() => Task, (task) => task.anthology)
+  tasks: Relation<Task[]>;
 }
