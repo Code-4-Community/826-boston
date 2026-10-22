@@ -20,7 +20,10 @@ export class TaskAttachment {
   @Column()
   fileUrl: string;
 
-  @ManyToOne(() => Task, (task) => task.attachments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Task, (task) => task.attachments, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'task_id' })
   task: Relation<Task>;
 

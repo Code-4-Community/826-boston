@@ -5,7 +5,7 @@ export class AddTaskTables1792202171435 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE "task_attachments" ("id" SERIAL NOT NULL, "fileName" character varying NOT NULL, "fileUrl" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "task" integer, CONSTRAINT "PK_34eb9e5133310a488eaba0be28a" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "task_attachments" ("id" SERIAL NOT NULL, "fileName" character varying NOT NULL, "fileUrl" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "task" integer NOT NULL, CONSTRAINT "PK_34eb9e5133310a488eaba0be28a" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."tasks_areaofwork_enum" AS ENUM('PLANNING', 'PROGRAMMING', 'CHECKPOINT', 'PRODUCTION')`,
