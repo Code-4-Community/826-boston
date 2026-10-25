@@ -45,11 +45,11 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
-  story?: {
-    id: number;
-    title: string;
-    author?: Author;
-  };
+  /**
+   * Attached by GET /stories/anthology/:id/story-drafts, which returns each
+   * draft alongside a trimmed version of its parent story.
+   */
+  story?: Pick<Story, 'id' | 'title'> & { author?: Author };
 }
 
 export interface Story {
@@ -154,6 +154,41 @@ export interface Anthology {
   shopifyUrl?: string;
   subtitle?: string;
   byline?: string;
+  /** camelCase fields as returned by the backend anthology endpoints. */
+  pubLevel?: AnthologyPubLevel;
+  publishedDate?: string;
+  sponsors?: string[];
+  triggers?: string[];
+  ageCategories?: string[];
+}
+
+/** Production metadata for an anthology, from GET /production-info/:anthologyId. */
+export interface ProductionInfo {
+  id: number;
+  design_files_link?: string | null;
+  cover_image_file_link?: string | null;
+  binding_type?: string | null;
+  dimensions?: string | null;
+  printing_cost?: number | null;
+  print_run?: number | null;
+  weight_in_grams?: number | null;
+  page_count?: number | null;
+  printed_by?: string | null;
+  foreword_author?: string | null;
+  number_of_students?: number | null;
+}
+
+export interface AnthologyInventoryLocation {
+  inventoryId: number;
+  name: string;
+  /** 0 when the location holds no copies of this anthology. */
+  numCopies: number;
+}
+
+export interface AnthologyInventory {
+  anthology: Anthology;
+  locations: AnthologyInventoryLocation[];
+  totalCopies: number;
 }
 
 export interface CreateAnthologyDto {

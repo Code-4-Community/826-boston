@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import {
   Anthology,
+  AnthologyInventory,
   Author,
   CreateAnthologyDto,
   CreateBatchOmchaiAssignmentsDto,
@@ -100,6 +101,28 @@ export class ApiClient {
   public async getAnthology(id: string | number): Promise<Anthology> {
     const data = await this.get(`/api/anthologies/${id}`);
     return normalizeAnthology(data);
+  }
+
+  /**
+   * Every inventory location and the copies it holds of this anthology.
+   * Locations holding no copies are included, with `numCopies: 0`.
+   */
+  public async getAnthologyInventory(
+    id: string | number,
+  ): Promise<AnthologyInventory> {
+    return this.get(
+      `/api/anthologies/${id}/inventory`,
+    ) as Promise<AnthologyInventory>;
+  }
+
+  /** Production metadata for an anthology. Resolves to null when none exists. */
+  public async getProductionInfo(
+    anthologyId: string | number,
+  ): Promise<ProductionInfo | null> {
+    return this.get(`/api/production-info/${anthologyId}`).then(
+      (data) => data as ProductionInfo,
+      () => null,
+    );
   }
 
   public async getStoriesByAnthology(

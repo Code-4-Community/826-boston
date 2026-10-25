@@ -42,6 +42,17 @@ export class Anthology {
   @Column({ type: 'simple-array', default: [] })
   triggers: string[];
 
+  // NOTE: PluralNamingStrategy ignores @Column `name`, so the physical column
+  // is "ageCategories". Don't add a `name:` here — it would be silently dropped.
+  @Column({
+    type: 'enum',
+    enum: AgeCategory,
+    enumName: 'anthologys_agecategories_enum',
+    array: true,
+    default: [],
+  })
+  ageCategories: AgeCategory[];
+
   @Column({ type: 'date', nullable: true })
   publishedDate?: Date;
 

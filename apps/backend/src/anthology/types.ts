@@ -14,5 +14,9 @@ export enum AnthologyPubLevel {
 }
 
 export enum AgeCategory {
-  YA = 'Young Adult Books (Ages 13-18)',
+  EARLY_READER = 'Early Reader Books (Ages 5–8)',
+  CHAPTER_BOOK = 'Chapter Books (Ages 6–10)',
+  MIDDLE_GRADE = 'Middle Grade Books (Ages 8–13)',
+  YA = 'Young Adult Books (Ages 13–18)',
+  ADULT = 'Adult (Ages 18+)',
 }

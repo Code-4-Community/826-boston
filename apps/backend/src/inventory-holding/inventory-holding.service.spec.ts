@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { InventoryHoldingService } from './inventory-holding.service';
 import { InventoryHolding } from './inventory-holding.entity';
+import { Inventory } from '../inventory/inventory.entity';
 import { CreateInventoryHoldingDto } from './dto/create-inventory-holding.dto';
 import { UpdateInventoryHoldingDto } from './dto/update-inventory-holding.dto';
 
@@ -17,6 +18,10 @@ describe('InventoryHoldingService', () => {
     remove: jest.fn(),
   };
 
+  const mockInventoryRepository = {
+    find: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -24,6 +29,10 @@ describe('InventoryHoldingService', () => {
         {
           provide: getRepositoryToken(InventoryHolding),
           useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Inventory),
+          useValue: mockInventoryRepository,
         },
       ],
     }).compile();
@@ -51,9 +60,7 @@ describe('InventoryHoldingService', () => {
     mockRepository.create.mockReturnValue(created);
     mockRepository.save.mockResolvedValue(created);
 
-    const result = await service.create(
-      dto as unknown as CreateInventoryHoldingDto,
-    );
+    const result = await service.create(dto as CreateInventoryHoldingDto);
 
     expect(result).toEqual(created);
     expect(mockRepository.create).toHaveBeenCalledWith(dto);
@@ -114,7 +121,7 @@ describe('InventoryHoldingService', () => {
 
     const result = await service.update(1, {
       numCopies: 8,
-    } as unknown as UpdateInventoryHoldingDto);
+    } as UpdateInventoryHoldingDto);
 
     expect(result).toEqual(updated);
     expect(mockRepository.save).toHaveBeenCalledWith(updated);
@@ -134,5 +141,45 @@ describe('InventoryHoldingService', () => {
 
     expect(result).toEqual(holding);
     expect(mockRepository.remove).toHaveBeenCalledWith(holding);
+  });
+
+  describe('findLocationsByAnthology', () => {
+    it('includes locations with no holding for the anthology, with 0 copies', async () => {
+      mockInventoryRepository.find.mockResolvedValue([
+        { id: 1, name: "O'Bryant Writers' Room" },
+        { id: 2, name: 'Northeastern University' },
+        { id: 3, name: '826 Columbus Ave' },
+      ]);
+      mockRepository.find.mockResolvedValue([
+        { id: 10, numCopies: 42, inventory: { id: 3 } },
+      ]);
+
+      const result = await service.findLocationsByAnthology(7);
+
+      expect(result).toEqual([
+        { inventoryId: 1, name: "O'Bryant Writers' Room", numCopies: 0 },
+        { inventoryId: 2, name: 'Northeastern University', numCopies: 0 },
+        { inventoryId: 3, name: '826 Columbus Ave', numCopies: 42 },
+      ]);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { anthology: { id: 7 } },
+        relations: ['inventory'],
+      });
+    });
+
+    it('returns every location with 0 copies when the anthology has no holdings', async () => {
+      mockInventoryRepository.find.mockResolvedValue([
+        { id: 1, name: "O'Bryant Writers' Room" },
+        { id: 2, name: 'Northeastern University' },
+      ]);
+      mockRepository.find.mockResolvedValue([]);
+
+      const result = await service.findLocationsByAnthology(99);
+
+      expect(result).toEqual([
+        { inventoryId: 1, name: "O'Bryant Writers' Room", numCopies: 0 },
+        { inventoryId: 2, name: 'Northeastern University', numCopies: 0 },
+      ]);
+    });
   });
 });
