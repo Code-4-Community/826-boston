@@ -18,6 +18,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { OmchaiGuard } from './auth/guards/omchai.guard';
 import { UserStatusGuard } from './auth/guards/user-status.guard';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { UserStatusGuard } from './auth/guards/user-status.guard';
     UsersModule,
     StoryDraftModule,
     AuthModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [

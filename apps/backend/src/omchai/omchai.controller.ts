@@ -200,7 +200,8 @@ export class OmchaiController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update an Omchai assignment',
-    description: 'Updates an existing Omchai assignment. Requires authentication.',
+    description:
+      'Updates an existing Omchai assignment. Requires authentication.',
   })
   @ApiOkResponse({
     description: 'Omchai assignment updated successfully',

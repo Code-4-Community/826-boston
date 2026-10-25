@@ -16,6 +16,9 @@ import {
 import User from './dtos/user.dto';
 import Role from './dtos/role';
 
+/** Allows explicitly clearing a field by sending `null` instead of omitting it. */
+type Nullable<T> = { [K in keyof T]?: T[K] | null };
+
 export interface FilterSortAnthologyBody {
   pubDateRange?: { start: string; end: string };
   pubLevels?: string[];
@@ -24,19 +27,46 @@ export interface FilterSortAnthologyBody {
   sortBy?: string;
 }
 
+export interface StoryDocumentRow {
+  storyId: number;
+  storyDraftId: number | null;
+  authorId: number;
+  consent: boolean;
+  firstName: string;
+  lastName: string;
+  grade: number | null;
+  docLink: string | null;
+}
+
+export interface PaginatedStoryDocuments {
+  data: StoryDocumentRow[];
+  total: number;
+  page: number;
+}
+
 const defaultBaseUrl =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
-/** Backend returns camelCase (`photoUrl`); UI expects `photo_url` in several places. */
+/** Backend returns camelCase (`photoUrl`, `shopifyUrl`); UI expects the snake_case
+ *  variants in several places, so both keys are populated on the returned object. */
 function normalizeAnthology(raw: unknown): Anthology {
   if (!raw || typeof raw !== 'object') {
     return raw as Anthology;
   }
   const o = raw as Record<string, unknown>;
-  const url =
+  const photoUrl =
     (typeof o.photo_url === 'string' ? o.photo_url : undefined) ??
     (typeof o.photoUrl === 'string' ? o.photoUrl : undefined);
-  return { ...(o as unknown as Anthology), photo_url: url, photoUrl: url };
+  const shopifyUrl =
+    (typeof o.shopify_url === 'string' ? o.shopify_url : undefined) ??
+    (typeof o.shopifyUrl === 'string' ? o.shopifyUrl : undefined);
+  return {
+    ...(o as unknown as Anthology),
+    photo_url: photoUrl,
+    photoUrl: photoUrl,
+    shopify_url: shopifyUrl,
+    shopifyUrl: shopifyUrl,
+  };
 }
 
 function normalizeAnthologies(raw: unknown): Anthology[] {
@@ -103,6 +133,16 @@ export class ApiClient {
     >;
   }
 
+  public async getStoryDocuments(
+    anthologyId: string | number,
+    page = 1,
+    limit = 10,
+  ): Promise<PaginatedStoryDocuments> {
+    return this.get(
+      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}`,
+    ) as Promise<PaginatedStoryDocuments>;
+  }
+
   public async filterSortAnthologies(
     body: FilterSortAnthologyBody,
   ): Promise<Anthology[]> {
@@ -120,6 +160,42 @@ export class ApiClient {
     classPeriod?: string;
   }): Promise<Author> {
     return this.post('/api/author', body) as Promise<Author>;
+  }
+
+  public async getProductionInfo(
+    anthologyId: number,
+  ): Promise<ProductionInfo | null> {
+    try {
+      return (await this.get(
+        `/api/production-info/${anthologyId}`,
+      )) as ProductionInfo;
+    } catch {
+      return null;
+    }
+  }
+
+  public async createProductionInfo(
+    body: Nullable<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
+  ): Promise<ProductionInfo> {
+    return this.post('/api/production-info', body) as Promise<ProductionInfo>;
+  }
+
+  public async updateProductionInfo(
+    id: number,
+    body: Nullable<Omit<ProductionInfo, 'id'>>,
+  ): Promise<ProductionInfo> {
+    return this.put(
+      `/api/production-info/${id}`,
+      body,
+    ) as Promise<ProductionInfo>;
+  }
+
+  public async updateAnthology(
+    id: number,
+    body: Nullable<{ shopify_url: string; isbn: string }>,
+  ): Promise<Anthology> {
+    const data = await this.patch(`/api/anthologies/${id}`, body);
+    return normalizeAnthology(data);
   }
 
   public async getStoryDrafts(anthologyId: number) {

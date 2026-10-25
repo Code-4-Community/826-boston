@@ -31,6 +31,7 @@ export const mockAnthology: Anthology = {
   omchaiAssignments: [],
   programs: [],
   sponsors: [],
+  tasks: [],
 };
 
 export const mockProductionInfo: ProductionInfo = {
@@ -61,6 +62,7 @@ describe('ProductionInfoService', () => {
 
   const mockAnthologyRepository = {
     findOne: jest.fn(),
+    save: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -101,15 +103,24 @@ describe('ProductionInfoService', () => {
       mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
       mockProductionInfoRepository.create.mockReturnValue(mockProductionInfo);
       mockProductionInfoRepository.save.mockResolvedValue(mockProductionInfo);
+      mockAnthologyRepository.save.mockResolvedValue(mockAnthology);
 
       const result = await service.create(dto);
 
       expect(anthologyRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
       });
-      expect(productionInfoRepository.create).toHaveBeenCalledWith(dto);
+      expect(productionInfoRepository.create).toHaveBeenCalledWith({
+        design_files_link: 'http://example.com',
+      });
       expect(productionInfoRepository.save).toHaveBeenCalledWith(
         mockProductionInfo,
+      );
+      expect(anthologyRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: mockAnthology.id,
+          productionInfo: mockProductionInfo,
+        }),
       );
       expect(result).toEqual(mockProductionInfo);
     });

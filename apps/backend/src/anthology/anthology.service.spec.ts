@@ -31,6 +31,7 @@ const mockAnthology1: Anthology = {
     id: 1,
     anthology: { id: 1 } as Anthology,
   },
+  tasks: [],
 };
 
 const mockAnthology2: Anthology = {
@@ -58,6 +59,7 @@ const mockAnthology2: Anthology = {
     id: 2,
     anthology: { id: 2 } as Anthology,
   },
+  tasks: [],
 };
 
 const mockAnthology3: Anthology = {
@@ -85,6 +87,7 @@ const mockAnthology3: Anthology = {
     id: 3,
     anthology: { id: 3 } as Anthology,
   },
+  tasks: [],
 };
 
 describe('AnthologyService', () => {

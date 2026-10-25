@@ -18,21 +18,28 @@ export class ProductionInfoService {
   async create(
     createProductionInfoDto: CreateProductionInfoDto,
   ): Promise<ProductionInfo> {
+    const { anthology_id, ...productionInfoFields } = createProductionInfoDto;
+
     const anthology = await this.anthologyRepository.findOne({
-      where: { id: createProductionInfoDto.anthology_id },
+      where: { id: anthology_id },
     });
 
     if (!anthology) {
       throw new NotFoundException(
-        `Anthology with ID ${createProductionInfoDto.anthology_id} not found`,
+        `Anthology with ID ${anthology_id} not found`,
       );
     }
 
-    const productionInfo = this.productionInfoRepository.create({
-      ...createProductionInfoDto,
-    });
+    const productionInfo = await this.productionInfoRepository.save(
+      this.productionInfoRepository.create(productionInfoFields),
+    );
 
-    return this.productionInfoRepository.save(productionInfo);
+    // ProductionInfo is the inverse side of this relation. Anthology owns the
+    // foreign key column, so the link is only persisted by saving the anthology.
+    anthology.productionInfo = productionInfo;
+    await this.anthologyRepository.save(anthology);
+
+    return productionInfo;
   }
 
   async findAll(): Promise<ProductionInfo[]> {
@@ -67,20 +74,31 @@ export class ProductionInfoService {
       throw new NotFoundException(`Production info with ID ${id} not found`);
     }
 
-    if (updateProductionInfoDto.anthology_id) {
-      const anthology = await this.anthologyRepository.findOne({
-        where: { id: updateProductionInfoDto.anthology_id },
+    const { anthology_id, ...productionInfoFields } = updateProductionInfoDto;
+
+    if (anthology_id) {
+      const newAnthology = await this.anthologyRepository.findOne({
+        where: { id: anthology_id },
       });
 
-      if (!anthology) {
+      if (!newAnthology) {
         throw new NotFoundException(
-          `Anthology with ID ${updateProductionInfoDto.anthology_id} not found`,
+          `Anthology with ID ${anthology_id} not found`,
         );
       }
-      productionInfo.anthology.id = anthology.id;
+
+      const previousAnthology = productionInfo.anthology;
+      if (previousAnthology && previousAnthology.id !== newAnthology.id) {
+        previousAnthology.productionInfo = null;
+        await this.anthologyRepository.save(previousAnthology);
+      }
+
+      newAnthology.productionInfo = productionInfo;
+      await this.anthologyRepository.save(newAnthology);
+      productionInfo.anthology = newAnthology;
     }
 
-    Object.assign(productionInfo, updateProductionInfoDto);
+    Object.assign(productionInfo, productionInfoFields);
 
     return this.productionInfoRepository.save(productionInfo);
   }

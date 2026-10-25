@@ -1,12 +1,15 @@
 import {
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
   ParseIntPipe,
+  Query,
   Post,
   Body,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { StoryService } from './story.service';
 import { Story } from './story.entity';
@@ -18,11 +21,15 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiCreatedResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AnthologyService } from '../anthology/anthology.service';
 import { AuthorService } from '../author/author.service';
 import { CreateStoryDto } from './dtos/create-story.dto';
+import { PaginatedStoryDocuments } from './dtos/story-document-row.dto';
 import { Public } from 'src/auth/roles.decorator';
+
+const MAX_DOCUMENTS_PAGE_SIZE = 100;
 
 @ApiTags('Story')
 @Controller('stories')
@@ -74,6 +81,80 @@ export class StoryController {
     const stories = await this.storyService.getStoriesByAnthology(anthologyId);
 
     return stories;
+  }
+
+  @Public()
+  @ApiOperation({
+    summary: 'Get story documents table for an anthology',
+    description:
+      'Retrieves a paginated, flattened view of every story in an anthology ' +
+      '(author name, grade, consent, and document link) for the publication Documents tab.',
+  })
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    example: 10,
+    description: 'Rows per page (max 100)',
+  })
+  @ApiOkResponse({
+    description: 'Story documents retrieved successfully',
+    schema: {
+      example: {
+        data: [
+          {
+            storyId: 1,
+            storyDraftId: 3,
+            authorId: 5,
+            consent: true,
+            firstName: 'John',
+            lastName: 'Doe',
+            grade: 6,
+            docLink: 'https://www.example.com/uhfouaofu',
+          },
+        ],
+        total: 42,
+        page: 1,
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'page or limit is not a positive integer',
+  })
+  @ApiNotFoundResponse({
+    description: 'Anthology not found',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Anthology with ID 999 not found',
+        error: 'Not Found',
+      },
+    },
+  })
+  @Get('/anthology/:anthologyId/documents')
+  async getStoryDocumentsByAnthology(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ): Promise<PaginatedStoryDocuments> {
+    if (page < 1 || limit < 1) {
+      throw new BadRequestException('page and limit must be positive integers');
+    }
+    // Keeps the row offset within what the database can handle
+    if (!Number.isSafeInteger(page * MAX_DOCUMENTS_PAGE_SIZE)) {
+      throw new BadRequestException('page is too large');
+    }
+
+    const anthology = await this.anthologyService.findOne(anthologyId);
+    if (!anthology) {
+      throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
+    }
+
+    return this.storyService.getDocumentsByAnthology(
+      anthologyId,
+      page,
+      Math.min(limit, MAX_DOCUMENTS_PAGE_SIZE),
+    );
   }
 
   @Public()
