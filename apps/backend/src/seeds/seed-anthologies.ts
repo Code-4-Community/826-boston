@@ -27,20 +27,17 @@ export async function seedAnthologies(dataSource: DataSource) {
 
   console.log('Seeding production info...');
 
-  // Anthology ids are generated in AnthologiesSeed order, so `anthology_id` is
-  // that 1-indexed position. Look the anthology up by it and attach the row —
-  // previously these were saved unlinked, and re-inserted on every seed run.
-  const anthologies = await anthologyRepo.find({
-    order: { id: 'ASC' },
-    relations: ['productionInfo'],
-  });
-
+  // Anthology ids are generated in AnthologiesSeed order, so `anthology_id`
+  // matches the id of the anthology each row belongs to.
   for (const { anthology_id, ...piData } of ProductionInfoSeed) {
-    const anthology = anthologies[anthology_id - 1];
+    const anthology = await anthologyRepo.findOne({
+      where: { id: anthology_id },
+      relations: ['productionInfo'],
+    });
 
     if (!anthology) {
       console.log(
-        `  - Anthology at position ${anthology_id} not found, skipping production info`,
+        `  - Anthology ${anthology_id} not found, skipping production info`,
       );
       continue;
     }
