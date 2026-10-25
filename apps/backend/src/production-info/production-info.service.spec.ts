@@ -30,6 +30,7 @@ export const mockAnthology: Anthology = {
   omchaiAssignments: [],
   programs: [],
   sponsors: [],
+  tasks: [],
 };
 
 export const mockProductionInfo: ProductionInfo = {
