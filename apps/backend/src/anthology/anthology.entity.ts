@@ -62,7 +62,11 @@ export class Anthology {
   @Column({ type: 'simple-array', default: [] })
   sponsors: string[];
 
-  @Column({ type: 'enum', enum: AnthologyStatus })
+  @Column({
+    type: 'enum',
+    enum: AnthologyStatus,
+    default: AnthologyStatus.NOT_STARTED,
+  })
   status: AnthologyStatus;
 
   @Column({

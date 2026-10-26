@@ -48,7 +48,7 @@ interface UploadedFileType {
   buffer: Buffer;
   size: number;
 }
-import { AnthologyPubLevel, AnthologyStatus } from './types';
+import { AnthologyPubLevel } from './types';
 
 @ApiTags('Anthologies')
 @Controller('anthologies')
@@ -74,7 +74,7 @@ export class AnthologyController {
           id: 1,
           title: '826 Spring Collection 2024',
           description: 'A collection of student works',
-          status: 'published',
+          status: 'Can Be Shared',
           pubLevel: 'public',
           programs: ['after-school'],
           photoUrl: 'https://example.com/photo.jpg',
@@ -112,7 +112,7 @@ export class AnthologyController {
           id: 1,
           title: '826 Spring Collection 2024',
           description: 'A collection of student works',
-          status: 'published',
+          status: 'Can Be Shared',
           pubLevel: 'public',
           programs: ['after-school'],
           photoUrl: 'https://example.com/photo.jpg',
@@ -139,7 +139,7 @@ export class AnthologyController {
         id: 1,
         title: '826 Spring Collection 2024',
         description: 'A collection of student works',
-        status: 'published',
+        status: 'Can Be Shared',
         pubLevel: 'public',
         programs: ['after-school'],
         photoUrl: 'https://example.com/photo.jpg',
@@ -187,7 +187,7 @@ export class AnthologyController {
           id: 1,
           title: '826 Spring Collection 2024',
           description: 'A collection of student works',
-          status: 'Published',
+          status: 'Can Be Shared',
           pubLevel: 'Chapbook',
         },
         locations: [
@@ -282,7 +282,7 @@ export class AnthologyController {
         id: 42,
         title: 'New Anthology 2024',
         description: 'A new collection of student works',
-        status: 'draft',
+        status: 'Not Started',
         pubLevel: 'internal',
         programs: ['after-school', 'workshop'],
         photoUrl: null,
@@ -309,7 +309,6 @@ export class AnthologyController {
     return this.anthologyService.create(
       createAnthologyDto.title,
       createAnthologyDto.description,
-      createAnthologyDto.status as AnthologyStatus,
       createAnthologyDto.pub_level as AnthologyPubLevel,
       createAnthologyDto.programs,
       createAnthologyDto.photo_url,
@@ -332,7 +331,7 @@ export class AnthologyController {
         id: 42,
         title: 'Updated Anthology Title',
         description: 'Updated description',
-        status: 'published',
+        status: 'Can Be Shared',
         pubLevel: 'public',
         programs: ['after-school'],
         photoUrl: 'https://example.com/photo.jpg',
@@ -394,7 +393,7 @@ export class AnthologyController {
         title: 'Anthology Title',
         photoUrl: 'https://s3.example.com/images/42-1693456789.jpg',
         description: 'Description',
-        status: 'published',
+        status: 'Can Be Shared',
         pubLevel: 'public',
         programs: ['after-school'],
         isbn: null,

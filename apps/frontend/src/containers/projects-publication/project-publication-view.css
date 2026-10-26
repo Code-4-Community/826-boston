@@ -23,9 +23,13 @@
   text-decoration: none;
 }
 
-.ppv-breadcrumb-link:hover { text-decoration: underline; }
+.ppv-breadcrumb-link:hover {
+  text-decoration: underline;
+}
 
-.ppv-breadcrumb-sep { color: var(--neutral-400); }
+.ppv-breadcrumb-sep {
+  color: var(--neutral-400);
+}
 
 .ppv-content {
   display: flex;
@@ -110,6 +114,17 @@
   align-self: center;
 }
 
+.ppv-status-pill {
+  margin-left: auto;
+  padding: 4px 16px;
+  border-radius: 13px;
+  background-color: var(--neutral-200);
+  color: var(--neutral-500);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
 .publication-tabs button.publication-tab {
   background: none;
   border: none;
@@ -152,8 +167,8 @@
 
 .document-tracker-edit-btn {
   background: none;
-  border: 1px solid #E85100;
-  color: #E85100;
+  border: 1px solid #e85100;
+  color: #e85100;
   border-radius: 6px;
   padding: 4px 14px;
   font-size: 13px;
@@ -163,7 +178,7 @@
 }
 
 .document-tracker-edit-btn:hover {
-  background: #E85100;
+  background: #e85100;
   color: #fff;
 }
 
