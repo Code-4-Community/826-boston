@@ -162,18 +162,6 @@ export class ApiClient {
     return this.post('/api/author', body) as Promise<Author>;
   }
 
-  public async getProductionInfo(
-    anthologyId: number,
-  ): Promise<ProductionInfo | null> {
-    try {
-      return (await this.get(
-        `/api/production-info/${anthologyId}`,
-      )) as ProductionInfo;
-    } catch {
-      return null;
-    }
-  }
-
   public async createProductionInfo(
     body: Nullable<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
   ): Promise<ProductionInfo> {
