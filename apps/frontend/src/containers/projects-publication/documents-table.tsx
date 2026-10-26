@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import apiClient, { type StoryDocumentRow } from '../../api/apiClient';
+import apiClient, {
+  type StoryDocumentRow,
+  type StoryDocumentsFilters,
+} from '../../api/apiClient';
 import NewStoryDraftModal from './new-story-draft-modal';
+import DocumentsFilterModal from './documents-filter-modal';
 import './documents-table.css';
 
 const PAGE_SIZE = 14;
@@ -47,17 +51,40 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<StoryDocumentsFilters>({
+    grades: [],
+    checkpoints: [],
+  });
+  const [deleteRow, setDeleteRow] = useState<StoryDocumentRow | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const loadDocuments = useCallback(
-    async (pageToLoad: number) => {
+    async (
+      pageToLoad: number,
+      filters: StoryDocumentsFilters = appliedFilters,
+    ) => {
       try {
-        const result = await apiClient.getStoryDocuments(
+        let result = await apiClient.getStoryDocuments(
           anthologyId,
           pageToLoad,
           PAGE_SIZE,
+          filters,
         );
+        // The requested page can be past the end once rows drop out of the
+        // filtered set, so fall back to the last page that has rows.
+        const lastPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+        if (pageToLoad > lastPage) {
+          result = await apiClient.getStoryDocuments(
+            anthologyId,
+            lastPage,
+            PAGE_SIZE,
+            filters,
+          );
+        }
         setDocuments(result.data);
         setTotal(result.total);
         setPage(result.page);
@@ -65,7 +92,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         // Documents will remain as-is on fetch failure
       }
     },
-    [anthologyId],
+    [anthologyId, appliedFilters],
   );
 
   useEffect(() => {
@@ -87,21 +114,58 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
       await apiClient.updateStoryDraft(row.storyDraftId, {
         studentConsent: consent,
       });
+      // The row may no longer match the "Consent on file" filter, so refetch
+      // to keep the rows, total and pagination in line with it.
+      if (appliedFilters.checkpoints.includes('consent')) {
+        await loadDocuments(page);
+      }
     } catch {
       setConsent(row.consent);
     }
   };
 
   const handleDelete = (row: StoryDocumentRow) => {
-    // TODO: open the delete confirmation modal once it is built
-    console.log('delete requested for story', row.storyId);
+    setDeleteRow(row);
+    setDeleteError(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteRow) return;
+
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await apiClient.deleteStory(deleteRow.storyId);
+      setDocuments((prev) =>
+        prev.filter((document) => document.storyId !== deleteRow.storyId),
+      );
+      setTotal((prev) => Math.max(0, prev - 1));
+      setDeleteRow(null);
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? err.message : 'Failed to delete document.',
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const activeFilterCount =
+    appliedFilters.grades.length + appliedFilters.checkpoints.length;
+
+  const applyFilters = (filters: StoryDocumentsFilters) => {
+    setAppliedFilters(filters);
+    setIsFilterModalOpen(false);
   };
 
   return (
     <>
       <div className="documents-toolbar">
-        {/* TODO: open the filter modal once it is built */}
-        <button type="button" className="documents-filter-btn">
+        <button
+          type="button"
+          className="documents-filter-btn"
+          onClick={() => setIsFilterModalOpen(true)}
+        >
           <svg
             className="documents-filter-icon"
             viewBox="0 0 24 24"
@@ -115,6 +179,9 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
             <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
           </svg>
           <span>Filters</span>
+          {activeFilterCount > 0 && (
+            <span className="documents-filter-count">{activeFilterCount}</span>
+          )}
         </button>
       </div>
 
@@ -257,6 +324,115 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
           onClose={() => setIsModalOpen(false)}
           onSaved={() => loadDocuments(page)}
         />
+      )}
+
+      {isFilterModalOpen && (
+        <DocumentsFilterModal
+          initialFilters={appliedFilters}
+          onClose={() => setIsFilterModalOpen(false)}
+          onApply={applyFilters}
+        />
+      )}
+
+      {deleteRow && (
+        <div className="documents-modal-overlay">
+          <div
+            className="documents-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="documents-delete-title"
+          >
+            <div className="documents-delete-modal-header">
+              <h2 id="documents-delete-title">Confirm deletion</h2>
+              <button
+                type="button"
+                className="documents-delete-modal-close"
+                aria-label="Close confirmation modal"
+                onClick={() => setDeleteRow(null)}
+                disabled={isDeleting}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z"
+                    fill="#1C1B1F"
+                  />
+                </svg>
+              </button>
+            </div>
+            <p className="documents-delete-modal-message">
+              Are you sure you want to delete this document? This action cannot
+              be undone.
+            </p>
+            <div className="documents-delete-student">
+              <h3>
+                {deleteRow.lastName}, {deleteRow.firstName}
+              </h3>
+              <p className="documents-delete-description">
+                {deleteRow.description || 'No description available.'}
+              </p>
+              <dl>
+                <div>
+                  <dt>Grade</dt>
+                  <dd>{formatGrade(deleteRow.grade) || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Name in Book</dt>
+                  <dd>{deleteRow.nameInBook || '—'}</dd>
+                </div>
+                <div>
+                  <dt>Consent on file</dt>
+                  <dd>{deleteRow.consent ? 'Yes' : 'No'}</dd>
+                </div>
+                <div>
+                  <dt>Document</dt>
+                  <dd>
+                    {deleteRow.docLink ? (
+                      <a
+                        href={deleteRow.docLink}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {deleteRow.docLink}
+                      </a>
+                    ) : (
+                      '—'
+                    )}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+            {deleteError && (
+              <p className="documents-delete-error" role="alert">
+                {deleteError}
+              </p>
+            )}
+            <div className="documents-delete-modal-footer">
+              <button
+                type="button"
+                className="documents-delete-cancel"
+                onClick={() => setDeleteRow(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="documents-delete-confirm"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

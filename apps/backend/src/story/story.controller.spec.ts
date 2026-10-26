@@ -91,6 +91,29 @@ describe('StoryController', () => {
       );
     });
 
+    it('passes document filters to the service', async () => {
+      mockAnthologyService.findOne.mockResolvedValue({ id: 5 });
+      mockService.getDocumentsByAnthology.mockResolvedValue(page);
+
+      await controller.getStoryDocumentsByAnthology(
+        5,
+        1,
+        10,
+        '5,6',
+        'draft1,consent',
+      );
+
+      expect(mockService.getDocumentsByAnthology).toHaveBeenCalledWith(
+        5,
+        1,
+        10,
+        {
+          grades: [5, 6],
+          checkpoints: ['draft1', 'consent'],
+        },
+      );
+    });
+
     it('throws NotFoundException when the anthology does not exist', async () => {
       mockAnthologyService.findOne.mockResolvedValue(null);
 

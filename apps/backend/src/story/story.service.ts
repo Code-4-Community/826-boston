@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Story } from './story.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
@@ -8,8 +8,10 @@ import { Author } from 'src/author/author.entity';
 import { StoryDraft } from 'src/story-draft/story-draft.entity';
 import {
   PaginatedStoryDocuments,
+  StoryDocumentsFilters,
   StoryDocumentRow,
 } from './dtos/story-document-row.dto';
+import { EditRound } from 'src/story-draft/types';
 
 // Author only stores a single `name`, so split on the last space.
 // TODO: split Author.name into first/last name columns.
@@ -55,11 +57,44 @@ export class StoryService {
     anthologyId: number,
     page: number,
     limit: number,
+    filters: StoryDocumentsFilters = {},
   ): Promise<PaginatedStoryDocuments> {
     // TODO: confirm with the team whether this should only list stories that
     // have a draft. For now every story in the anthology is shown.
+    const storyDraftFilters: Record<string, unknown> = {};
+    const checkpoints = filters.checkpoints ?? [];
+    const submissionRounds = checkpoints
+      .filter((checkpoint) => checkpoint.startsWith('draft'))
+      .map((checkpoint) => Number(checkpoint.slice(-1)) - 1);
+
+    if (submissionRounds.length > 0) {
+      storyDraftFilters.submissionRound = In(submissionRounds);
+    }
+    if (checkpoints.includes('consent')) {
+      storyDraftFilters.studentConsent = true;
+    }
+    if (checkpoints.includes('authorApproval')) {
+      storyDraftFilters.inManuscript = true;
+    }
+    if (checkpoints.includes('copyedit')) {
+      storyDraftFilters.editRound = EditRound.TWO;
+    }
+    if (checkpoints.includes('proofread')) {
+      storyDraftFilters.proofread = true;
+    }
+
+    const where: Record<string, unknown> = {
+      anthology: { id: anthologyId },
+    };
+    if (filters.grades && filters.grades.length > 0) {
+      where.author = { grade: In(filters.grades) };
+    }
+    if (Object.keys(storyDraftFilters).length > 0) {
+      where.storyDraft = storyDraftFilters;
+    }
+
     const [stories, total] = await this.repo.findAndCount({
-      where: { anthology: { id: anthologyId } },
+      where,
       relations: ['author', 'storyDraft'],
       order: { id: 'ASC' },
       skip: (page - 1) * limit,
@@ -73,6 +108,8 @@ export class StoryService {
       consent: story.storyDraft?.studentConsent ?? false,
       ...splitName(story.author.name),
       grade: story.author.grade ?? null,
+      nameInBook: story.author.nameInBook ?? null,
+      description: story.studentBio ?? story.description ?? null,
       docLink: story.storyDraft?.docLink ?? null,
     }));
 
@@ -100,13 +137,25 @@ export class StoryService {
   }
 
   async remove(id: number) {
-    const story = await this.findOne(id);
+    const story = id
+      ? await this.repo.findOne({ where: { id }, relations: ['storyDraft'] })
+      : null;
 
     if (!story) {
       throw new NotFoundException('Story not found');
     }
 
-    return this.repo.remove(story);
+    // The story holds the FK to its draft, so the story has to go first. The
+    // draft carries the doc link and checkpoint state; leaving it behind would
+    // orphan it.
+    const { storyDraft } = story;
+    return this.repo.manager.transaction(async (manager) => {
+      const removed = await manager.remove(story);
+      if (storyDraft) {
+        await manager.remove(storyDraft);
+      }
+      return removed;
+    });
   }
 
   async findByAnthologyAndId(

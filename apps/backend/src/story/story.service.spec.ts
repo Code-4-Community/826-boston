@@ -5,6 +5,8 @@ import { StoryService, splitName } from './story.service';
 import { StoriesSeed } from '../seeds/stories.seed';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { Author } from 'src/author/author.entity';
+import { StoryDraft } from 'src/story-draft/story-draft.entity';
+import { NotFoundException } from '@nestjs/common';
 
 export const storyExample = {
   title: 'Standing at the Threshold',
@@ -29,6 +31,8 @@ describe('StoryService', () => {
     findAndCount: jest.fn(),
     count: jest.fn(),
     remove: jest.fn(),
+    findOne: jest.fn(),
+    manager: { transaction: jest.fn() },
   };
 
   beforeEach(async () => {
@@ -108,7 +112,13 @@ describe('StoryService', () => {
         [
           {
             id: 1,
-            author: { id: 10, name: 'John Doe', grade: 6 },
+            author: {
+              id: 10,
+              name: 'John Doe',
+              nameInBook: 'John Doe',
+              grade: 6,
+            },
+            studentBio: 'A student description.',
             storyDraft: {
               id: 3,
               studentConsent: true,
@@ -145,6 +155,8 @@ describe('StoryService', () => {
             firstName: 'John',
             lastName: 'Doe',
             grade: 6,
+            nameInBook: 'John Doe',
+            description: 'A student description.',
             docLink: 'https://x.com/a',
           },
           {
@@ -155,10 +167,36 @@ describe('StoryService', () => {
             firstName: 'Risa',
             lastName: 'Tuffaha',
             grade: null,
+            nameInBook: null,
+            description: null,
             docLink: null,
           },
         ],
       });
+    });
+
+    it('applies grade and checkpoint filters before pagination', async () => {
+      mockRepository.findAndCount.mockResolvedValue([[], 0]);
+
+      await service.getDocumentsByAnthology(7, 1, 5, {
+        grades: [5, 6],
+        checkpoints: [
+          'draft1',
+          'draft2',
+          'consent',
+          'authorApproval',
+          'copyedit',
+          'proofread',
+        ],
+      });
+
+      const query = mockRepository.findAndCount.mock.calls[0][0];
+      expect(query.where.author.grade.value).toEqual([5, 6]);
+      expect(query.where.storyDraft.submissionRound.value).toEqual([0, 1]);
+      expect(query.where.storyDraft.studentConsent).toBe(true);
+      expect(query.where.storyDraft.inManuscript).toBe(true);
+      expect(query.where.storyDraft.editRound).toBe(1);
+      expect(query.where.storyDraft.proofread).toBe(true);
     });
   });
 
@@ -194,6 +232,51 @@ describe('StoryService', () => {
         theme: 'Theme',
       });
       expect(result).toEqual(createdStory);
+    });
+  });
+
+  describe('remove', () => {
+    const mockManager = { remove: jest.fn() };
+
+    beforeEach(() => {
+      mockRepository.manager.transaction.mockImplementation(async (cb) =>
+        cb(mockManager),
+      );
+      mockManager.remove.mockImplementation(async (entity) => entity);
+    });
+
+    it('removes the story and then its draft in one transaction', async () => {
+      const storyDraft = {
+        id: 5,
+        docLink: 'https://docs.example',
+      } as StoryDraft;
+      const story = { id: 3, storyDraft } as Story;
+      mockRepository.findOne.mockResolvedValue(story);
+
+      const result = await service.remove(3);
+
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 3 },
+        relations: ['storyDraft'],
+      });
+      expect(mockManager.remove.mock.calls).toEqual([[story], [storyDraft]]);
+      expect(result).toBe(story);
+    });
+
+    it('only removes the story when it has no draft', async () => {
+      const story = { id: 4, storyDraft: null } as unknown as Story;
+      mockRepository.findOne.mockResolvedValue(story);
+
+      await service.remove(4);
+
+      expect(mockManager.remove.mock.calls).toEqual([[story]]);
+    });
+
+    it('throws NotFoundException and removes nothing when the story does not exist', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+      expect(mockRepository.manager.transaction).not.toHaveBeenCalled();
     });
   });
 });
