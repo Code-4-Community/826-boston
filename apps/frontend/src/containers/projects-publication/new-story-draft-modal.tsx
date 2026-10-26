@@ -2,6 +2,9 @@ import { useState } from 'react';
 import '../../containers/create-publication-modal/styles.css';
 import apiClient from '../../api/apiClient';
 
+const MIN_GRADE = 1;
+const MAX_GRADE = 12;
+
 interface Props {
   anthologyId: number;
   onClose: () => void;
@@ -33,12 +36,20 @@ export default function NewStoryDraftModal({
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [nameInBook, setNameInBook] = useState('');
+  const [grade, setGrade] = useState('');
   const [classPeriod, setClassPeriod] = useState('');
   const [docLink, setDocLink] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isValid = firstName.trim() && lastName.trim() && docLink.trim();
+  const gradeNumber = grade.trim() === '' ? undefined : Number(grade);
+  const isGradeValid =
+    gradeNumber === undefined ||
+    (Number.isInteger(gradeNumber) &&
+      gradeNumber >= MIN_GRADE &&
+      gradeNumber <= MAX_GRADE);
+  const isValid =
+    firstName.trim() && lastName.trim() && docLink.trim() && isGradeValid;
 
   const handleSave = async () => {
     if (!isValid) return;
@@ -51,6 +62,7 @@ export default function NewStoryDraftModal({
         name: `${firstName.trim()} ${lastName.trim()}`,
         nameInBook: nameInBook || undefined,
         classPeriod: classPeriod || undefined,
+        grade: gradeNumber,
       });
 
       await apiClient.createStoryDraft({
@@ -120,15 +132,30 @@ export default function NewStoryDraftModal({
             />
           </Field>
 
-          <Field label="Class Period">
-            <input
-              className="input"
-              placeholder="e.g. Edwards 1/6"
-              value={classPeriod}
-              onChange={(e) => setClassPeriod(e.target.value)}
-              disabled={saving}
-            />
-          </Field>
+          <div className="field-row">
+            <Field label="Grade">
+              <input
+                className="input"
+                type="number"
+                min={MIN_GRADE}
+                max={MAX_GRADE}
+                step={1}
+                placeholder={`${MIN_GRADE}-${MAX_GRADE}`}
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                disabled={saving}
+              />
+            </Field>
+            <Field label="Class Period">
+              <input
+                className="input"
+                placeholder="e.g. Edwards 1/6"
+                value={classPeriod}
+                onChange={(e) => setClassPeriod(e.target.value)}
+                disabled={saving}
+              />
+            </Field>
+          </div>
 
           <Field label="Document Link" required>
             <input

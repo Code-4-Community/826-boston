@@ -5,6 +5,8 @@ import { StoryService, splitName } from './story.service';
 import { StoriesSeed } from '../seeds/stories.seed';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { Author } from 'src/author/author.entity';
+import { StoryDraft } from 'src/story-draft/story-draft.entity';
+import { NotFoundException } from '@nestjs/common';
 
 export const storyExample = {
   title: 'Standing at the Threshold',
@@ -29,6 +31,8 @@ describe('StoryService', () => {
     findAndCount: jest.fn(),
     count: jest.fn(),
     remove: jest.fn(),
+    findOne: jest.fn(),
+    manager: { transaction: jest.fn() },
   };
 
   beforeEach(async () => {
@@ -228,6 +232,51 @@ describe('StoryService', () => {
         theme: 'Theme',
       });
       expect(result).toEqual(createdStory);
+    });
+  });
+
+  describe('remove', () => {
+    const mockManager = { remove: jest.fn() };
+
+    beforeEach(() => {
+      mockRepository.manager.transaction.mockImplementation(async (cb) =>
+        cb(mockManager),
+      );
+      mockManager.remove.mockImplementation(async (entity) => entity);
+    });
+
+    it('removes the story and then its draft in one transaction', async () => {
+      const storyDraft = {
+        id: 5,
+        docLink: 'https://docs.example',
+      } as StoryDraft;
+      const story = { id: 3, storyDraft } as Story;
+      mockRepository.findOne.mockResolvedValue(story);
+
+      const result = await service.remove(3);
+
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 3 },
+        relations: ['storyDraft'],
+      });
+      expect(mockManager.remove.mock.calls).toEqual([[story], [storyDraft]]);
+      expect(result).toBe(story);
+    });
+
+    it('only removes the story when it has no draft', async () => {
+      const story = { id: 4, storyDraft: null } as unknown as Story;
+      mockRepository.findOne.mockResolvedValue(story);
+
+      await service.remove(4);
+
+      expect(mockManager.remove.mock.calls).toEqual([[story]]);
+    });
+
+    it('throws NotFoundException and removes nothing when the story does not exist', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+      expect(mockRepository.manager.transaction).not.toHaveBeenCalled();
     });
   });
 });

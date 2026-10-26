@@ -68,12 +68,23 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
       filters: StoryDocumentsFilters = appliedFilters,
     ) => {
       try {
-        const result = await apiClient.getStoryDocuments(
+        let result = await apiClient.getStoryDocuments(
           anthologyId,
           pageToLoad,
           PAGE_SIZE,
           filters,
         );
+        // The requested page can be past the end once rows drop out of the
+        // filtered set, so fall back to the last page that has rows.
+        const lastPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+        if (pageToLoad > lastPage) {
+          result = await apiClient.getStoryDocuments(
+            anthologyId,
+            lastPage,
+            PAGE_SIZE,
+            filters,
+          );
+        }
         setDocuments(result.data);
         setTotal(result.total);
         setPage(result.page);
@@ -103,6 +114,11 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
       await apiClient.updateStoryDraft(row.storyDraftId, {
         studentConsent: consent,
       });
+      // The row may no longer match the "Consent on file" filter, so refetch
+      // to keep the rows, total and pagination in line with it.
+      if (appliedFilters.checkpoints.includes('consent')) {
+        await loadDocuments(page);
+      }
     } catch {
       setConsent(row.consent);
     }

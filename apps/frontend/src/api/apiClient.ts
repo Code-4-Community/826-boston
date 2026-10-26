@@ -162,6 +162,7 @@ export class ApiClient {
     name: string;
     nameInBook?: string;
     classPeriod?: string;
+    grade?: number;
   }): Promise<Author> {
     return this.post('/api/author', body) as Promise<Author>;
   }

@@ -137,13 +137,25 @@ export class StoryService {
   }
 
   async remove(id: number) {
-    const story = await this.findOne(id);
+    const story = id
+      ? await this.repo.findOne({ where: { id }, relations: ['storyDraft'] })
+      : null;
 
     if (!story) {
       throw new NotFoundException('Story not found');
     }
 
-    return this.repo.remove(story);
+    // The story holds the FK to its draft, so the story has to go first. The
+    // draft carries the doc link and checkpoint state; leaving it behind would
+    // orphan it.
+    const { storyDraft } = story;
+    return this.repo.manager.transaction(async (manager) => {
+      const removed = await manager.remove(story);
+      if (storyDraft) {
+        await manager.remove(storyDraft);
+      }
+      return removed;
+    });
   }
 
   async findByAnthologyAndId(
