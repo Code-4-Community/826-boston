@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AddDocumentModal from './add-document-modal';
 import apiClient from '../../api/apiClient';
+import { STORY_DRAFT_CHECKPOINTS } from './checkpoints';
 
 vi.mock('../../api/apiClient', () => ({
   default: {
@@ -10,11 +11,17 @@ vi.mock('../../api/apiClient', () => ({
   },
 }));
 
+// Built from the checkpoint list so the tests keep working if it changes
+const [metCheckpoint, ...unmetCheckpoints] = STORY_DRAFT_CHECKPOINTS;
+const allCheckpointsMet = Object.fromEntries(
+  STORY_DRAFT_CHECKPOINTS.map((checkpoint) => [checkpoint.id, true]),
+);
+
 const drafts = [
   {
     id: 1,
     docLink: 'https://example.com/jane',
-    proofread: true,
+    checkpoints: allCheckpointsMet,
     story: {
       id: 10,
       title: 'A',
@@ -24,7 +31,7 @@ const drafts = [
   {
     id: 2,
     docLink: 'https://example.com/risa',
-    proofread: false,
+    checkpoints: { [metCheckpoint.id]: true },
     story: { id: 11, title: 'B', author: { id: 2, name: 'Risa Tuffaha' } },
   },
 ];
@@ -47,6 +54,17 @@ const search = (text: string) =>
   fireEvent.change(screen.getByPlaceholderText('Search for a student...'), {
     target: { value: text },
   });
+
+// Waits for the drafts to load, then searches for and picks a student
+async function selectStudent(query: string, name: string) {
+  const handlers = setup();
+  const input = screen.getByPlaceholderText('Search for a student...');
+  await waitFor(() => expect((input as HTMLInputElement).disabled).toBe(false));
+
+  search(query);
+  fireEvent.click(screen.getByText(name));
+  return handlers;
+}
 
 describe('AddDocumentModal', () => {
   beforeEach(() => {
@@ -87,16 +105,24 @@ describe('AddDocumentModal', () => {
     expect(add.disabled).toBe(true);
   });
 
-  it('approves the selected draft and closes', async () => {
-    const { onClose, onSaved } = setup();
-    const input = screen.getByPlaceholderText('Search for a student...');
-    await waitFor(() =>
-      expect((input as HTMLInputElement).disabled).toBe(false),
-    );
+  it('lists only the unmet checkpoints for the selected draft', async () => {
+    await selectStudent('risa', 'Risa Tuffaha');
 
-    search('risa');
-    fireEvent.click(screen.getByText('Risa Tuffaha'));
-    expect(screen.getByText(/Proofreading/)).toBeTruthy();
+    expect(screen.getByText(/have not been met yet/)).toBeTruthy();
+    unmetCheckpoints.forEach((checkpoint) =>
+      expect(screen.getByText(checkpoint.label)).toBeTruthy(),
+    );
+    expect(screen.queryByText(metCheckpoint.label)).toBeNull();
+  });
+
+  it('shows no checkpoint warning when every checkpoint is met', async () => {
+    await selectStudent('jane', 'Jane Doe');
+
+    expect(screen.queryByText(/have not been met yet/)).toBeNull();
+  });
+
+  it('approves the selected draft and closes', async () => {
+    const { onClose, onSaved } = await selectStudent('risa', 'Risa Tuffaha');
 
     fireEvent.click(screen.getByText('Add document'));
     await waitFor(() =>
