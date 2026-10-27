@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, type ReactNode } from 'react';
 import apiClient, {
   type StoryDocumentRow,
   type StoryDocumentsFilters,
@@ -40,12 +40,21 @@ function getPageItems(current: number, totalPages: number): (number | null)[] {
 
 interface DocumentsTableProps {
   anthologyId: number;
-  onRowClick?: (row: StoryDocumentRow) => void;
+  // Only show stories whose draft has this inManuscript value
+  inManuscript?: boolean;
+  showFilters?: boolean;
+  // reload refetches the current page, e.g. after the row is edited
+  onRowClick?: (row: StoryDocumentRow, reload: () => void) => void;
+  // Modal opened by the + button. Defaults to NewStoryDraftModal.
+  renderAddModal?: (onClose: () => void, onSaved: () => void) => ReactNode;
 }
 
 const DocumentsTable: React.FC<DocumentsTableProps> = ({
   anthologyId,
+  inManuscript,
+  showFilters = true,
   onRowClick,
+  renderAddModal,
 }) => {
   const [documents, setDocuments] = useState<StoryDocumentRow[]>([]);
   const [page, setPage] = useState(1);
@@ -67,12 +76,15 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
       pageToLoad: number,
       filters: StoryDocumentsFilters = appliedFilters,
     ) => {
+      // inManuscript comes from the tab, so it applies on top of the user's
+      // filters
+      const query = { ...filters, inManuscript };
       try {
         let result = await apiClient.getStoryDocuments(
           anthologyId,
           pageToLoad,
           PAGE_SIZE,
-          filters,
+          query,
         );
         // The requested page can be past the end once rows drop out of the
         // filtered set, so fall back to the last page that has rows.
@@ -82,7 +94,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
             anthologyId,
             lastPage,
             PAGE_SIZE,
-            filters,
+            query,
           );
         }
         setDocuments(result.data);
@@ -92,7 +104,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         // Documents will remain as-is on fetch failure
       }
     },
-    [anthologyId, appliedFilters],
+    [anthologyId, appliedFilters, inManuscript],
   );
 
   useEffect(() => {
@@ -160,30 +172,34 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
 
   return (
     <>
-      <div className="documents-toolbar">
-        <button
-          type="button"
-          className="documents-filter-btn"
-          onClick={() => setIsFilterModalOpen(true)}
-        >
-          <svg
-            className="documents-filter-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+      {showFilters && (
+        <div className="documents-toolbar">
+          <button
+            type="button"
+            className="documents-filter-btn"
+            onClick={() => setIsFilterModalOpen(true)}
           >
-            <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
-          </svg>
-          <span>Filters</span>
-          {activeFilterCount > 0 && (
-            <span className="documents-filter-count">{activeFilterCount}</span>
-          )}
-        </button>
-      </div>
+            <svg
+              className="documents-filter-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" />
+            </svg>
+            <span>Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="documents-filter-count">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
 
       <table className="document-tracker-table">
         <thead>
@@ -219,7 +235,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
               <tr
                 key={row.storyId}
                 className="documents-row"
-                onClick={() => onRowClick?.(row)}
+                onClick={() => onRowClick?.(row, () => loadDocuments(page))}
               >
                 <td>
                   <div className="documents-consent-cell">
@@ -318,13 +334,19 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         </nav>
       )}
 
-      {isModalOpen && (
-        <NewStoryDraftModal
-          anthologyId={anthologyId}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={() => loadDocuments(page)}
-        />
-      )}
+      {isModalOpen &&
+        (renderAddModal ? (
+          renderAddModal(
+            () => setIsModalOpen(false),
+            () => loadDocuments(page),
+          )
+        ) : (
+          <NewStoryDraftModal
+            anthologyId={anthologyId}
+            onClose={() => setIsModalOpen(false)}
+            onSaved={() => loadDocuments(page)}
+          />
+        ))}
 
       {isFilterModalOpen && (
         <DocumentsFilterModal

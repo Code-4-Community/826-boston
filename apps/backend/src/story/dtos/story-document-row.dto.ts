@@ -28,5 +28,7 @@ export type DocumentCheckpoint =
 
 export interface StoryDocumentsFilters {
   grades?: number[];
+  // Only stories whose draft has this inManuscript value
+  inManuscript?: boolean;
   checkpoints?: DocumentCheckpoint[];
 }

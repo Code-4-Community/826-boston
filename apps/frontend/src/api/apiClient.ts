@@ -58,6 +58,8 @@ export type DocumentCheckpoint =
 export interface StoryDocumentsFilters {
   grades: number[];
   checkpoints: DocumentCheckpoint[];
+  // Only stories whose draft has this inManuscript value
+  inManuscript?: boolean;
 }
 
 const defaultBaseUrl =
@@ -153,17 +155,20 @@ export class ApiClient {
     anthologyId: string | number,
     page = 1,
     limit = 10,
-    filters?: StoryDocumentsFilters,
+    filters?: Partial<StoryDocumentsFilters>,
   ): Promise<PaginatedStoryDocuments> {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
     });
-    if (filters?.grades.length) {
+    if (filters?.grades?.length) {
       params.set('grades', filters.grades.join(','));
     }
-    if (filters?.checkpoints.length) {
+    if (filters?.checkpoints?.length) {
       params.set('checkpoints', filters.checkpoints.join(','));
+    }
+    if (filters?.inManuscript !== undefined) {
+      params.set('inManuscript', String(filters.inManuscript));
     }
     return this.get(
       `/api/stories/anthology/${anthologyId}/documents?${params.toString()}`,
@@ -190,18 +195,6 @@ export class ApiClient {
     return this.post('/api/author', body) as Promise<Author>;
   }
 
-  public async getProductionInfo(
-    anthologyId: number,
-  ): Promise<ProductionInfo | null> {
-    try {
-      return (await this.get(
-        `/api/production-info/${anthologyId}`,
-      )) as ProductionInfo;
-    } catch {
-      return null;
-    }
-  }
-
   public async createProductionInfo(
     body: Nullable<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
   ): Promise<ProductionInfo> {
@@ -226,9 +219,11 @@ export class ApiClient {
     return normalizeAnthology(data);
   }
 
-  public async getStoryDrafts(anthologyId: number) {
+  public async getStoryDrafts(anthologyId: number, inManuscript?: boolean) {
+    const query =
+      inManuscript === undefined ? '' : `?inManuscript=${inManuscript}`;
     return this.get(
-      `/api/stories/anthology/${anthologyId}/story-drafts`,
+      `/api/stories/anthology/${anthologyId}/story-drafts${query}`,
     ) as Promise<StoryDraft[]>;
   }
 
@@ -263,6 +258,9 @@ export class ApiClient {
       name?: string;
       nameInBook?: string;
       classPeriod?: string;
+      bio?: string;
+      /** null clears the stored grade. */
+      grade?: number | null;
     },
   ): Promise<Author> {
     return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
@@ -278,6 +276,7 @@ export class ApiClient {
       editRound?: EditRound;
       proofread?: boolean;
       notes?: string[];
+      checkpoints?: Record<string, boolean>;
     },
   ): Promise<{ message: string }> {
     return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{

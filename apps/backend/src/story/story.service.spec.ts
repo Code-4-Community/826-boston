@@ -27,11 +27,11 @@ describe('StoryService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOneBy: jest.fn(),
+    findOne: jest.fn(),
     find: jest.fn(),
     findAndCount: jest.fn(),
     count: jest.fn(),
     remove: jest.fn(),
-    findOne: jest.fn(),
     manager: { transaction: jest.fn() },
   };
 
@@ -197,6 +197,41 @@ describe('StoryService', () => {
       expect(query.where.storyDraft.inManuscript).toBe(true);
       expect(query.where.storyDraft.editRound).toBe(1);
       expect(query.where.storyDraft.proofread).toBe(true);
+    });
+
+    it('filters by draft inManuscript when given', async () => {
+      mockRepository.findAndCount.mockResolvedValue([[], 0]);
+
+      await service.getDocumentsByAnthology(7, 1, 5, { inManuscript: true });
+
+      expect(mockRepository.findAndCount).toHaveBeenCalledWith({
+        where: { anthology: { id: 7 }, storyDraft: { inManuscript: true } },
+        relations: ['author', 'storyDraft'],
+        order: { id: 'ASC' },
+        skip: 0,
+        take: 5,
+      });
+    });
+  });
+
+  describe('findByAnthologyAndId', () => {
+    it('returns the story when it belongs to the anthology', async () => {
+      mockRepository.findOne.mockResolvedValue(storyExample);
+
+      const result = await service.findByAnthologyAndId(1, 1);
+
+      expect(result).toEqual(storyExample);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, anthology: { id: 1 } },
+      });
+    });
+
+    it('throws NotFoundException when the story is not in the anthology', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findByAnthologyAndId(2, 1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

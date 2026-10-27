@@ -41,6 +41,7 @@ describe('StoryDraftController', () => {
       proofread: false,
       notes: ['First draft'],
       storyId: 1,
+      checkpoints: { copyedit: true },
     };
 
     const response = await controller.createStoryDraft(dto);
@@ -54,6 +55,7 @@ describe('StoryDraftController', () => {
       dto.proofread,
       dto.notes,
       dto.storyId,
+      dto.checkpoints,
     );
     expect(response).toEqual({ message: 'StoryDraft created successfully' });
   });
@@ -76,6 +78,7 @@ describe('StoryDraftController', () => {
       dto.editRound,
       dto.proofread,
       dto.notes,
+      dto.checkpoints,
     );
     expect(response).toEqual({
       message: 'StoryDraft with id 7 updated successfully',

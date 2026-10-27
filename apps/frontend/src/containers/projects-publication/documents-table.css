@@ -93,12 +93,14 @@
   padding: 0;
   color: #d92d20;
   cursor: pointer;
-  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
-.documents-row:hover .documents-delete-btn,
+/* Only show the bin when it is hovered or tabbed to */
+.documents-delete-btn:hover,
 .documents-delete-btn:focus-visible {
-  visibility: visible;
+  opacity: 1;
 }
 
 .documents-delete-btn:hover {

@@ -45,6 +45,8 @@ export interface StoryDraft {
   editRound: EditRound;
   proofread: boolean;
   notes: string[];
+  /** Keyed by checkpoint id - see STORY_DRAFT_CHECKPOINTS. */
+  checkpoints?: Record<string, boolean>;
   /**
    * Attached by GET /stories/anthology/:id/story-drafts, which returns each
    * draft alongside a trimmed version of its parent story.
@@ -204,19 +206,6 @@ export interface CreateAnthologyDto {
   isbn: string;
   shopifyUrl?: string;
   inventory?: number;
-}
-
-export interface ProductionInfo {
-  id: number;
-  design_files_link?: string;
-  cover_image_file_link?: string;
-  binding_type?: string;
-  dimensions?: string;
-  printing_cost?: number;
-  print_run?: number;
-  weight_in_grams?: number;
-  page_count?: number;
-  printed_by?: string;
 }
 
 export interface CreateBatchOmchaiAssignmentsDto {

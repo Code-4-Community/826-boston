@@ -59,9 +59,12 @@ export class StoryService {
     limit: number,
     filters: StoryDocumentsFilters = {},
   ): Promise<PaginatedStoryDocuments> {
-    // TODO: confirm with the team whether this should only list stories that
-    // have a draft. For now every story in the anthology is shown.
+    // TODO: this should only list stories that have a draft. For now every
+    // story in the anthology is shown unless a draft filter is applied.
     const storyDraftFilters: Record<string, unknown> = {};
+    if (filters.inManuscript !== undefined) {
+      storyDraftFilters.inManuscript = filters.inManuscript;
+    }
     const checkpoints = filters.checkpoints ?? [];
     const submissionRounds = checkpoints
       .filter((checkpoint) => checkpoint.startsWith('draft'))
