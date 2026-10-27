@@ -76,7 +76,6 @@ describe('StoryController', () => {
         5,
         2,
         10,
-        undefined,
       );
     });
 
@@ -89,7 +88,6 @@ describe('StoryController', () => {
         5,
         1,
         100,
-        undefined,
       );
     });
 
@@ -97,12 +95,42 @@ describe('StoryController', () => {
       mockAnthologyService.findOne.mockResolvedValue({ id: 5 });
       mockService.getDocumentsByAnthology.mockResolvedValue(page);
 
-      await controller.getStoryDocumentsByAnthology(5, 1, 10, true);
+      await controller.getStoryDocumentsByAnthology(
+        5,
+        1,
+        10,
+        undefined,
+        undefined,
+        false,
+      );
       expect(mockService.getDocumentsByAnthology).toHaveBeenCalledWith(
         5,
         1,
         10,
-        true,
+        { inManuscript: false },
+      );
+    });
+
+    it('passes document filters to the service', async () => {
+      mockAnthologyService.findOne.mockResolvedValue({ id: 5 });
+      mockService.getDocumentsByAnthology.mockResolvedValue(page);
+
+      await controller.getStoryDocumentsByAnthology(
+        5,
+        1,
+        10,
+        '5,6',
+        'draft1,consent',
+      );
+
+      expect(mockService.getDocumentsByAnthology).toHaveBeenCalledWith(
+        5,
+        1,
+        10,
+        {
+          grades: [5, 6],
+          checkpoints: ['draft1', 'consent'],
+        },
       );
     });
 

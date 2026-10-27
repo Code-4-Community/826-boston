@@ -37,6 +37,8 @@ import { CreateAnthologyDto } from './dtos/create-anthology.dto';
 import { UpdateAnthologyDto } from './dtos/update-anthology.dto';
 import { Role } from 'src/users/types';
 import { AwsS3Service } from '../aws/aws-s3.service';
+import { InventoryHoldingService } from '../inventory-holding/inventory-holding.service';
+import { AnthologyInventoryDto } from '../inventory-holding/dto/anthology-inventory.dto';
 
 interface UploadedFileType {
   fieldname: string;
@@ -54,6 +56,7 @@ export class AnthologyController {
   constructor(
     private readonly anthologyService: AnthologyService,
     private readonly s3Service: AwsS3Service,
+    private readonly inventoryHoldingService: InventoryHoldingService,
   ) {}
 
   @Public()
@@ -166,6 +169,70 @@ export class AnthologyController {
     }
 
     return anthology;
+  }
+
+  @Public()
+  @ApiOperation({
+    summary: 'Get an anthology with its inventory by location',
+    description:
+      'Retrieves an anthology along with every inventory location and the number of copies ' +
+      'that location holds. Locations with no holding record for this anthology are still ' +
+      'returned, with a count of 0.',
+  })
+  @ApiOkResponse({
+    description: 'Anthology inventory retrieved successfully',
+    schema: {
+      example: {
+        anthology: {
+          id: 1,
+          title: '826 Spring Collection 2024',
+          description: 'A collection of student works',
+          status: 'Published',
+          pubLevel: 'Chapbook',
+        },
+        locations: [
+          { inventoryId: 3, name: '826 Columbus Ave', numCopies: 45 },
+          {
+            inventoryId: 12,
+            name: 'Tutoring Center (3035 Office)',
+            numCopies: 0,
+          },
+        ],
+        totalCopies: 45,
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Anthology not found with the provided ID',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Anthology with ID 999 not found',
+        error: 'Not Found',
+      },
+    },
+  })
+  @Get(':id/inventory')
+  async getAnthologyInventory(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<AnthologyInventoryDto> {
+    const anthology = await this.anthologyService.findOne(id);
+
+    if (!anthology) {
+      throw new NotFoundException(`Anthology with ID ${id} not found`);
+    }
+
+    const locations =
+      await this.inventoryHoldingService.findLocationsByAnthology(id);
+
+    return {
+      anthology,
+      locations,
+      totalCopies: locations.reduce(
+        (total, location) => total + location.numCopies,
+        0,
+      ),
+    };
   }
 
   @ApiBearerAuth()

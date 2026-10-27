@@ -10,17 +10,19 @@
 /* Breadcrumb Header */
 .breadcrumb-header {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   align-items: center;
-  margin-bottom: 84px;
+  /* Figma spaces every block in the content column by 36px. */
+  margin-bottom: 36px;
 }
 
 .breadcrumb-link {
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
   font-size: 20px;
-  line-height: normal;
-  color: #000;
+  line-height: 23px;
+  /* Neutral/600 */
+  color: #3b3330;
   text-decoration: none;
   cursor: pointer;
 }
@@ -41,8 +43,9 @@
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
   font-size: 20px;
-  line-height: normal;
-  color: #000;
+  line-height: 23px;
+  /* Neutral/600 */
+  color: #3b3330;
   margin: 0;
 }
 
@@ -50,7 +53,7 @@
 .publication-content {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 36px;
 }
 
 /* Publication Header Section */
@@ -62,9 +65,9 @@
 }
 
 .publication-image {
-  width: 240px;
-  height: 237px;
-  flex: 0 0 240px;
+  width: 256px;
+  height: 257px;
+  flex: 0 0 256px;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -92,9 +95,9 @@
 
 .publication-title {
   font-family: 'Roboto', sans-serif;
-  font-weight: 800;
-  font-size: 24px;
-  line-height: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 23px;
   color: #000;
   margin: 0;
   white-space: pre-wrap;
@@ -122,7 +125,7 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
+  line-height: 22px;
   color: #707682;
   margin: 0;
   white-space: pre-wrap;
@@ -183,8 +186,9 @@
   font-family: 'Roboto', sans-serif;
   font-weight: 600;
   font-size: 16px;
-  line-height: normal;
-  color: #938b88;
+  line-height: 19px;
+  /* Neutral/500 */
+  color: #58504c;
   margin: 0;
   flex-shrink: 0;
 }
@@ -193,7 +197,8 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
+  line-height: 22px;
+  /* Neutral/600 */
   color: #3b3330;
   margin: 0;
   min-width: 0;
@@ -203,7 +208,7 @@
 .tag-group {
   display: flex;
   flex-wrap: wrap; /* was nowrap */
-  gap: 7px;
+  gap: 8px;
   align-items: center;
   min-width: 0; /* was max-content */
 }
@@ -213,68 +218,118 @@
   gap: 10px;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   height: 22px;
-  padding: 3px 15px;
+  padding: 4px 16px 6px;
   border-radius: 13px;
   border: 1px solid;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 12px;
+  line-height: 16px;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.tag-fantasy {
-  border-color: #ec9209;
-  color: #ec9209;
+/* Genre and theme tags share one accent in the design — they are not coloured
+   per genre. Figma: Accents/600. */
+.tag-accent {
+  border-color: #aa5e00;
+  color: #aa5e00;
 }
 
-.tag-science-fiction {
-  border-color: #970d95;
-  color: #970d95;
-}
-
-.tag-mystery {
-  border-color: #238bdb;
-  color: #238bdb;
-}
-
+/* Reserved for the "Empty" placeholder, which stays muted like every other
+   empty value on the page. */
 .tag-neutral {
   border-color: #938b88;
   color: #938b88;
 }
 
+/* Publication Action Buttons */
+.publication-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.publication-action {
+  box-sizing: border-box;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 19px;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.publication-action-primary {
+  background-color: #e85100;
+  border: 1px solid #e85100;
+  color: #fff;
+}
+
+.publication-action-secondary {
+  background-color: transparent;
+  border: 1px solid #3b3330;
+  color: #3b3330;
+}
+
+.publication-action-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
 /* Tab Navigation */
 .tab-navigation {
   display: flex;
-  gap: 24px;
+  gap: 12px;
   align-items: center;
   font-size: 16px;
-  color: #3b3330;
   flex-wrap: wrap;
   row-gap: 12px;
+  /* Neutral/300 rule the active tab's own border sits on top of. */
+  border-bottom: 1px solid #cac3c0;
 }
 
 .tab-item {
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
-  color: #3b3330;
+  line-height: 19px;
+  color: #000;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
   background: none;
+  padding: 8px;
+  /* Always reserve the 2px indicator so activating a tab doesn't shift the row,
+     and pull it down to cover the strip's own 1px rule. */
   border: none;
-  padding: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
 
+/* Figma: Accents/600 label over a 2px underline of the same colour. */
 .tab-active {
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 25%;
-  text-decoration-color: #ec9209;
-  text-decoration-style: solid;
+  color: #aa5e00;
+  border-bottom-color: #aa5e00;
 }
 
 /* Tab Content */
@@ -286,9 +341,8 @@
 
 .detail-row {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   align-items: flex-start;
-  justify-content: space-between;
   font-size: 16px;
   line-height: normal;
   white-space: pre-wrap;
@@ -299,10 +353,11 @@
   font-family: 'Roboto', sans-serif;
   font-weight: 600;
   font-size: 16px;
-  line-height: normal;
-  color: #938b88;
+  line-height: 19px;
+  /* Neutral/500 */
+  color: #58504c;
   margin: 0;
-  flex: 0 0 180px;
+  flex: 0 0 200px;
   min-width: 0;
   min-height: 0;
 }
@@ -349,19 +404,30 @@
   gap: 8px;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  height: 27px;
   padding: 4px 12px;
   border-radius: 12px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: normal;
+  line-height: 19px;
+  /* Neutral/200 fill, Neutral/500 label. */
   background-color: #f0ebe9;
-  color: #938b88;
+  color: #58504c;
+  /* Transparent rather than none so the active pill's border doesn't shift the
+     row by 2px when it appears. */
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
+/* Figma: fill Accents/400, 1px border Accents/500, plain black label. */
 .filter-active {
-  background-color: #ec9209;
-  color: #fdfcfb;
+  background-color: #ffcc7f;
+  border-color: #ec9209;
+  color: #000;
 }
 
 .filter-icon {
@@ -377,11 +443,12 @@
 }
 
 .assets-table-header {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 8px 8px 0;
-  border-top: 1px solid #f0ebe9;
+  /* Figma rules the header off from the rows below it only. */
   border-bottom: 1px solid #f0ebe9;
   gap: 12px;
 }
@@ -394,8 +461,9 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
-  color: #938b88;
+  line-height: 22px;
+  /* Neutral/500 */
+  color: #58504c;
   min-width: 0;
 }
 
@@ -413,8 +481,9 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
-  color: #938b88;
+  line-height: 22px;
+  /* Neutral/500 */
+  color: #58504c;
   width: 145px;
   flex: 0 0 auto;
 }
@@ -425,6 +494,7 @@
 }
 
 .assets-table-row {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -437,7 +507,7 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
+  line-height: 22px;
   color: #3b3330;
   min-width: 0;
   overflow-wrap: anywhere;
@@ -450,7 +520,7 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
+  line-height: 22px;
   color: #3b3330;
   width: 128px;
   flex: 0 0 auto;
@@ -470,7 +540,7 @@
 }
 
 .detail-row-special .detail-label {
-  flex: 0 0 180px;
+  flex: 0 0 200px;
 }
 
 .detail-row-special .sponsor-tags,
@@ -483,13 +553,16 @@
 }
 
 .status-badge {
+  box-sizing: border-box;
   display: flex;
   gap: 4px;
   align-items: center;
   justify-content: flex-start;
-  padding: 3px 12px;
+  height: 22px;
+  padding: 4px 16px 6px;
   border-radius: 13px;
-  background-color: #00996b;
+  background-color: transparent;
+  border: 1px solid #056500;
   width: fit-content;
   min-width: fit-content;
 }
@@ -513,9 +586,9 @@
 .status-badge span {
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
-  font-size: 14px;
-  line-height: normal;
-  color: white;
+  font-size: 12px;
+  line-height: 16px;
+  color: #056500;
 }
 
 .sponsor-tags {
@@ -524,19 +597,23 @@
   flex-wrap: wrap;
 }
 
+/* Figma: Neutral/500 border and text, one size up from the genre badges. */
 .sponsor-tag {
+  box-sizing: border-box;
   display: flex;
   gap: 10px;
   align-items: center;
   justify-content: flex-start;
-  padding: 3px 15px;
-  border-radius: 5px;
-  background-color: #938b88;
+  height: 22px;
+  padding: 4px 16px 6px;
+  border-radius: 13px;
+  background-color: transparent;
+  border: 1px solid #58504c;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: normal;
-  color: #fdfcfb;
+  line-height: 19px;
+  color: #58504c;
   white-space: nowrap;
 }
 
@@ -545,6 +622,14 @@
 }
 
 /* Inventory Tab Styles */
+
+/* Location names run longer than the production-detail labels, so the design
+   gives this tab a wider label column. */
+.tab-content-inventory .detail-label {
+  flex: 0 0 310px;
+  max-width: 310px;
+}
+
 .detail-row-link {
   align-items: center;
 }
@@ -567,8 +652,9 @@
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: normal;
+  line-height: 19px;
   color: #39869d;
+  text-decoration: underline;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

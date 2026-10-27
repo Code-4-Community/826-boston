@@ -14,6 +14,7 @@ import { Story } from '../story/story.entity';
 import { InventoryHolding } from '../inventory-holding/inventory-holding.entity';
 import { ProductionInfo } from '../production-info/production-info.entity';
 import { Omchai } from 'src/omchai/omchai.entity';
+import { Task } from 'src/task/task.entity';
 
 @Entity()
 export class Anthology {
@@ -40,6 +41,17 @@ export class Anthology {
 
   @Column({ type: 'simple-array', default: [] })
   triggers: string[];
+
+  // NOTE: PluralNamingStrategy ignores @Column `name`, so the physical column
+  // is "ageCategories". Don't add a `name:` here — it would be silently dropped.
+  @Column({
+    type: 'enum',
+    enum: AgeCategory,
+    enumName: 'anthologys_agecategories_enum',
+    array: true,
+    default: [],
+  })
+  ageCategories: AgeCategory[];
 
   @Column({ type: 'date', nullable: true })
   publishedDate?: Date;
@@ -89,4 +101,7 @@ export class Anthology {
 
   @OneToMany(() => Omchai, (omchai) => omchai.anthology)
   omchaiAssignments: Relation<Omchai[]>;
+
+  @OneToMany(() => Task, (task) => task.anthology)
+  tasks: Relation<Task[]>;
 }

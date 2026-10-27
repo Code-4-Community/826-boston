@@ -15,6 +15,7 @@ const mockAnthology1: Anthology = {
   genres: ['mystery'],
   themes: [],
   triggers: [],
+  ageCategories: [],
   publishedDate: new Date('2020-01-01'),
   programs: ['after-school'],
   sponsors: [],
@@ -30,6 +31,7 @@ const mockAnthology1: Anthology = {
     id: 1,
     anthology: { id: 1 } as Anthology,
   },
+  tasks: [],
 };
 
 const mockAnthology2: Anthology = {
@@ -41,6 +43,7 @@ const mockAnthology2: Anthology = {
   genres: ['fiction'],
   themes: [],
   triggers: [],
+  ageCategories: [],
   publishedDate: new Date('2022-06-15'),
   programs: ['summer'],
   sponsors: [],
@@ -56,6 +59,7 @@ const mockAnthology2: Anthology = {
     id: 2,
     anthology: { id: 2 } as Anthology,
   },
+  tasks: [],
 };
 
 const mockAnthology3: Anthology = {
@@ -67,6 +71,7 @@ const mockAnthology3: Anthology = {
   genres: ['nonfiction'],
   themes: [],
   triggers: [],
+  ageCategories: [],
   publishedDate: new Date('2018-03-20'),
   programs: ['in-school'],
   sponsors: [],
@@ -82,6 +87,7 @@ const mockAnthology3: Anthology = {
     id: 3,
     anthology: { id: 3 } as Anthology,
   },
+  tasks: [],
 };
 
 describe('AnthologyService', () => {

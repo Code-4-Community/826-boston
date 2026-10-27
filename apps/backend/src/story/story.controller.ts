@@ -27,10 +27,51 @@ import {
 import { AnthologyService } from '../anthology/anthology.service';
 import { AuthorService } from '../author/author.service';
 import { CreateStoryDto } from './dtos/create-story.dto';
-import { PaginatedStoryDocuments } from './dtos/story-document-row.dto';
+import {
+  DocumentCheckpoint,
+  PaginatedStoryDocuments,
+  StoryDocumentsFilters,
+} from './dtos/story-document-row.dto';
 import { Public } from 'src/auth/roles.decorator';
 
 const MAX_DOCUMENTS_PAGE_SIZE = 100;
+const DOCUMENT_CHECKPOINTS: DocumentCheckpoint[] = [
+  'draft1',
+  'draft2',
+  'draft3',
+  'consent',
+  'authorApproval',
+  'copyedit',
+  'proofread',
+];
+
+function parseGrades(value?: string): number[] | undefined {
+  if (!value) return undefined;
+
+  const grades = value.split(',').map(Number);
+  if (
+    grades.length === 0 ||
+    grades.some((grade) => !Number.isInteger(grade) || grade < 0)
+  ) {
+    throw new BadRequestException('grades must be comma-separated integers');
+  }
+  return [...new Set(grades)];
+}
+
+function parseCheckpoints(value?: string): DocumentCheckpoint[] | undefined {
+  if (!value) return undefined;
+
+  const checkpoints = value.split(',');
+  if (
+    checkpoints.some(
+      (checkpoint) =>
+        !DOCUMENT_CHECKPOINTS.includes(checkpoint as DocumentCheckpoint),
+    )
+  ) {
+    throw new BadRequestException('invalid document checkpoint');
+  }
+  return [...new Set(checkpoints)] as DocumentCheckpoint[];
+}
 
 @ApiTags('Story')
 @Controller('stories')
@@ -144,6 +185,8 @@ export class StoryController {
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('grades') grades?: string,
+    @Query('checkpoints') checkpoints?: string,
     @Query('inManuscript', new ParseBoolPipe({ optional: true }))
     inManuscript?: boolean,
   ): Promise<PaginatedStoryDocuments> {
@@ -155,16 +198,31 @@ export class StoryController {
       throw new BadRequestException('page is too large');
     }
 
+    const filters: StoryDocumentsFilters = {
+      grades: parseGrades(grades),
+      checkpoints: parseCheckpoints(checkpoints),
+      inManuscript,
+    };
+
     const anthology = await this.anthologyService.findOne(anthologyId);
     if (!anthology) {
       throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
     }
 
+    const safeLimit = Math.min(limit, MAX_DOCUMENTS_PAGE_SIZE);
+    if (!grades && !checkpoints && inManuscript === undefined) {
+      return this.storyService.getDocumentsByAnthology(
+        anthologyId,
+        page,
+        safeLimit,
+      );
+    }
+
     return this.storyService.getDocumentsByAnthology(
       anthologyId,
       page,
-      Math.min(limit, MAX_DOCUMENTS_PAGE_SIZE),
-      inManuscript,
+      safeLimit,
+      filters,
     );
   }
 

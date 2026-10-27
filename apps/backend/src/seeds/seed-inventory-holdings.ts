@@ -42,7 +42,16 @@ export async function seedInventoryHoldings(dataSource: DataSource) {
     });
 
     if (!exists) {
-      await holdingRepo.save(inventoryHolding);
+      // Assign the `anthology`/`inventory` relations rather than saving the
+      // seed item's `anthology_id`/`inventory_id` keys directly — those are not
+      // entity properties, so saving them raw leaves both foreign keys NULL.
+      await holdingRepo.save(
+        holdingRepo.create({
+          anthology,
+          inventory,
+          numCopies: inventoryHolding.numCopies,
+        }),
+      );
       console.log(
         `  ✓ Created holding: "Anthology ${anthology.title}" @ "${inventory.name}" (${inventoryHolding.numCopies} copies)`,
       );

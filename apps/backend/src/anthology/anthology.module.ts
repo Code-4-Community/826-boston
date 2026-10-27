@@ -8,6 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { OmchaiService } from 'src/omchai/omchai.service';
 import { OmchaiModule } from 'src/omchai/omchai.module';
 import { AwsS3Module } from '../aws/aws-s3.module';
+import { InventoryHoldingModule } from '../inventory-holding/inventory-holding.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AwsS3Module } from '../aws/aws-s3.module';
     UsersModule,
     OmchaiModule,
     AwsS3Module,
+    InventoryHoldingModule,
   ],
   controllers: [AnthologyController],
   providers: [AnthologyService],
