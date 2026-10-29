@@ -183,8 +183,23 @@ const PublicationDetailsView: React.FC<Props> = ({
               className="publication-details__cover-placeholder"
               onClick={() => editable && fileRef.current?.click()}
               disabled={!editable}
+              aria-label="Upload cover image"
             >
-              Add cover image
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                width="32"
+                height="32"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 16V4" />
+                <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+                <path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" />
+              </svg>
             </button>
           )}
           {values.photo_url && editable && (
@@ -284,68 +299,66 @@ const PublicationDetailsView: React.FC<Props> = ({
           {saveError && (
             <p className="publication-details__error">{saveError}</p>
           )}
-
-          <div className="publication-details__grid">
-            <label className="publication-details__field">
-              <span>Publication Level</span>
-              <select
-                value={values.pubLevel ?? values.pub_level ?? ''}
-                disabled={!editable}
-                onChange={(event) =>
-                  saveImmediately('pub_level', event.target.value)
-                }
-              >
-                {PUB_LEVELS.map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="publication-details__field">
-              <span>Publication Date</span>
-              <input
-                type="date"
-                value={dateValue}
-                disabled={!editable}
-                onChange={(event) =>
-                  saveImmediately('publicationDate', event.target.value)
-                }
-              />
-            </label>
-
-            <MultiSelect
-              label="Genre(s)"
-              options={GENRES}
-              selected={values.genres ?? []}
-              disabled={!editable}
-              onChange={(value) => saveImmediately('genres', value)}
-            />
-            <MultiSelect
-              label="Theme(s)"
-              options={THEMES}
-              selected={values.themes ?? []}
-              disabled={!editable}
-              onChange={(value) => saveImmediately('themes', value)}
-            />
-
-            <label className="publication-details__field">
-              <span>Grade</span>
-              <input
-                value={values.gradeLevel ?? ''}
-                disabled={!editable}
-                onChange={(event) =>
-                  changeText('gradeLevel', event.target.value)
-                }
-                onBlur={() => {
-                  clearTimeout(timers.current.gradeLevel);
-                  void save('gradeLevel', { gradeLevel: values.gradeLevel });
-                }}
-              />
-            </label>
-          </div>
         </div>
+      </div>
+
+      <div className="publication-details__grid">
+        <label className="publication-details__field">
+          <span>Publication Level</span>
+          <select
+            value={values.pubLevel ?? values.pub_level ?? ''}
+            disabled={!editable}
+            onChange={(event) =>
+              saveImmediately('pub_level', event.target.value)
+            }
+          >
+            {PUB_LEVELS.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="publication-details__field">
+          <span>Publication Date</span>
+          <input
+            type="date"
+            value={dateValue}
+            disabled={!editable}
+            onChange={(event) =>
+              saveImmediately('publicationDate', event.target.value)
+            }
+          />
+        </label>
+
+        <MultiSelect
+          label="Genre(s)"
+          options={GENRES}
+          selected={values.genres ?? []}
+          disabled={!editable}
+          onChange={(value) => saveImmediately('genres', value)}
+        />
+        <MultiSelect
+          label="Theme(s)"
+          options={THEMES}
+          selected={values.themes ?? []}
+          disabled={!editable}
+          onChange={(value) => saveImmediately('themes', value)}
+        />
+
+        <label className="publication-details__field">
+          <span>Grade</span>
+          <input
+            value={values.gradeLevel ?? ''}
+            disabled={!editable}
+            onChange={(event) => changeText('gradeLevel', event.target.value)}
+            onBlur={() => {
+              clearTimeout(timers.current.gradeLevel);
+              void save('gradeLevel', { gradeLevel: values.gradeLevel });
+            }}
+          />
+        </label>
       </div>
     </div>
   );

@@ -32,7 +32,6 @@ const ProjectPublicationView: React.FC = () => {
     draft: StoryDraftDetail;
     reload: () => void;
   } | null>(null);
-
   // Table rows lack bio, name in book and checkpoints, so fetch the full draft
   const openDraftDetail = async (row: StoryDocumentRow, reload: () => void) => {
     if (row.storyDraftId === null || !anthology) return;
