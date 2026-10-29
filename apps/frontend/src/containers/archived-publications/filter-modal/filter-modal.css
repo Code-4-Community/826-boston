@@ -1,234 +1,492 @@
-/* Filter Modal Backdrop */
 .filter-modal-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.35);
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  background: rgb(0 0 0 / 35%);
 }
 
-/* Modal Container */
 .filter-modal {
-  background: white;
-  border: 1px solid var(--neutral-200);
+  position: relative;
+  box-sizing: border-box;
+  width: min(709px, calc(100vw - 32px));
+  height: min(648px, calc(100vh - 32px));
+  overflow: visible;
+  border: 1px solid #f0ebe9;
   border-radius: 12px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.25);
-  width: 90%;
-  max-width: 860px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0 2px rgb(0 0 0 / 25%);
   animation: filterModalFadeIn 0.2s ease-out;
 }
 
-/* Header */
 .filter-modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  padding: 29px 42px 0;
-  flex-shrink: 0;
-}
-
-.filter-modal-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  height: 24px;
+  padding: 36px 32px 0;
 }
 
 .filter-modal-title {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--neutral-600);
   margin: 0;
-}
-
-.filter-modal-subtitle {
+  color: #000;
   font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 12px;
-  color: #858585;
-  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21px;
 }
 
 .filter-modal-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  color: var(--neutral-600);
-  flex-shrink: 0;
-  transition: opacity 0.15s ease;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1c1b1f;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 20px;
 }
 
-.filter-modal-close:hover {
-  opacity: 0.6;
-}
-
-/* Body */
 .filter-modal-body {
-  padding: 21px 42px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  box-sizing: border-box;
+  height: calc(100% - 60px);
+  padding: 48px 32px 36px;
+  overflow: visible;
 }
 
-/* Section */
 .filter-modal-section {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
+.filter-modal-section + .filter-modal-section {
+  margin-top: 32px;
+}
+
 .filter-modal-section-title {
+  margin: 0 0 12px;
+  color: #3b3330;
   font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--neutral-600);
-  margin: 0 0 4px;
-}
-
-/* Footer */
-.filter-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 42px 24px;
-  border-top: 1px solid var(--neutral-200);
-  flex-shrink: 0;
-}
-
-.filter-modal-btn {
-  font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
-  padding: 8px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
+  line-height: 19px;
 }
 
-.filter-modal-btn:hover {
-  opacity: 0.8;
-}
-
-.filter-modal-btn--clear {
-  background: white;
-  border: 1px solid var(--neutral-300);
-  color: var(--neutral-600);
-}
-
-.filter-modal-btn--apply {
-  background: var(--neutral-600);
-  border: 1px solid var(--neutral-600);
-  color: white;
-}
-
-/* ── Shared: Tab Filter Row ──────────────────────────────── */
-
-.filter-tab-row {
+.filter-tab-row,
+.filter-search-row {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  min-height: 48px;
+  gap: 12px;
 }
 
-/* When a label column is present */
-.filter-tab-row--labeled {
-  gap: 12px;
+.filter-tab-row:not(.filter-tab-row--labeled) {
+  align-items: flex-start;
+  min-height: 0;
 }
 
 .filter-tab-label {
+  width: 135px;
+  flex: 0 0 135px;
+  color: #3b3330;
   font-family: var(--font-body);
+  font-size: 16px;
   font-weight: 400;
-  font-size: 12px;
-  color: var(--neutral-600);
-  width: 118px;
-  flex-shrink: 0;
+  line-height: 19px;
 }
 
 .filter-tab-options {
   display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  align-items: center;
   flex: 1;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
 }
 
 .filter-tab-option {
-  background: none;
-  border: none;
-  border-bottom: 0.5px solid var(--neutral-300);
-  padding: 8px 0;
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 12px;
-  color: var(--neutral-600);
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: #f0ebe9;
+  color: #635b58;
   cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
   white-space: nowrap;
-  transition: border-color 0.15s ease;
 }
 
-.filter-tab-option:hover {
-  border-bottom-color: var(--neutral-600);
+.filter-tab-option:hover,
+.filter-tab-option--active {
+  border-color: #ff9d00;
+  background: #ffcb66;
+  color: #3b3330;
 }
 
 .filter-tab-option--active {
-  font-weight: 700;
-  border-bottom: 0.5px solid var(--neutral-600);
+  font-weight: 500;
 }
 
-/* ── Shared: Range Filter Row ────────────────────────────── */
+.filter-search-control {
+  position: relative;
+  flex: 1;
+}
+
+.filter-search-input-wrapper {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #cfc7c4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.filter-search-input-wrapper input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  color: #3b3330;
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+
+.filter-search-input-wrapper input::placeholder,
+.filter-range-input::placeholder {
+  color: #9c9390;
+  opacity: 1;
+}
+
+.filter-search-input-wrapper span {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  color: #8f8784;
+  font-size: 0;
+}
+
+.filter-search-input-wrapper span::before {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  content: '';
+}
+
+.filter-search-input-wrapper span::after {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 7px;
+  height: 2px;
+  transform: rotate(45deg);
+  background: currentColor;
+  content: '';
+}
+
+.filter-search-options {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 4;
+  max-height: 248px;
+  overflow-y: auto;
+  border: 1px solid #cfc7c4;
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+}
+
+.filter-search-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.filter-search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid #ff9d00;
+  border-radius: 14px;
+  background: #ffcb66;
+  color: #3b3330;
+  font-size: 14px;
+}
+
+.filter-search-chip button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #3b3330;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 16px;
+}
+
+.filter-search-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 8px;
+  color: #3b3330;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.filter-search-option:has(input:checked) {
+  background: #ffe8c7;
+}
+
+.filter-search-option:hover {
+  background: #f8f4f2;
+}
+
+.filter-search-option input {
+  width: 16px;
+  height: 16px;
+  accent-color: #f45100;
+}
+
+.filter-search-empty {
+  display: block;
+  padding: 12px;
+  color: #8f8784;
+}
+
+.filter-search-dismiss {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  border: 0;
+  background: transparent;
+}
 
 .filter-range-inputs {
   display: flex;
+  flex: 1;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+}
+
+.filter-date-picker {
+  position: relative;
+  flex: 0 0 173px;
+}
+
+.filter-date-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px 0 16px;
+  border: 1px solid #cfc7c4;
+  border-radius: 8px;
+  outline: 0;
+  background: #fff;
+  color: #3b3330;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 16px;
+  text-align: left;
+}
+
+.filter-date-input--open {
+  border-color: #8f8784;
+}
+
+.filter-date-placeholder {
+  color: #9c9390;
+}
+
+.filter-calendar-icon {
+  position: relative;
+  width: 17px;
+  height: 15px;
+  border: 2px solid #8f8784;
+  border-radius: 2px;
+}
+
+.filter-calendar-icon::before {
+  position: absolute;
+  top: 3px;
+  right: -2px;
+  left: -2px;
+  border-top: 2px solid #8f8784;
+  content: '';
+}
+
+.filter-calendar-icon::after {
+  position: absolute;
+  top: -5px;
+  left: 3px;
+  width: 7px;
+  height: 4px;
+  border-right: 2px solid #8f8784;
+  border-left: 2px solid #8f8784;
+  content: '';
+}
+
+.filter-calendar {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  z-index: 8;
+  width: 260px;
+  padding: 14px 12px 12px;
+  box-sizing: border-box;
+  border: 1px solid #cfc7c4;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 18%);
+}
+
+.filter-calendar-header,
+.filter-calendar-weekdays,
+.filter-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: center;
+  text-align: center;
+}
+
+.filter-calendar-header {
+  grid-template-columns: 28px 1fr 28px;
+  margin-bottom: 12px;
+  color: #3b3330;
+  font-size: 13px;
+}
+
+.filter-calendar-header button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #3b3330;
+  cursor: pointer;
+  font-size: 25px;
+  line-height: 20px;
+}
+
+.filter-calendar-weekdays {
+  margin-bottom: 5px;
+  color: #635b58;
+  font-size: 12px;
+}
+
+.filter-calendar-days button {
+  width: 32px;
+  height: 32px;
+  margin: 1px auto;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #3b3330;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.filter-calendar-days button:hover {
+  background: #fff0d9;
+}
+
+.filter-calendar-days .filter-calendar-day--muted {
+  color: #aaa3a0;
+}
+
+.filter-calendar-days .filter-calendar-day--selected {
+  background: #ffcb66;
+  color: #3b3330;
 }
 
 .filter-range-input {
-  border: 0.5px solid #858585;
+  box-sizing: border-box;
+  width: 173px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #cfc7c4;
   border-radius: 8px;
-  padding: 4px 9px;
+  outline: 0;
+  color: #3b3330;
   font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--neutral-600);
-  width: 90px;
-  outline: none;
-  background: white;
-  /* Remove browser-default number spinners */
-  -moz-appearance: textfield;
+  font-size: 16px;
 }
 
-.filter-range-input::-webkit-outer-spin-button,
-.filter-range-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.filter-range-input[type='date'] {
+  position: relative;
+  padding-right: 10px;
 }
 
-.filter-range-input::placeholder {
-  color: #858585;
-}
-
-.filter-range-input:focus {
-  border-color: var(--neutral-600);
+.filter-range-input[type='date']::-webkit-calendar-picker-indicator {
+  width: 18px;
+  height: 18px;
+  opacity: 0.55;
+  cursor: pointer;
 }
 
 .filter-range-separator {
+  color: #635b58;
+  font-size: 16px;
+}
+
+.filter-modal-footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  box-sizing: border-box;
+  width: min(709px, calc(100vw - 32px));
+  padding: 0 32px 24px;
+  pointer-events: none;
+}
+
+.filter-modal-footer button {
+  pointer-events: auto;
+}
+
+.filter-modal-btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  cursor: pointer;
   font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--neutral-600);
-  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.filter-modal-btn--clear {
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+}
+
+.filter-modal-btn--apply {
+  min-width: 158px;
+  border: 1px solid #f45100;
+  background: #f45100;
+  color: #fff;
 }
 
 @keyframes filterModalFadeIn {
@@ -239,5 +497,25 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@media (max-width: 680px) {
+  .filter-modal-body {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .filter-tab-label {
+    width: 115px;
+    flex-basis: 115px;
+  }
+
+  .filter-range-input {
+    width: 145px;
+  }
+
+  .filter-date-picker {
+    flex-basis: 145px;
   }
 }
