@@ -111,6 +111,28 @@ export const DEFAULT_FILTER_STATE: FilterState = {
   inventoryMax: '',
 };
 
+/** Values match the backend's AnthologySortOption, so they're sent as-is. */
+export enum TrackerSortOption {
+  TITLE_ASC = 'title-asc',
+  TITLE_DESC = 'title-desc',
+  BYLINE_ASC = 'byline-asc',
+  BYLINE_DESC = 'byline-desc',
+  DATE_RECENT = 'date-recent',
+  DATE_OLDEST = 'date-oldest',
+}
+
+export interface TrackerFilterState {
+  sortBy: TrackerSortOption;
+  programs: string[];
+  staffIds: number[];
+}
+
+export const DEFAULT_TRACKER_FILTER_STATE: TrackerFilterState = {
+  sortBy: TrackerSortOption.TITLE_ASC,
+  programs: [],
+  staffIds: [],
+};
+
 export enum OmchaiRole {
   OWNER = 'OWNER',
   MANAGER = 'MANAGER',

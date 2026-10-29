@@ -231,6 +231,271 @@
   flex-shrink: 0;
 }
 
+/* ── Tracker variant ("Sort and Filter Results") ─────────── */
+
+/* visible overflow so the picker dropdowns can extend past the modal's edge */
+.filter-modal--tracker {
+  max-width: 710px;
+  overflow: visible;
+}
+
+.filter-modal--tracker .filter-modal-header {
+  align-items: center;
+  padding: 36px 32px 0;
+}
+
+.filter-modal--tracker .filter-modal-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--black);
+}
+
+.filter-modal--tracker .filter-modal-close img {
+  width: 24px;
+  height: 24px;
+}
+
+.filter-modal--tracker .filter-modal-body {
+  padding: 24px 32px;
+  gap: 32px;
+  overflow: visible;
+}
+
+.filter-modal--tracker .filter-modal-section-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+/* sort options render as pills instead of underlined tabs */
+.filter-modal--tracker .filter-tab-row {
+  padding: 0;
+}
+
+.filter-modal--tracker .filter-tab-options {
+  gap: 8px 12px;
+}
+
+.filter-modal--tracker .filter-tab-option {
+  background: var(--neutral-200);
+  border: none;
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 14px;
+  color: var(--neutral-500);
+  transition: background-color 0.15s ease;
+}
+
+.filter-modal--tracker .filter-tab-option:hover {
+  background: var(--neutral-300);
+}
+
+.filter-modal--tracker .filter-tab-option--active,
+.filter-modal--tracker .filter-tab-option--active:hover {
+  font-weight: 400;
+  background: var(--accent-300);
+  color: var(--neutral-600);
+  box-shadow: inset 0 0 0 1px var(--accent-500);
+}
+
+.filter-modal--tracker .filter-modal-footer {
+  gap: 10px;
+  padding: 0 32px 36px;
+  border-top: none;
+}
+
+.filter-modal--tracker .filter-modal-btn {
+  height: 36px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.filter-modal--tracker .filter-modal-btn--clear {
+  border-color: var(--black);
+  color: var(--black);
+}
+
+.filter-modal--tracker .filter-modal-btn--apply {
+  background: var(--accent-600);
+  border-color: var(--accent-600);
+  padding: 8px 24px;
+}
+
+/* ── Searchable multi-select (Program(s), Staff) ─────────── */
+
+.filter-select-row {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 8px 0;
+}
+
+.filter-select-row + .filter-select-row {
+  margin-top: 9px;
+}
+
+.filter-select-label {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  color: var(--neutral-600);
+  width: 128px;
+  flex-shrink: 0;
+}
+
+.filter-select {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-select-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  padding: 8px 16px;
+  background: white;
+}
+
+.filter-select-box:focus-within {
+  border-color: var(--neutral-600);
+}
+
+.filter-select-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-select-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--black);
+  white-space: nowrap;
+}
+
+.filter-select-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--accent-500);
+  border-radius: 999px;
+  background: var(--accent-400);
+  font-size: 10px;
+  color: var(--black);
+}
+
+.filter-select-tag-remove {
+  display: inline-flex;
+  margin-left: -1px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.filter-select-tag-remove:hover {
+  opacity: 0.6;
+}
+
+.filter-select-input {
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  outline: none;
+  padding: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--neutral-600);
+}
+
+.filter-select-input::placeholder {
+  color: var(--neutral-400);
+}
+
+.filter-select-search-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--neutral-600);
+}
+
+.filter-select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  background: white;
+}
+
+.filter-select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 8px;
+  border: none;
+  background: white;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.filter-select-option:hover {
+  background: var(--neutral-150);
+}
+
+.filter-select-option--selected,
+.filter-select-option--selected:hover {
+  background: var(--accent-300);
+}
+
+.filter-select-checkbox {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border: 1px solid var(--neutral-600);
+  border-radius: 1px;
+}
+
+/* the check icon spans the full 10px box, border included */
+.filter-select-checkbox img {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+}
+
+.filter-select-message {
+  padding: 10px 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--neutral-400);
+}
+
 @keyframes filterModalFadeIn {
   from {
     opacity: 0;
