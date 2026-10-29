@@ -23,9 +23,13 @@
   text-decoration: none;
 }
 
-.ppv-breadcrumb-link:hover { text-decoration: underline; }
+.ppv-breadcrumb-link:hover {
+  text-decoration: underline;
+}
 
-.ppv-breadcrumb-sep { color: var(--neutral-400); }
+.ppv-breadcrumb-sep {
+  color: var(--neutral-400);
+}
 
 .ppv-content {
   display: flex;
@@ -108,6 +112,17 @@
   color: var(--neutral-600);
   margin: 0;
   align-self: center;
+}
+
+.ppv-status-pill {
+  margin-left: auto;
+  padding: 4px 16px;
+  border-radius: 13px;
+  background-color: var(--neutral-200);
+  color: var(--neutral-500);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
 }
 
 .publication-tabs button.publication-tab {

@@ -7,7 +7,7 @@ import Logo from '../assets/icons/826-boston-logo.png';
 import HomeIcon from '../assets/icons/home.svg';
 import LibraryIcon from '../assets/icons/library.svg';
 import LibraryActiveIcon from '../assets/icons/library-active.svg';
-import ProjectsIcon from '../assets/icons/projects.svg';
+import TrackerIcon from '../assets/icons/projects.svg';
 import ResourcesIcon from '../assets/icons/resources.svg';
 import PeopleIcon from '../assets/icons/people.svg';
 import ChevronRightIcon from '../assets/icons/chevron-right.svg';
@@ -28,8 +28,8 @@ const Sidebar: React.FC = () => {
 
   const isLibraryActive =
     location.pathname.startsWith('/library') || location.pathname === '/';
-  const isProjectsActive =
-    location.pathname.startsWith('/projects') || location.pathname === '/';
+  const isTrackerActive =
+    location.pathname.startsWith('/tracker') || location.pathname === '/';
   const isResourcesActive =
     location.pathname.startsWith('/resouces') || location.pathname === '/';
   const isPeopleActive =
@@ -82,17 +82,17 @@ const Sidebar: React.FC = () => {
             </NavLink>
           </div>
 
-          {/* Projects */}
+          {/* Tracker */}
           {isAuthorized && (
-            <NavLink to="/projects" className="sidebar-nav-item">
+            <NavLink to="/tracker" className="sidebar-nav-item">
               <div className="sidebar-nav-item-content">
                 <div className="sidebar-nav-item-left">
                   <img
-                    src={ProjectsIcon}
+                    src={TrackerIcon}
                     alt=""
                     className="sidebar-nav-icon"
                     style={{
-                      filter: isProjectsActive
+                      filter: isTrackerActive
                         ? 'brightness(0) saturate(100%) invert(57%) sepia(99%) saturate(456%) hue-rotate(1deg) brightness(98%) contrast(98%)'
                         : 'none',
                     }}
@@ -100,9 +100,9 @@ const Sidebar: React.FC = () => {
                   {!collapsed && (
                     <span
                       className="sidebar-nav-label"
-                      style={{ fontWeight: isProjectsActive ? 700 : 400 }}
+                      style={{ fontWeight: isTrackerActive ? 700 : 400 }}
                     >
-                      Projects
+                      Tracker
                     </span>
                   )}
                 </div>

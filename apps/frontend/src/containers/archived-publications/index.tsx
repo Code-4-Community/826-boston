@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom';
 import './styles.css';
 import apiClient from '../../api/apiClient';
 import { type FilterSortAnthologyBody } from '../../api/apiClient';
@@ -19,15 +19,41 @@ import MenuDotsIcon from '../../assets/icons/menu-dots.svg';
 import BookmarkIcon from '../../assets/icons/bookmark.svg';
 import CreatePublicationModal from '@containers/create-publication-modal';
 
-type PublicationsPageMode = 'archive' | 'projects';
+type PublicationsPageMode = 'archive' | 'tracker';
 type ArchiveTab = 'published' | 'archived';
-type ProjectTab =
-  | 'all'
-  | 'drafts'
-  | 'in-revision'
-  | 'in-production'
-  | 'published'
-  | 'archived';
+
+const ARCHIVE_TAB_STATUS: Record<ArchiveTab, AnthologyStatus> = {
+  published: AnthologyStatus.CAN_BE_SHARED,
+  archived: AnthologyStatus.ARCHIVED,
+};
+
+interface TrackerTab {
+  slug: string;
+  label: string;
+  /** Omitted for the All tab, which shows every publication. */
+  status?: AnthologyStatus;
+}
+
+const TRACKER_TABS: TrackerTab[] = [
+  { slug: 'all', label: 'All' },
+  {
+    slug: 'not-started',
+    label: 'Not Started',
+    status: AnthologyStatus.NOT_STARTED,
+  },
+  { slug: 'drafting', label: 'Drafting', status: AnthologyStatus.DRAFTING },
+  {
+    slug: 'awaiting-review',
+    label: 'Awaiting Review',
+    status: AnthologyStatus.AWAITING_REVIEW,
+  },
+  {
+    slug: 'can-be-shared',
+    label: 'Can be Shared',
+    status: AnthologyStatus.CAN_BE_SHARED,
+  },
+  { slug: 'archived', label: 'Archive', status: AnthologyStatus.ARCHIVED },
+];
 
 interface PublicationsPageProps {
   mode?: PublicationsPageMode;
@@ -105,17 +131,6 @@ function isArchiveTab(value: string | undefined): value is ArchiveTab {
   return value === 'published' || value === 'archived';
 }
 
-function isProjectTab(value: string | undefined): value is ProjectTab {
-  return (
-    value === 'all' ||
-    value === 'drafts' ||
-    value === 'in-revision' ||
-    value === 'in-production' ||
-    value === 'published' ||
-    value === 'archived'
-  );
-}
-
 export default function ArchivedPublications({
   mode = 'archive',
 }: PublicationsPageProps) {
@@ -130,7 +145,7 @@ export default function ArchivedPublications({
   const { tab } = useParams<{ tab?: string }>();
 
   const activeArchiveTab: ArchiveTab = isArchiveTab(tab) ? tab : 'published';
-  const activeProjectTab: ProjectTab = isProjectTab(tab) ? tab : 'all';
+  const activeTrackerTab = TRACKER_TABS.find((t) => t.slug === tab);
 
   useEffect(() => {
     const body = buildFilterSortBody(appliedFilters);
@@ -147,43 +162,15 @@ export default function ArchivedPublications({
       });
   }, [appliedFilters]);
 
-  const statusFilteredPublications = publications.filter((pub) => {
-    const status = String(pub.status);
+  if (mode === 'tracker' && !activeTrackerTab) {
+    return <Navigate to="/tracker/all" replace />;
+  }
 
-    if (mode === 'archive') {
-      if (activeArchiveTab === 'published') {
-        return status === AnthologyStatus.PUBLISHED || status === 'Published';
-      }
-
-      return status === AnthologyStatus.ARCHIVED;
-    }
-
-    if (activeProjectTab === 'all') {
-      return true;
-    }
-
-    if (activeProjectTab === 'drafts') {
-      return pub.status === AnthologyStatus.DRAFT;
-    }
-
-    if (activeProjectTab === 'in-revision') {
-      return pub.status === AnthologyStatus.IN_REVISION;
-    }
-
-    if (activeProjectTab === 'in-production') {
-      return status === 'InProduction' || status === 'In Production';
-    }
-
-    if (activeProjectTab === 'published') {
-      return status === AnthologyStatus.PUBLISHED || status === 'Published';
-    }
-
-    if (activeProjectTab === 'archived') {
-      return status === AnthologyStatus.ARCHIVED;
-    }
-
-    return false;
-  });
+  const statusFilteredPublications = publications.filter((pub) =>
+    mode === 'archive'
+      ? pub.status === ARCHIVE_TAB_STATUS[activeArchiveTab]
+      : !activeTrackerTab?.status || pub.status === activeTrackerTab.status,
+  );
 
   const filteredPublications = applyLocalFilters(
     statusFilteredPublications,
@@ -230,7 +217,7 @@ export default function ArchivedPublications({
                 <span>Filters</span>
               </button>
 
-              {mode === 'projects' && (
+              {mode === 'tracker' && (
                 <button
                   type="button"
                   className="publication-create-btn"
@@ -264,56 +251,21 @@ export default function ArchivedPublications({
             </div>
           )}
 
-          {mode === 'projects' && (
+          {mode === 'tracker' && (
             <div className="publication-tabs">
-              <NavLink
-                to="/projects/all"
-                className={({ isActive }) =>
-                  `publication-tab ${isActive ? 'publication-tab--active' : ''}`
-                }
-              >
-                All
-              </NavLink>
-              <NavLink
-                to="/projects/drafts"
-                className={({ isActive }) =>
-                  `publication-tab ${isActive ? 'publication-tab--active' : ''}`
-                }
-              >
-                Drafts
-              </NavLink>
-              <NavLink
-                to="/projects/in-revision"
-                className={({ isActive }) =>
-                  `publication-tab ${isActive ? 'publication-tab--active' : ''}`
-                }
-              >
-                In Revision
-              </NavLink>
-              <NavLink
-                to="/projects/in-production"
-                className={({ isActive }) =>
-                  `publication-tab ${isActive ? 'publication-tab--active' : ''}`
-                }
-              >
-                In Production
-              </NavLink>
-              <NavLink
-                to="/projects/published"
-                className={({ isActive }) =>
-                  `publication-tab ${isActive ? 'publication-tab--active' : ''}`
-                }
-              >
-                Published
-              </NavLink>
-              <NavLink
-                to="/projects/archived"
-                className={({ isActive }) =>
-                  `publication-tab ${isActive ? 'publication-tab--active' : ''}`
-                }
-              >
-                Library
-              </NavLink>
+              {TRACKER_TABS.map(({ slug, label }) => (
+                <NavLink
+                  key={slug}
+                  to={`/tracker/${slug}`}
+                  className={({ isActive }) =>
+                    `publication-tab ${
+                      isActive ? 'publication-tab--active' : ''
+                    }`
+                  }
+                >
+                  {label}
+                </NavLink>
+              ))}
             </div>
           )}
 
@@ -325,8 +277,8 @@ export default function ArchivedPublications({
                 className="publication-card"
                 onClick={() =>
                   navigate(
-                    mode === 'projects'
-                      ? `/projects/publication/${pub.id}`
+                    mode === 'tracker'
+                      ? `/tracker/publication/${pub.id}`
                       : `/library/publication/${pub.id}`,
                   )
                 }

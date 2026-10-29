@@ -1,10 +1,10 @@
 //import { PUB_LEVEL_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
 
 export enum AnthologyStatus {
-  DRAFT = 'Draft',
-  IN_REVISION = 'In Revision',
-  IN_PRODUCTION = 'In Production',
-  PUBLISHED = 'Published',
+  NOT_STARTED = 'Not Started',
+  DRAFTING = 'Drafting',
+  AWAITING_REVIEW = 'Awaiting Review',
+  CAN_BE_SHARED = 'Can Be Shared',
   ARCHIVED = 'Archived',
 }
 
@@ -196,7 +196,6 @@ export interface AnthologyInventory {
 export interface CreateAnthologyDto {
   title: string;
   pub_level: AnthologyPubLevel;
-  status: AnthologyStatus;
   themes: string[];
   genres: string[];
   publicationDate: string;

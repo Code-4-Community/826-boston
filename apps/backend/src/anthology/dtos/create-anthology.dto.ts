@@ -6,7 +6,7 @@ import {
   IsArray,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AnthologyStatus, AnthologyPubLevel } from '../types';
+import { AnthologyPubLevel } from '../types';
 
 export class CreateAnthologyDto {
   @ApiProperty({ description: 'Title of the anthology' })
@@ -16,14 +16,6 @@ export class CreateAnthologyDto {
   @ApiProperty({ description: 'Description of the anthology' })
   @IsString()
   description: string;
-
-  @ApiProperty({
-    description: 'Status of the anthology',
-    enum: AnthologyStatus,
-    example: AnthologyStatus.DRAFT,
-  })
-  @IsEnum(AnthologyStatus)
-  status: AnthologyStatus;
 
   @ApiProperty({ description: 'Projected publication date of the anthology' })
   @IsString()

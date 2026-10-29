@@ -25,7 +25,6 @@ export class AnthologyService {
   async create(
     title: string,
     description: string,
-    status: AnthologyStatus,
     pubLevel: AnthologyPubLevel,
     programs?: string[],
     photoUrl?: string,
@@ -35,7 +34,6 @@ export class AnthologyService {
     const anthology = this.repo.create({
       title,
       description,
-      status,
       pubLevel,
       programs,
       photoUrl,
