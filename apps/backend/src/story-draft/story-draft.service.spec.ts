@@ -39,6 +39,7 @@ describe('StoryDraftService', () => {
         proofread: false,
         notes: ['First draft'],
         story: { id: 1 },
+        checkpoints: {},
       };
 
       const created = { id: 1, ...payload } as StoryDraft;
@@ -54,6 +55,7 @@ describe('StoryDraftService', () => {
         payload.proofread,
         payload.notes,
         payload.story.id,
+        payload.checkpoints,
       );
 
       expect(mockRepo.create).toHaveBeenCalledWith(payload);
@@ -82,6 +84,7 @@ describe('StoryDraftService', () => {
         editRound: EditRound.ONE,
         proofread: false,
         notes: ['Old note'],
+        checkpoints: { copyedit: false } as Record<string, boolean>,
       } as StoryDraft;
 
       mockRepo.findOne.mockResolvedValue(existing);
@@ -96,6 +99,7 @@ describe('StoryDraftService', () => {
         EditRound.TWO,
         true,
         ['New note'],
+        { copyedit: true },
       );
 
       expect(mockRepo.save).toHaveBeenCalledWith(
@@ -108,6 +112,7 @@ describe('StoryDraftService', () => {
           editRound: EditRound.TWO,
           proofread: true,
           notes: ['New note'],
+          checkpoints: { copyedit: true },
         }),
       );
       expect(result.docLink).toBe('https://docs.google.com/new');
@@ -117,6 +122,7 @@ describe('StoryDraftService', () => {
       expect(result.editRound).toBe(EditRound.TWO);
       expect(result.proofread).toBe(true);
       expect(result.notes).toEqual(['New note']);
+      expect(result.checkpoints).toEqual({ copyedit: true });
     });
   });
 
