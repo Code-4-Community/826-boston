@@ -3,31 +3,35 @@ import User from '@api/dtos/user.dto';
 import * as Sentry from '@sentry/react';
 import apiClient from '@api/apiClient';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 
 export default function useAuth(): [boolean, boolean, User | undefined] {
-  // get user and authStatus from authenticator hook
-  const { user, authStatus } = useAuthenticator((context) => [
-    context.user,
-    context.authStatus,
-  ]);
+  // get authStatus from authenticator hook
+  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+  const isUserAuthenticated = authStatus === 'authenticated';
+  const queryClient = useQueryClient();
+
+  // prevent unauthenticated users from seeing the auth data from previous logins
+  useEffect(() => {
+    if (authStatus === 'unauthenticated') {
+      queryClient.removeQueries(['auth']);
+    }
+  }, [authStatus, queryClient]);
+
+  const { isLoading, isError, data } = useQuery({
+    queryKey: ['auth'],
+    queryFn: () => apiClient.getMe(),
+    enabled: isUserAuthenticated,
+  });
 
   // sentry user tracking
   useEffect(() => {
-    if (authStatus === 'authenticated') {
-      Sentry.setUser(user);
+    if (isUserAuthenticated && data) {
+      Sentry.setUser({ id: data.id, email: data.email });
     } else {
       Sentry.setUser(null);
     }
-  }, [user, authStatus]);
-
-  const isUserAuthenticated = authStatus === 'authenticated';
-
-  const { isLoading, isError, data } = useQuery({
-    queryKey: ['auth', user?.userId],
-    queryFn: () => apiClient.getMe(),
-    enabled: isUserAuthenticated && !!user,
-  });
+  }, [isUserAuthenticated, data]);
 
   return [
     isLoading || authStatus === 'configuring',
