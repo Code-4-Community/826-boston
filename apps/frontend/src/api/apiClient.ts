@@ -24,6 +24,9 @@ export interface FilterSortAnthologyBody {
   pubLevels?: string[];
   programs?: string[];
   genres?: string[];
+  search?: string;
+  /** Requires a logged-in user; the backend returns 401 otherwise. */
+  staffIds?: number[];
   sortBy?: string;
 }
 
@@ -149,7 +152,6 @@ export class ApiClient {
     const data = await this.post('/api/anthologies/filter-sort', body);
     return normalizeAnthologies(data);
   }
-
   public async getAuthors(): Promise<Author[]> {
     return this.get('/api/author') as Promise<Author[]>;
   }
