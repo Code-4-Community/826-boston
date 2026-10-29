@@ -366,7 +366,8 @@ export class AnthologyController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAnthologyDto: UpdateAnthologyDto,
   ): Promise<Anthology> {
-    const { photo_url, shopify_url, pub_level, ...rest } = updateAnthologyDto;
+    const { photo_url, shopify_url, pub_level, publicationDate, ...rest } =
+      updateAnthologyDto;
     const attrs: Partial<Anthology> = { ...rest };
 
     // DTO fields use snake_case to match the create payload, but the entity's
@@ -375,6 +376,8 @@ export class AnthologyController {
     if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
     if (pub_level !== undefined)
       attrs.pubLevel = pub_level as AnthologyPubLevel;
+    if (publicationDate !== undefined)
+      attrs.publishedDate = new Date(publicationDate);
 
     return this.anthologyService.update(id, attrs);
   }

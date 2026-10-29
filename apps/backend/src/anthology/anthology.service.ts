@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ArrayOverlap,
@@ -77,7 +81,35 @@ export class AnthologyService {
       throw new NotFoundException('Anthology not found');
     }
 
-    Object.assign(anthology, attrs);
+    const updated = Object.assign(anthology, attrs);
+
+    if (attrs.status !== undefined && attrs.status !== AnthologyStatus.DRAFT) {
+      const missingFields: string[] = [];
+      if (!updated.title?.trim()) missingFields.push('title');
+      if (!updated.description?.trim()) missingFields.push('description');
+      if (!updated.genres?.length) missingFields.push('genres');
+      if (!updated.programs?.length) missingFields.push('programs');
+      if (!updated.pubLevel) missingFields.push('publication level');
+
+      if (missingFields.length) {
+        throw new BadRequestException({
+          message: 'Required publication fields are missing',
+          missingFields,
+        });
+      }
+    }
+
+    if (
+      updated.status === AnthologyStatus.PUBLISHED &&
+      (updated.pubLevel === AnthologyPubLevel.PERFECT_BOUND ||
+        updated.pubLevel === AnthologyPubLevel.SIGNATURE) &&
+      !updated.isbn?.trim()
+    ) {
+      throw new BadRequestException({
+        message: 'An ISBN is required for this publication level',
+        missingFields: ['ISBN'],
+      });
+    }
 
     return this.repo.save(anthology);
   }

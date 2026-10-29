@@ -82,6 +82,9 @@ export class Anthology {
   @Column({ nullable: true })
   isbn?: string;
 
+  @Column({ nullable: true })
+  gradeLevel?: string;
+
   @Column({
     name: 'shopify_url',
     nullable: true,

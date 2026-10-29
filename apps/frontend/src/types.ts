@@ -149,6 +149,7 @@ export interface Anthology {
   pub_level: AnthologyPubLevel;
   photo_url?: string;
   photoUrl?: string;
+  gradeLevel?: string;
   genres?: string[];
   themes?: string[];
   isbn?: string;
