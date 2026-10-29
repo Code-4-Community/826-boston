@@ -1,13 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  ArrayOverlap,
-  Between,
-  FindOptionsOrder,
-  FindOptionsWhere,
-  In,
-  Repository,
-} from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 import { Anthology } from './anthology.entity';
 import { AgeCategory, AnthologyStatus, AnthologyPubLevel } from './types';
@@ -15,6 +8,47 @@ import {
   AnthologySortOption,
   FilterSortAnthologyDto,
 } from './dtos/filter-anthology.dto';
+
+// escapes LIKE wildcards so user input is matched literally
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+// NOTE: ordering by expressions like LOWER() works with getMany() as long as the query
+// has no joins combined with skip/take; revisit this if pagination is added
+function applySort(
+  qb: SelectQueryBuilder<Anthology>,
+  sortBy: AnthologySortOption = AnthologySortOption.TITLE_ASC,
+): void {
+  switch (sortBy) {
+    case AnthologySortOption.TITLE_DESC:
+      qb.orderBy('LOWER(a.title)', 'DESC');
+      break;
+    case AnthologySortOption.BYLINE_ASC:
+      qb.orderBy("NULLIF(LOWER(a.byline), '')", 'ASC', 'NULLS LAST');
+      break;
+    case AnthologySortOption.BYLINE_DESC:
+      qb.orderBy("NULLIF(LOWER(a.byline), '')", 'DESC', 'NULLS LAST');
+      break;
+    case AnthologySortOption.DATE_RECENT:
+      qb.orderBy('a.publishedDate', 'DESC', 'NULLS LAST');
+      break;
+    case AnthologySortOption.DATE_OLDEST:
+      qb.orderBy('a.publishedDate', 'ASC', 'NULLS LAST');
+      break;
+    default:
+      qb.orderBy('LOWER(a.title)', 'ASC');
+  }
+
+  if (
+    sortBy !== AnthologySortOption.TITLE_ASC &&
+    sortBy !== AnthologySortOption.TITLE_DESC
+  ) {
+    qb.addOrderBy('LOWER(a.title)', 'ASC');
+  }
+  // tiebreak so equal rows keep a stable order
+  qb.addOrderBy('a.id', 'ASC');
+}
 
 @Injectable()
 export class AnthologyService {
@@ -101,34 +135,43 @@ export class AnthologyService {
     return this.repo.save(anthology);
   }
 
+  // all filters combine with AND; empty lists and blank search are ignored
   findWithFilterSort(dto: FilterSortAnthologyDto): Promise<Anthology[]> {
-    const where: FindOptionsWhere<Anthology> = {};
-    const order: FindOptionsOrder<Anthology> = {};
+    const qb = this.repo.createQueryBuilder('a');
 
     if (dto.pubDateRange) {
-      where.publishedDate = Between(
-        new Date(dto.pubDateRange.start),
-        new Date(dto.pubDateRange.end),
-      );
+      qb.andWhere('a.publishedDate BETWEEN :start AND :end', {
+        start: new Date(dto.pubDateRange.start),
+        end: new Date(dto.pubDateRange.end),
+      });
     }
     if (dto.pubLevels?.length) {
-      where.pubLevel = In(dto.pubLevels);
+      qb.andWhere('a.pubLevel IN (:...pubLevels)', {
+        pubLevels: dto.pubLevels,
+      });
     }
     if (dto.genres?.length) {
-      where.genres = ArrayOverlap(dto.genres);
+      qb.andWhere('a.genres && :genres', { genres: dto.genres });
     }
     if (dto.programs?.length) {
-      where.programs = ArrayOverlap(dto.programs);
+      qb.andWhere('a.programs && :programs', { programs: dto.programs });
     }
 
-    if (dto.sortBy === AnthologySortOption.TITLE_ASC) {
-      order.title = 'ASC';
-    } else if (dto.sortBy === AnthologySortOption.DATE_RECENT) {
-      order.publishedDate = 'DESC';
-    } else if (dto.sortBy === AnthologySortOption.DATE_OLDEST) {
-      order.publishedDate = 'ASC';
+    const search = dto.search?.trim();
+    if (search) {
+      qb.andWhere('a.title ILIKE :search', {
+        search: `%${escapeLike(search)}%`,
+      });
+    }
+    // EXISTS rather than a join so a publication with several matching staff appears once
+    if (dto.staffIds?.length) {
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM omchais o WHERE o.anthology = a.id AND o."user" IN (:...staffIds))',
+        { staffIds: dto.staffIds },
+      );
     }
 
-    return this.repo.find({ where, order });
+    applySort(qb, dto.sortBy);
+    return qb.getMany();
   }
 }
