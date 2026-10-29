@@ -324,7 +324,7 @@ const People: React.FC = () => {
               className="people-create-btn"
               onClick={() => setShowModal(true)}
             >
-              Add member
+              Add User
             </button>
           )}
         </div>
