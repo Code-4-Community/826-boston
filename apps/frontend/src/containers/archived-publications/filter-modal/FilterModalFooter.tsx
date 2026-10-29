@@ -14,14 +14,14 @@ export default function FilterModalFooter({
         className="filter-modal-btn filter-modal-btn--clear"
         onClick={onClear}
       >
-        Reset filters
+        Clear Filters
       </button>
       <button
         type="button"
         className="filter-modal-btn filter-modal-btn--apply"
         onClick={onApply}
       >
-        Save and Apply
+        Apply
       </button>
     </div>
   );

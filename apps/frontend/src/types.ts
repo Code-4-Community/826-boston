@@ -86,9 +86,7 @@ export enum AnthologyGenre {
 
 export enum SortOption {
   TITLE_ASC = 'title-asc',
-  TITLE_DESC = 'title-desc',
   AUTHOR_ASC = 'author-asc',
-  AUTHOR_DESC = 'author-desc',
   DATE_NEWEST = 'date-newest',
   DATE_OLDEST = 'date-oldest',
 }
@@ -98,10 +96,10 @@ export interface FilterState {
   pubDateStart: string;
   pubDateEnd: string;
   pubLevels: AnthologyPubLevel[];
-  programs: string[];
-  genres: string[];
-  themes: string[];
-  inventoryLocations: string[];
+  programs: AnthologyProgram[];
+  genres: AnthologyGenre[];
+  inventoryMin: string;
+  inventoryMax: string;
 }
 
 export const DEFAULT_FILTER_STATE: FilterState = {
@@ -111,8 +109,8 @@ export const DEFAULT_FILTER_STATE: FilterState = {
   pubLevels: [],
   programs: [],
   genres: [],
-  themes: [],
-  inventoryLocations: [],
+  inventoryMin: '',
+  inventoryMax: '',
 };
 
 export enum OmchaiRole {

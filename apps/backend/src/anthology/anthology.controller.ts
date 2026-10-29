@@ -15,7 +15,6 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
-  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnthologyService } from './anthology.service';
@@ -98,54 +97,6 @@ export class AnthologyController {
   @Post('filter-sort')
   filterSort(@Body() dto: FilterSortAnthologyDto): Promise<Anthology[]> {
     return this.anthologyService.findWithFilterSort(dto);
-  }
-
-  @Public()
-  @Get('genres')
-  getGenres(): Promise<string[]> {
-    return this.anthologyService.findGenres();
-  }
-
-  @Public()
-  @Get('inventory-locations')
-  getInventoryLocations(): Promise<string[]> {
-    return this.anthologyService.findInventoryLocations();
-  }
-
-  @Public()
-  @Get('themes')
-  getThemes(): Promise<string[]> {
-    return this.anthologyService.findThemes();
-  }
-
-  @Public()
-  @Get('programs')
-  getPrograms(): Promise<string[]> {
-    return this.anthologyService.findPrograms();
-  }
-
-  @Public()
-  @Get('by-genre')
-  getAnthologiesByGenre(
-    @Query('genres') genres: string | string[],
-  ): Promise<Anthology[]> {
-    return this.anthologyService.findByGenres(
-      Array.isArray(genres) ? genres : genres ? genres.split(',') : [],
-    );
-  }
-
-  @Public()
-  @Get('by-inventory-location')
-  getAnthologiesByInventoryLocations(
-    @Query('locations') locations: string | string[],
-  ): Promise<Anthology[]> {
-    return this.anthologyService.findByInventoryLocations(
-      Array.isArray(locations)
-        ? locations
-        : locations
-        ? locations.split(',')
-        : [],
-    );
   }
 
   @Public()

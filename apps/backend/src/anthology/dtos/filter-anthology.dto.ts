@@ -20,9 +20,6 @@ export class DateRangeDto {
 
 export enum AnthologySortOption {
   TITLE_ASC = 'title-asc',
-  TITLE_DESC = 'title-desc',
-  AUTHOR_ASC = 'author-asc',
-  AUTHOR_DESC = 'author-desc',
   DATE_RECENT = 'date-recent',
   DATE_OLDEST = 'date-oldest',
 }
@@ -48,16 +45,6 @@ export class FilterAnthologyDto {
   @IsArray()
   @IsString({ each: true })
   genres?: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  themes?: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  inventoryLocations?: string[];
 }
 
 export class SortAnthologyDto {

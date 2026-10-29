@@ -5,8 +5,6 @@ import SortSection from './SortSection';
 import FilterByAttributeSection from './FilterByAttributeSection';
 import FilterModalFooter from './FilterModalFooter';
 import './filter-modal.css';
-import apiClient from '../../../api/apiClient';
-import { useEffect } from 'react';
 
 interface FilterModalProps {
   initialFilters: FilterState;
@@ -20,28 +18,6 @@ export default function FilterModal({
   onClose,
 }: FilterModalProps) {
   const [draft, setDraft] = useState<FilterState>(initialFilters);
-  const [genres, setGenres] = useState<string[]>([]);
-  const [themes, setThemes] = useState<string[]>([]);
-  const [programs, setPrograms] = useState<string[]>([]);
-  const [inventoryLocations, setInventoryLocations] = useState<string[]>([]);
-
-  useEffect(() => {
-    Promise.all([
-      apiClient.getGenres(),
-      apiClient.getInventoryLocations(),
-      apiClient.getThemes(),
-      apiClient.getPrograms(),
-    ])
-      .then(([genreOptions, locationOptions, themeOptions, programOptions]) => {
-        setGenres(genreOptions);
-        setInventoryLocations(locationOptions);
-        setThemes(themeOptions);
-        setPrograms(programOptions);
-      })
-      .catch((error) => {
-        console.error('Unable to load filter options', error);
-      });
-  }, []);
 
   const update = <K extends keyof FilterState>(
     key: K,
@@ -67,14 +43,7 @@ export default function FilterModal({
             sortBy={draft.sortBy}
             onChange={(value) => update('sortBy', value)}
           />
-          <FilterByAttributeSection
-            draft={draft}
-            update={update}
-            genres={genres}
-            themes={themes}
-            programs={programs}
-            inventoryLocations={inventoryLocations}
-          />
+          <FilterByAttributeSection draft={draft} update={update} />
         </div>
 
         <FilterModalFooter

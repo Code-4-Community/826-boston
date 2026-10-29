@@ -58,50 +58,6 @@ export class AnthologyService {
     return this.repo.find();
   }
 
-  async findGenres(): Promise<string[]> {
-    const anthologies = await this.repo.find({ select: { genres: true } });
-    return [
-      ...new Set(anthologies.flatMap((anthology) => anthology.genres)),
-    ].sort();
-  }
-
-  async findInventoryLocations(): Promise<string[]> {
-    const anthologies = await this.repo.find({
-      relations: ['inventoryHoldings', 'inventoryHoldings.inventory'],
-    });
-    return [
-      ...new Set(
-        anthologies.flatMap((anthology) =>
-          anthology.inventoryHoldings.map((holding) => holding.inventory.name),
-        ),
-      ),
-    ].sort();
-  }
-
-  async findThemes(): Promise<string[]> {
-    const anthologies = await this.repo.find({ select: { themes: true } });
-    return [
-      ...new Set(anthologies.flatMap((anthology) => anthology.themes)),
-    ].sort();
-  }
-
-  async findPrograms(): Promise<string[]> {
-    const anthologies = await this.repo.find({ select: { programs: true } });
-    return [
-      ...new Set(anthologies.flatMap((anthology) => anthology.programs)),
-    ].sort();
-  }
-
-  async findByGenres(genres: string[]): Promise<Anthology[]> {
-    return this.findWithFilterSort({ genres });
-  }
-
-  async findByInventoryLocations(
-    inventoryLocations: string[],
-  ): Promise<Anthology[]> {
-    return this.findWithFilterSort({ inventoryLocations });
-  }
-
   findByStatus(status: AnthologyStatus) {
     return this.repo.find({ where: { status } });
   }
@@ -147,7 +103,7 @@ export class AnthologyService {
     return this.repo.save(anthology);
   }
 
-  async findWithFilterSort(dto: FilterSortAnthologyDto): Promise<Anthology[]> {
+  findWithFilterSort(dto: FilterSortAnthologyDto): Promise<Anthology[]> {
     const where: FindOptionsWhere<Anthology> = {};
     const order: FindOptionsOrder<Anthology> = {};
 
@@ -166,41 +122,15 @@ export class AnthologyService {
     if (dto.programs?.length) {
       where.programs = ArrayOverlap(dto.programs);
     }
-    if (dto.themes?.length) {
-      where.themes = ArrayOverlap(dto.themes);
-    }
 
     if (dto.sortBy === AnthologySortOption.TITLE_ASC) {
       order.title = 'ASC';
-    } else if (dto.sortBy === AnthologySortOption.TITLE_DESC) {
-      order.title = 'DESC';
-    } else if (dto.sortBy === AnthologySortOption.AUTHOR_ASC) {
-      order.byline = 'ASC';
-    } else if (dto.sortBy === AnthologySortOption.AUTHOR_DESC) {
-      order.byline = 'DESC';
     } else if (dto.sortBy === AnthologySortOption.DATE_RECENT) {
       order.publishedDate = 'DESC';
     } else if (dto.sortBy === AnthologySortOption.DATE_OLDEST) {
       order.publishedDate = 'ASC';
     }
 
-    const anthologies = await this.repo.find({
-      where,
-      order,
-      ...(dto.inventoryLocations?.length
-        ? { relations: ['inventoryHoldings', 'inventoryHoldings.inventory'] }
-        : {}),
-    });
-
-    if (!dto.inventoryLocations?.length) {
-      return anthologies;
-    }
-
-    const locations = new Set(dto.inventoryLocations);
-    return anthologies.filter((anthology) =>
-      anthology.inventoryHoldings.some((holding) =>
-        locations.has(holding.inventory.name),
-      ),
-    );
+    return this.repo.find({ where, order });
   }
 }

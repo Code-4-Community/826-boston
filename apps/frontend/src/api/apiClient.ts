@@ -24,8 +24,6 @@ export interface FilterSortAnthologyBody {
   pubLevels?: string[];
   programs?: string[];
   genres?: string[];
-  themes?: string[];
-  inventoryLocations?: string[];
   sortBy?: string;
 }
 
@@ -115,40 +113,6 @@ export class ApiClient {
 
   public async getAnthologies(): Promise<Anthology[]> {
     const data = await this.get('/api/anthologies');
-    return normalizeAnthologies(data);
-  }
-
-  public async getGenres(): Promise<string[]> {
-    return this.get('/api/anthologies/genres') as Promise<string[]>;
-  }
-
-  public async getInventoryLocations(): Promise<string[]> {
-    return this.get('/api/anthologies/inventory-locations') as Promise<
-      string[]
-    >;
-  }
-
-  public async getThemes(): Promise<string[]> {
-    return this.get('/api/anthologies/themes') as Promise<string[]>;
-  }
-
-  public async getPrograms(): Promise<string[]> {
-    return this.get('/api/anthologies/programs') as Promise<string[]>;
-  }
-
-  public async getAnthologiesByGenre(genres: string[]): Promise<Anthology[]> {
-    const params = new URLSearchParams({ genres: genres.join(',') });
-    const data = await this.get(`/api/anthologies/by-genre?${params}`);
-    return normalizeAnthologies(data);
-  }
-
-  public async getAnthologiesByInventoryLocations(
-    locations: string[],
-  ): Promise<Anthology[]> {
-    const params = new URLSearchParams({ locations: locations.join(',') });
-    const data = await this.get(
-      `/api/anthologies/by-inventory-location?${params}`,
-    );
     return normalizeAnthologies(data);
   }
 
