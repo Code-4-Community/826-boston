@@ -2,12 +2,13 @@ import {
   SortOption,
   AnthologyPubLevel,
   AnthologyProgram,
-  AnthologyGenre,
 } from '../../../types';
 
 export const SORT_OPTIONS: { value: SortOption; displayLabel: string }[] = [
   { value: SortOption.TITLE_ASC, displayLabel: 'By Title (A-Z)' },
+  { value: SortOption.TITLE_DESC, displayLabel: 'By Title (Z-A)' },
   { value: SortOption.AUTHOR_ASC, displayLabel: 'By Author (A-Z)' },
+  { value: SortOption.AUTHOR_DESC, displayLabel: 'By Author (Z-A)' },
   {
     value: SortOption.DATE_NEWEST,
     displayLabel: 'By Publication Date (Most Recent First)',
@@ -41,16 +42,3 @@ export const PROGRAM_OPTIONS: {
   },
   { value: AnthologyProgram.YOUNG_AUTHORS, displayLabel: 'Young Authors' },
 ];
-
-export const GENRE_OPTIONS: { value: AnthologyGenre; displayLabel: string }[] =
-  [
-    { value: AnthologyGenre.MYSTERY, displayLabel: 'Mystery' },
-    { value: AnthologyGenre.FANTASY, displayLabel: 'Fantasy' },
-    {
-      value: AnthologyGenre.HISTORICAL_FICTION,
-      displayLabel: 'Historical Fiction',
-    },
-    { value: AnthologyGenre.ROMANCE, displayLabel: 'Romance' },
-    { value: AnthologyGenre.COMEDY, displayLabel: 'Comedy' },
-    { value: AnthologyGenre.POETRY, displayLabel: 'Poetry' },
-  ];
