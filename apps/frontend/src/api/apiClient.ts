@@ -38,6 +38,8 @@ export interface StoryDocumentRow {
   firstName: string;
   lastName: string;
   grade: number | null;
+  nameInBook: string | null;
+  description: string | null;
   docLink: string | null;
 }
 
@@ -45,6 +47,22 @@ export interface PaginatedStoryDocuments {
   data: StoryDocumentRow[];
   total: number;
   page: number;
+}
+
+export type DocumentCheckpoint =
+  | 'draft1'
+  | 'draft2'
+  | 'draft3'
+  | 'consent'
+  | 'authorApproval'
+  | 'copyedit'
+  | 'proofread';
+
+export interface StoryDocumentsFilters {
+  grades: number[];
+  checkpoints: DocumentCheckpoint[];
+  // Only stories whose draft has this inManuscript value
+  inManuscript?: boolean;
 }
 
 const defaultBaseUrl =
@@ -140,9 +158,23 @@ export class ApiClient {
     anthologyId: string | number,
     page = 1,
     limit = 10,
+    filters?: Partial<StoryDocumentsFilters>,
   ): Promise<PaginatedStoryDocuments> {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (filters?.grades?.length) {
+      params.set('grades', filters.grades.join(','));
+    }
+    if (filters?.checkpoints?.length) {
+      params.set('checkpoints', filters.checkpoints.join(','));
+    }
+    if (filters?.inManuscript !== undefined) {
+      params.set('inManuscript', String(filters.inManuscript));
+    }
     return this.get(
-      `/api/stories/anthology/${anthologyId}/documents?page=${page}&limit=${limit}`,
+      `/api/stories/anthology/${anthologyId}/documents?${params.toString()}`,
     ) as Promise<PaginatedStoryDocuments>;
   }
 
@@ -160,6 +192,7 @@ export class ApiClient {
     name: string;
     nameInBook?: string;
     classPeriod?: string;
+    grade?: number;
   }): Promise<Author> {
     return this.post('/api/author', body) as Promise<Author>;
   }
@@ -188,9 +221,11 @@ export class ApiClient {
     return normalizeAnthology(data);
   }
 
-  public async getStoryDrafts(anthologyId: number) {
+  public async getStoryDrafts(anthologyId: number, inManuscript?: boolean) {
+    const query =
+      inManuscript === undefined ? '' : `?inManuscript=${inManuscript}`;
     return this.get(
-      `/api/stories/anthology/${anthologyId}/story-drafts`,
+      `/api/stories/anthology/${anthologyId}/story-drafts${query}`,
     ) as Promise<StoryDraft[]>;
   }
 
@@ -225,6 +260,9 @@ export class ApiClient {
       name?: string;
       nameInBook?: string;
       classPeriod?: string;
+      bio?: string;
+      /** null clears the stored grade. */
+      grade?: number | null;
     },
   ): Promise<Author> {
     return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
@@ -240,11 +278,16 @@ export class ApiClient {
       editRound?: EditRound;
       proofread?: boolean;
       notes?: string[];
+      checkpoints?: Record<string, boolean>;
     },
   ): Promise<{ message: string }> {
     return this.patch(`/api/story-drafts/${storyDraftId}`, body) as Promise<{
       message: string;
     }>;
+  }
+
+  public async deleteStory(storyId: number): Promise<Story> {
+    return this.delete(`/api/stories/${storyId}`) as Promise<Story>;
   }
 
   public async getOmchaiByAnthology(

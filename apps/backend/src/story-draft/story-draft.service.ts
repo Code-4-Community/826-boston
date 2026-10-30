@@ -20,6 +20,7 @@ export class StoryDraftService {
     proofread: boolean,
     notes: string[],
     storyId: number, // assume story created before draft with other details, so we can link the draft to the story
+    checkpoints: Record<string, boolean> = {},
   ) {
     const storyDraft = this.repo.create({
       docLink,
@@ -30,6 +31,7 @@ export class StoryDraftService {
       proofread,
       notes,
       story: { id: storyId },
+      checkpoints,
     });
 
     return await this.repo.save(storyDraft);
@@ -44,6 +46,7 @@ export class StoryDraftService {
     editRound?: EditRound,
     proofread?: boolean,
     notes?: string[],
+    checkpoints?: Record<string, boolean>,
   ) {
     const storyDraft = await this.repo.findOne({ where: { id: storyDraftId } });
 
@@ -71,6 +74,9 @@ export class StoryDraftService {
     }
     if (notes !== undefined) {
       storyDraft.notes = notes;
+    }
+    if (checkpoints !== undefined) {
+      storyDraft.checkpoints = checkpoints;
     }
 
     return await this.repo.save(storyDraft);

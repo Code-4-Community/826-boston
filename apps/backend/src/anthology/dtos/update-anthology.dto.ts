@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, ValidateIf } from 'class-validator';
 import { CreateAnthologyDto } from './create-anthology.dto';
 import { AnthologyStatus } from '../types';
 
@@ -11,7 +11,9 @@ export class UpdateAnthologyDto extends PartialType(CreateAnthologyDto) {
     enum: AnthologyStatus,
     example: AnthologyStatus.DRAFTING,
   })
-  @IsOptional()
+  // Not @IsOptional(): that also skips validation for null, which would reach
+  // the NOT NULL status column and fail as a 500 instead of a 400.
+  @ValidateIf((_, value) => value !== undefined)
   @IsEnum(AnthologyStatus)
   status?: AnthologyStatus;
 }
