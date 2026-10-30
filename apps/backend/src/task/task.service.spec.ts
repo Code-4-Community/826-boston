@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { TaskService } from './task.service';
+import { CreateTaskDto } from './dtos/create-task.dto';
 import { Task } from './task.entity';
 import { TaskAttachment } from './task-attachment.entity';
 import { AreaOfWork, TaskStatus } from './types';
@@ -17,9 +18,15 @@ describe('TaskService', () => {
 
   const mockTaskRepository = {
     find: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
   };
 
   const mockAnthologyRepository = {
+    findOne: jest.fn(),
+  };
+
+  const mockUserRepository = {
     findOne: jest.fn(),
   };
 
@@ -34,6 +41,10 @@ describe('TaskService', () => {
         {
           provide: getRepositoryToken(Anthology),
           useValue: mockAnthologyRepository,
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: mockUserRepository,
         },
       ],
     }).compile();
@@ -116,6 +127,7 @@ describe('TaskService', () => {
           personInCharge: { id: 2, firstName: 'John', lastName: 'Doe' },
           attachments: [
             {
+              id: 1,
               fileName: 'First_Draft.pdf',
               fileUrl: 'tasks/attachments/First_Draft.pdf',
             },
@@ -142,6 +154,98 @@ describe('TaskService', () => {
       const result = await service.findByAnthologyId(1, SortOrder.ASC);
 
       expect(result[0].personInCharge).toBeNull();
+    });
+  });
+
+  describe('create', () => {
+    const mockAnthology = { id: 1 } as Anthology;
+    const mockUser = {
+      id: 2,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@example.com',
+    } as User;
+    const createTaskDto: CreateTaskDto = {
+      name: 'Draft Check-Point',
+      areaOfWork: AreaOfWork.CHECKPOINT,
+      personInChargeId: 2,
+    };
+    const savedTask = {
+      id: 1,
+      name: 'Draft Check-Point',
+      areaOfWork: AreaOfWork.CHECKPOINT,
+      status: TaskStatus.NOT_STARTED,
+      anthology: mockAnthology,
+      personInCharge: mockUser,
+      createdAt: new Date('2026-10-01'),
+      updatedAt: new Date('2026-10-01'),
+    } as Task;
+
+    it('should throw NotFoundException if anthology not found', async () => {
+      mockAnthologyRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.create(999, createTaskDto)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should throw BadRequestException if person in charge not found', async () => {
+      mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.create(1, createTaskDto)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should successfully create a task', async () => {
+      mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockTaskRepository.create.mockReturnValue(savedTask);
+      mockTaskRepository.save.mockResolvedValue(savedTask);
+
+      const result = await service.create(1, createTaskDto);
+
+      expect(taskRepository.create).toHaveBeenCalledWith({
+        ...createTaskDto,
+        anthology: mockAnthology,
+        personInCharge: mockUser,
+      });
+      expect(result).toEqual({
+        id: 1,
+        name: 'Draft Check-Point',
+        areaOfWork: AreaOfWork.CHECKPOINT,
+        status: TaskStatus.NOT_STARTED,
+        createdAt: new Date('2026-10-01'),
+        updatedAt: new Date('2026-10-01'),
+        personInCharge: { id: 2, firstName: 'John', lastName: 'Doe' },
+        attachments: [],
+      });
+    });
+
+    it('should successfully create a task without a person in charge', async () => {
+      const unassignedTask = { ...savedTask, personInCharge: undefined };
+      mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
+      mockTaskRepository.create.mockReturnValue(unassignedTask);
+      mockTaskRepository.save.mockResolvedValue(unassignedTask);
+
+      const result = await service.create(1, { name: 'Draft Check-Point' });
+
+      expect(taskRepository.create).toHaveBeenCalledWith({
+        name: 'Draft Check-Point',
+        anthology: mockAnthology,
+        personInCharge: undefined,
+      });
+      expect(result).toEqual({
+        id: 1,
+        name: 'Draft Check-Point',
+        areaOfWork: AreaOfWork.CHECKPOINT,
+        status: TaskStatus.NOT_STARTED,
+        createdAt: new Date('2026-10-01'),
+        updatedAt: new Date('2026-10-01'),
+        personInCharge: null,
+        attachments: [],
+      });
     });
   });
 });

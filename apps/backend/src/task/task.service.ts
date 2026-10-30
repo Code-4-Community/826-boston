@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +10,8 @@ import { Anthology } from 'src/anthology/anthology.entity';
 import { SortOrder } from 'src/shared/types';
 import { AreaOfWork, TaskStatus } from './types';
 import { TaskResponseDto } from './dtos/task-response.dto';
+import { CreateTaskDto } from './dtos/create-task.dto';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class TaskService {
@@ -14,6 +20,8 @@ export class TaskService {
     private taskRepository: Repository<Task>,
     @InjectRepository(Anthology)
     private anthologyRepository: Repository<Anthology>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async findByAnthologyId(
@@ -42,7 +50,45 @@ export class TaskService {
       order: { dueBy: sort },
     });
 
-    return tasks.map((t) => ({
+    return tasks.map((t) => this.toResponseDto(t));
+  }
+
+  async create(
+    anthologyId: number,
+    createTaskDto: CreateTaskDto,
+  ): Promise<TaskResponseDto> {
+    const anthology = await this.anthologyRepository.findOne({
+      where: { id: anthologyId },
+    });
+
+    if (!anthology) {
+      throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
+    }
+
+    let personInCharge: User | undefined;
+    if (createTaskDto.personInChargeId) {
+      const user = await this.userRepository.findOne({
+        where: { id: createTaskDto.personInChargeId },
+      });
+
+      if (!user) {
+        throw new BadRequestException(
+          `User with ID ${createTaskDto.personInChargeId} not found`,
+        );
+      }
+      personInCharge = user;
+    }
+
+    const task = this.taskRepository.create({
+      ...createTaskDto,
+      anthology,
+      personInCharge,
+    });
+    return this.toResponseDto(await this.taskRepository.save(task));
+  }
+
+  private toResponseDto(t: Task): TaskResponseDto {
+    return {
       id: t.id,
       name: t.name,
       note: t.note,
@@ -59,10 +105,11 @@ export class TaskService {
             lastName: t.personInCharge.lastName,
           }
         : null,
-      attachments: t.attachments.map((a) => ({
+      attachments: (t.attachments ?? []).map((a) => ({
+        id: a.id,
         fileName: a.fileName,
         fileUrl: a.fileUrl,
       })),
-    }));
+    };
   }
 }

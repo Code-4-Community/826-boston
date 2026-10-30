@@ -5,9 +5,10 @@ import { TaskAttachment } from './task-attachment.entity';
 import { TaskService } from './task.service';
 import { TaskController } from './task.controller';
 import { Anthology } from 'src/anthology/anthology.entity';
+import { User } from 'src/users/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task, TaskAttachment, Anthology])],
+  imports: [TypeOrmModule.forFeature([Task, TaskAttachment, Anthology, User])],
   controllers: [TaskController],
   providers: [TaskService],
 })

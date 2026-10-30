@@ -1,15 +1,18 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Get,
   Param,
   ParseEnumPipe,
   ParseIntPipe,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
@@ -22,6 +25,7 @@ import { SortOrder } from 'src/shared/types';
 import { OmchaiRoles } from 'src/auth/roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
 import { TaskResponseDto } from './dtos/task-response.dto';
+import { CreateTaskDto } from './dtos/create-task.dto';
 
 @ApiTags('Tasks')
 @Controller('anthologies')
@@ -61,6 +65,7 @@ export class TaskController {
           personInCharge: { id: 1, firstName: 'John', lastName: 'Doe' },
           attachments: [
             {
+              id: 1,
               fileName: 'First_Draft.pdf',
               fileUrl: 'tasks/attachments/First_Draft.pdf',
             },
@@ -79,7 +84,6 @@ export class TaskController {
       },
     },
   })
-  // never returns a 404 because OmchaiGuard already checks for a missing anthology and returns a 403
   @ApiForbiddenResponse({
     description: 'User has no OMCHAI assignment on this anthology',
     schema: {
@@ -113,5 +117,58 @@ export class TaskController {
       areaOfWork,
       personInChargeId,
     );
+  }
+
+  @ApiBearerAuth()
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
+  @ApiOperation({
+    summary: 'Create a task for an anthology',
+    description:
+      'Creates a task for an anthology. Restricted to anthology owners and managers.',
+  })
+  @ApiCreatedResponse({
+    description: 'Task created successfully',
+    schema: {
+      example: {
+        id: 1,
+        name: 'Draft Check-Point',
+        note: 'Collect first drafts from all classes',
+        areaOfWork: 'CHECKPOINT',
+        status: 'NOT_STARTED',
+        timeFrame: '2026-10-05',
+        dueBy: '2026-10-10',
+        createdAt: '2026-10-01T12:00:00.000Z',
+        updatedAt: '2026-10-01T12:00:00.000Z',
+        personInCharge: { id: 1, firstName: 'John', lastName: 'Doe' },
+        attachments: [],
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid payload or unknown personInChargeId',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['name must be a string'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User is not an owner or manager on this anthology',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Forbidden resource',
+        error: 'Forbidden',
+      },
+    },
+  })
+  @Post(':anthologyId/tasks')
+  create(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Body() createTaskDto: CreateTaskDto,
+  ): Promise<TaskResponseDto> {
+    return this.taskService.create(anthologyId, createTaskDto);
   }
 }

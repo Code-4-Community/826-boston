@@ -7,6 +7,7 @@ export class TaskPersonInChargeDto {
 }
 
 export class TaskAttachmentDto {
+  id: number;
   fileName: string;
   fileUrl: string;
 }
