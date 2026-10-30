@@ -37,7 +37,8 @@ interface CreatePublicationModalProps {
   onClose: () => void;
   onSave: (form: PublicationFormState) => void;
   teamMembers?: TeamMemberOption[];
-  setPublications: React.Dispatch<React.SetStateAction<Anthology[]>>;
+  /** Called after the publication and its OMCHAI assignments are saved. */
+  onCreated?: (anthology: Anthology) => void;
 }
 
 const PUBLICATION_TYPES = [
@@ -318,7 +319,7 @@ function Field({ label, required = false, children }: FieldProps) {
 export default function CreatePublicationModal({
   onClose,
   onSave,
-  setPublications,
+  onCreated,
 }: CreatePublicationModalProps) {
   const [tab, setTab] = useState<0 | 1>(0);
   const [form, setForm] = useState<PublicationFormState>(INITIAL_FORM);
@@ -358,7 +359,7 @@ export default function CreatePublicationModal({
         createBatchOmchaiAssignmentsBody,
       );
 
-      setPublications((prev) => [...prev, anthology]);
+      onCreated?.(anthology);
     } catch (err) {
       console.log(err);
     }

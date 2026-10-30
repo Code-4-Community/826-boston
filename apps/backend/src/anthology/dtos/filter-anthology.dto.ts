@@ -5,6 +5,9 @@ import {
   IsOptional,
   ValidateNested,
   IsArray,
+  IsInt,
+  MaxLength,
+  ArrayMaxSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IntersectionType } from '@nestjs/swagger';
@@ -20,6 +23,9 @@ export class DateRangeDto {
 
 export enum AnthologySortOption {
   TITLE_ASC = 'title-asc',
+  TITLE_DESC = 'title-desc',
+  BYLINE_ASC = 'byline-asc',
+  BYLINE_DESC = 'byline-desc',
   DATE_RECENT = 'date-recent',
   DATE_OLDEST = 'date-oldest',
 }
@@ -45,6 +51,19 @@ export class FilterAnthologyDto {
   @IsArray()
   @IsString({ each: true })
   genres?: string[];
+
+  // case-insensitive match anywhere in the title
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  search?: string;
+
+  // publications where any of these users holds any OMCHAI role
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(200)
+  @IsInt({ each: true })
+  staffIds?: number[];
 }
 
 export class SortAnthologyDto {
