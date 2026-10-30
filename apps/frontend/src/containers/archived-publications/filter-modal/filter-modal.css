@@ -11,8 +11,13 @@
 .filter-modal {
   position: relative;
   box-sizing: border-box;
-  width: min(709px, calc(100vw - 32px));
-  height: min(648px, calc(100vh - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(709.5px, calc(100vw - 32px));
+  min-height: min(650px, calc(100vh - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 36px 32px;
   overflow: visible;
   border: 1px solid #f0ebe9;
   border-radius: 12px;
@@ -26,7 +31,7 @@
   align-items: flex-start;
   justify-content: space-between;
   height: 24px;
-  padding: 36px 32px 0;
+  flex: 0 0 24px;
 }
 
 .filter-modal-title {
@@ -54,9 +59,11 @@
 
 .filter-modal-body {
   box-sizing: border-box;
-  height: calc(100% - 60px);
-  padding: 48px 32px 36px;
-  overflow: visible;
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  padding: 16px 0 24px;
+  overflow-y: auto;
 }
 
 .filter-modal-section {
@@ -69,21 +76,46 @@
   margin-top: 32px;
 }
 
-.filter-modal-section-title {
+.filter-modal .filter-modal-section-title {
   margin: 0 0 12px;
   color: #3b3330;
-  font-family: var(--font-body);
+  font-family: Roboto, sans-serif;
   font-size: 16px;
   font-weight: 600;
-  line-height: 19px;
+  font-style: normal;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-transform: capitalize;
 }
 
-.filter-tab-row,
-.filter-search-row {
+.filter-tab-row {
   display: flex;
   align-items: center;
   min-height: 48px;
   gap: 12px;
+}
+
+.filter-search-row {
+  display: flex;
+  align-items: flex-start;
+  min-height: 40px;
+  gap: 12px;
+}
+
+.filter-search-row .filter-tab-label {
+  padding-top: 12px;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.filter-search-row + .filter-search-row,
+.filter-search-row + .filter-tab-row,
+.filter-tab-row + .filter-search-row {
+  margin-top: 24px;
 }
 
 .filter-tab-row:not(.filter-tab-row--labeled) {
@@ -125,8 +157,8 @@
 
 .filter-tab-option:hover,
 .filter-tab-option--active {
-  border-color: #ff9d00;
-  background: #ffcb66;
+  border-color: #ec9209;
+  background: #ffcc7f;
   color: #3b3330;
 }
 
@@ -167,37 +199,19 @@
 }
 
 .filter-search-input-wrapper span {
-  position: relative;
   width: 18px;
   height: 18px;
-  color: #8f8784;
   font-size: 0;
 }
 
-.filter-search-input-wrapper span::before {
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 10px;
-  height: 10px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  content: '';
-}
-
-.filter-search-input-wrapper span::after {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 7px;
-  height: 2px;
-  transform: rotate(45deg);
-  background: currentColor;
-  content: '';
+.filter-search-icon {
+  display: inline-flex;
+  flex: 0 0 18px;
 }
 
 .filter-search-options {
   position: absolute;
+  top: 40px;
   right: 0;
   left: 0;
   z-index: 4;
@@ -216,6 +230,11 @@
   padding-top: 10px;
 }
 
+.filter-search-chips--hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .filter-search-chip {
   display: inline-flex;
   align-items: center;
@@ -223,9 +242,9 @@
   height: 28px;
   box-sizing: border-box;
   padding: 0 10px;
-  border: 1px solid #ff9d00;
+  border: 1px solid #ec9209;
   border-radius: 14px;
-  background: #ffcb66;
+  background: #ffcc7f;
   color: #3b3330;
   font-size: 14px;
 }
@@ -252,7 +271,7 @@
 }
 
 .filter-search-option:has(input:checked) {
-  background: #ffe8c7;
+  background: #ffeacb;
 }
 
 .filter-search-option:hover {
@@ -260,9 +279,20 @@
 }
 
 .filter-search-option input {
-  width: 16px;
-  height: 16px;
-  accent-color: #f45100;
+  width: 12px;
+  height: 12px;
+  appearance: none;
+  flex: 0 0 12px;
+  margin: 0;
+  border: 1px solid #938b88;
+  border-radius: 2px;
+  background: #fff center / 8px 6px no-repeat;
+}
+
+.filter-search-option input:checked {
+  border-color: #3b3330;
+  background-color: #ffeacb;
+  background-image: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7.26628 0.600098L2.68294 5.18343L0.599609 3.1001' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round' stroke='%233B3330'/%3E%3C/svg%3E");
 }
 
 .filter-search-empty {
@@ -449,16 +479,14 @@
 }
 
 .filter-modal-footer {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   box-sizing: border-box;
-  width: min(709px, calc(100vw - 32px));
-  padding: 0 32px 24px;
+  flex: 0 0 auto;
+  width: 100%;
+  margin-top: 24px;
+  padding: 0;
   pointer-events: none;
 }
 
