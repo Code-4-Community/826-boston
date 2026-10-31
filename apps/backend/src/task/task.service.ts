@@ -12,6 +12,7 @@ import { AreaOfWork, TaskStatus } from './types';
 import { TaskResponseDto } from './dtos/task-response.dto';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { User } from 'src/users/user.entity';
+import { UpdateTaskDto } from './dtos/update-task.dto';
 
 @Injectable()
 export class TaskService {
@@ -34,7 +35,6 @@ export class TaskService {
     const anthology = await this.anthologyRepository.findOne({
       where: { id: anthologyId },
     });
-
     if (!anthology) {
       throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
     }
@@ -60,7 +60,6 @@ export class TaskService {
     const anthology = await this.anthologyRepository.findOne({
       where: { id: anthologyId },
     });
-
     if (!anthology) {
       throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
     }
@@ -84,6 +83,49 @@ export class TaskService {
       anthology,
       personInCharge,
     });
+    return this.toResponseDto(await this.taskRepository.save(task));
+  }
+
+  async update(
+    anthologyId: number,
+    taskId: number,
+    updateTaskDto: UpdateTaskDto,
+  ): Promise<TaskResponseDto> {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId, anthology: { id: anthologyId } },
+      relations: ['personInCharge', 'attachments'],
+    });
+    if (!task) {
+      throw new NotFoundException(
+        `Task with ID ${taskId} not found in this anthology`,
+      );
+    }
+
+    const { personInChargeId, ...fields } = updateTaskDto;
+    if (personInChargeId === null) {
+      task.personInCharge = null;
+    } else if (personInChargeId) {
+      const user = await this.userRepository.findOne({
+        where: { id: personInChargeId },
+      });
+
+      if (!user) {
+        throw new BadRequestException(
+          `User with ID ${personInChargeId} not found`,
+        );
+      }
+      task.personInCharge = user;
+    }
+
+    if (fields.name === null) {
+      throw new BadRequestException('Task name cannot be null');
+    }
+
+    if (fields.status === null) {
+      throw new BadRequestException('Task status cannot be null');
+    }
+
+    Object.assign(task, fields);
     return this.toResponseDto(await this.taskRepository.save(task));
   }
 

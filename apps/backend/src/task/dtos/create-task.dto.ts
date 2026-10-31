@@ -34,7 +34,10 @@ export class CreateTaskDto {
   @IsEnum(TaskStatus)
   status?: TaskStatus;
 
-  @ApiPropertyOptional({ description: 'User in charge of the task' })
+  @ApiPropertyOptional({
+    description: 'User in charge of the task',
+    nullable: true,
+  })
   @IsOptional()
   @IsInt()
   personInChargeId?: number;

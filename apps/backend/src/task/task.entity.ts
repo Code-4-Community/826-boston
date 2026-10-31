@@ -37,7 +37,7 @@ export class Task {
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'person_in_charge_id' })
-  personInCharge?: Relation<User>;
+  personInCharge?: Relation<User> | null;
 
   @Column({ type: 'date', nullable: true })
   timeFrame?: Date;

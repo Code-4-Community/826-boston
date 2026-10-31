@@ -3,6 +3,7 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { TaskResponseDto } from './dtos/task-response.dto';
 import { CreateTaskDto } from './dtos/create-task.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
 import { AreaOfWork, TaskStatus } from './types';
 import { SortOrder } from 'src/shared/types';
 
@@ -13,6 +14,7 @@ describe('TaskController', () => {
   const mockTaskService = {
     findByAnthologyId: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -85,6 +87,28 @@ describe('TaskController', () => {
       const result = await controller.create(1, createTaskDto);
 
       expect(service.create).toHaveBeenCalledWith(1, createTaskDto);
+      expect(result).toEqual(mockTask);
+    });
+  });
+
+  describe('update', () => {
+    const updateTaskDto: UpdateTaskDto = { status: TaskStatus.COMPLETE };
+    const mockTask: TaskResponseDto = {
+      id: 2,
+      name: 'Draft Check-Point',
+      status: TaskStatus.COMPLETE,
+      createdAt: new Date('2026-10-01'),
+      updatedAt: new Date('2026-10-01'),
+      personInCharge: null,
+      attachments: [],
+    };
+
+    it('should update a task in the anthology', async () => {
+      mockTaskService.update.mockResolvedValue(mockTask);
+
+      const result = await controller.update(1, 2, updateTaskDto);
+
+      expect(service.update).toHaveBeenCalledWith(1, 2, updateTaskDto);
       expect(result).toEqual(mockTask);
     });
   });

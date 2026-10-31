@@ -4,6 +4,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
 import { Task } from './task.entity';
 import { TaskAttachment } from './task-attachment.entity';
 import { AreaOfWork, TaskStatus } from './types';
@@ -18,6 +19,7 @@ describe('TaskService', () => {
 
   const mockTaskRepository = {
     find: jest.fn(),
+    findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
   };
@@ -244,6 +246,97 @@ describe('TaskService', () => {
         createdAt: new Date('2026-10-01'),
         updatedAt: new Date('2026-10-01'),
         personInCharge: null,
+        attachments: [],
+      });
+    });
+  });
+
+  describe('update', () => {
+    const existingTask = {
+      id: 1,
+      name: 'Draft Check-Point',
+      status: TaskStatus.NOT_STARTED,
+      anthology: { id: 1 } as Anthology,
+      personInCharge: {
+        id: 2,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+      } as User,
+      attachments: [],
+      createdAt: new Date('2026-10-01'),
+      updatedAt: new Date('2026-10-01'),
+    } as Task;
+
+    it('should throw NotFoundException if task not found in this anthology', async () => {
+      mockTaskRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.update(1, 999, {})).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should unassign the person in charge if personInChargeId is null', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+      mockTaskRepository.save.mockImplementation(async (task) => task);
+
+      const result = await service.update(1, 1, {
+        personInChargeId: null,
+      } as unknown as UpdateTaskDto);
+
+      expect(result.personInCharge).toBeNull();
+    });
+
+    it('should throw BadRequestException if person in charge not found', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.update(1, 1, { personInChargeId: 999 }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if name is null', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+
+      await expect(
+        service.update(1, 1, { name: null } as unknown as UpdateTaskDto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if status is null', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+
+      await expect(
+        service.update(1, 1, { status: null } as unknown as UpdateTaskDto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should successfully update a task', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+      mockUserRepository.findOne.mockResolvedValue({
+        id: 3,
+        firstName: 'Jane',
+        lastName: 'Smith',
+      } as User);
+      mockTaskRepository.save.mockImplementation(async (task) => task);
+
+      const result = await service.update(1, 1, {
+        status: TaskStatus.COMPLETE,
+        personInChargeId: 3,
+      });
+
+      expect(taskRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, anthology: { id: 1 } },
+        relations: ['personInCharge', 'attachments'],
+      });
+      expect(result).toEqual({
+        id: 1,
+        name: 'Draft Check-Point',
+        status: TaskStatus.COMPLETE,
+        createdAt: new Date('2026-10-01'),
+        updatedAt: new Date('2026-10-01'),
+        personInCharge: { id: 3, firstName: 'Jane', lastName: 'Smith' },
         attachments: [],
       });
     });

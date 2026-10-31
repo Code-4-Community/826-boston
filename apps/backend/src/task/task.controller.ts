@@ -6,6 +6,7 @@ import {
   Param,
   ParseEnumPipe,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
@@ -26,6 +28,7 @@ import { OmchaiRoles } from 'src/auth/roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
 import { TaskResponseDto } from './dtos/task-response.dto';
 import { CreateTaskDto } from './dtos/create-task.dto';
+import { UpdateTaskDto } from './dtos/update-task.dto';
 
 @ApiTags('Tasks')
 @Controller('anthologies')
@@ -170,5 +173,78 @@ export class TaskController {
     @Body() createTaskDto: CreateTaskDto,
   ): Promise<TaskResponseDto> {
     return this.taskService.create(anthologyId, createTaskDto);
+  }
+
+  @ApiBearerAuth()
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
+  @ApiOperation({
+    summary: 'Update a task',
+    description:
+      'Partially updates a task. Restricted to anthology owners and managers.',
+  })
+  @ApiOkResponse({
+    description: 'Task updated successfully',
+    schema: {
+      example: {
+        id: 1,
+        name: 'Draft Check-Point',
+        note: 'Collect first drafts from all classes',
+        areaOfWork: 'CHECKPOINT',
+        status: 'COMPLETE',
+        timeFrame: '2026-10-05',
+        dueBy: '2026-10-10',
+        createdAt: '2026-10-01T12:00:00.000Z',
+        updatedAt: '2026-10-08T12:00:00.000Z',
+        personInCharge: { id: 1, firstName: 'John', lastName: 'Doe' },
+        attachments: [
+          {
+            id: 1,
+            fileName: 'First_Draft.pdf',
+            fileUrl: 'tasks/attachments/First_Draft.pdf',
+          },
+        ],
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Invalid payload, null name or status, or unknown personInChargeId',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: [
+          'status must be one of the following values: NOT_STARTED, IN_PROGRESS, COMPLETE',
+        ],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User is not an owner or manager on this anthology',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Forbidden resource',
+        error: 'Forbidden',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Task not found in this anthology',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Task with ID 1 not found in this anthology',
+        error: 'Not Found',
+      },
+    },
+  })
+  @Patch(':anthologyId/tasks/:taskId')
+  update(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ): Promise<TaskResponseDto> {
+    return this.taskService.update(anthologyId, taskId, updateTaskDto);
   }
 }
