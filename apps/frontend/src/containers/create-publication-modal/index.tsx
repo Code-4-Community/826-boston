@@ -7,7 +7,6 @@ import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/
 import {
   Anthology,
   AnthologyPubLevel,
-  AnthologyStatus,
   CreateAnthologyDto,
   CreateBatchOmchaiAssignmentsDto,
 } from '../../types';
@@ -331,7 +330,6 @@ export default function CreatePublicationModal({
     try {
       // create body for anthology and omchai api calls
       const createAnthologyBody: CreateAnthologyDto = {
-        status: AnthologyStatus.DRAFT,
         title: form.title,
         pub_level: form.publicationType as AnthologyPubLevel,
         themes: form.themes,
@@ -360,10 +358,7 @@ export default function CreatePublicationModal({
         createBatchOmchaiAssignmentsBody,
       );
 
-      setPublications((prev) => [
-        ...prev,
-        { ...anthology, status: AnthologyStatus.DRAFT },
-      ]);
+      setPublications((prev) => [...prev, anthology]);
     } catch (err) {
       console.log(err);
     }

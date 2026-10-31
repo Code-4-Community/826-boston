@@ -150,16 +150,12 @@ const assets: AssetRowProps[] = [];
 
 const ASSET_FILTERS = ['Program Files', 'Design Files'];
 
-/**
- * The spreadsheet's wording for each status, which is what the designs show.
- * Our enum is a workflow state, so this is a lossy reverse of the mapping the
- * seed applies — see the modelling note in the PR description.
- */
+/** The spreadsheet's wording for each status, which is what the designs show. */
 const STATUS_LABELS: Record<AnthologyStatus, string> = {
-  [AnthologyStatus.DRAFT]: 'Not started',
-  [AnthologyStatus.IN_REVISION]: 'In revision',
-  [AnthologyStatus.IN_PRODUCTION]: 'In production',
-  [AnthologyStatus.PUBLISHED]: 'Can be shared',
+  [AnthologyStatus.NOT_STARTED]: 'Not started',
+  [AnthologyStatus.DRAFTING]: 'Drafting',
+  [AnthologyStatus.AWAITING_REVIEW]: 'Awaiting review',
+  [AnthologyStatus.CAN_BE_SHARED]: 'Can be shared',
   [AnthologyStatus.ARCHIVED]: 'Archived / Out of Circulation',
 };
 
@@ -356,11 +352,9 @@ const PublicationView: React.FC = () => {
     })),
   ];
 
-  const isProjectsView = location.pathname.startsWith('/projects/');
-  const breadcrumbHref = isProjectsView
-    ? '/projects/drafts'
-    : '/library/published';
-  const breadcrumbLabel = isProjectsView ? 'Projects' : 'Library';
+  const isTrackerView = location.pathname.startsWith('/tracker/');
+  const breadcrumbHref = isTrackerView ? '/tracker/all' : '/library/published';
+  const breadcrumbLabel = isTrackerView ? 'Tracker' : 'Library';
 
   return (
     <div className="publication-view">

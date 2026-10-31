@@ -3,6 +3,8 @@ import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
+  useLocation,
+  useParams,
 } from 'react-router-dom';
 
 import './styles.css';
@@ -19,6 +21,13 @@ import Role from '@api/dtos/role';
 import ProjectPublicationView from '@containers/projects-publication/project-publication-view';
 import SignUp from '@containers/auth/SignUp';
 import ForgotPassword from '@containers/auth/ForgotPassword';
+
+/** Old /projects/* links (bookmarks, emails) moved to /tracker/*. */
+const ProjectsRedirect: React.FC = () => {
+  const { '*': rest = '' } = useParams();
+  const { search, hash } = useLocation();
+  return <Navigate to={`/tracker/${rest}${search}${hash}`} replace />;
+};
 
 const router = createBrowserRouter([
   {
@@ -46,6 +55,7 @@ const router = createBrowserRouter([
         ],
       },
       { path: 'resources', element: <Resources /> },
+      { path: 'projects/*', element: <ProjectsRedirect /> },
       // admin and volunteer routes
       {
         element: <ProtectedRoute roles={[Role.ADMIN, Role.STANDARD]} />,
@@ -55,15 +65,15 @@ const router = createBrowserRouter([
         element: <ProtectedRoute roles={[Role.ADMIN, Role.STANDARD]} />,
         children: [
           {
-            path: 'projects',
+            path: 'tracker',
             children: [
               {
                 index: true,
-                element: <Navigate to="/projects/drafts" replace />,
+                element: <Navigate to="/tracker/all" replace />,
               },
               {
                 path: ':tab',
-                element: <ArchivedPublications mode="projects" />,
+                element: <ArchivedPublications mode="tracker" />,
               },
               {
                 path: 'publication/:id?',
@@ -76,7 +86,7 @@ const router = createBrowserRouter([
             element: <NotFound />,
           },
           /*
-          TODO: set default page for admins/standard to projects page?
+          TODO: set default page for admins/standard to tracker page?
           {index: true,
             element: <Projects />
           }*/
