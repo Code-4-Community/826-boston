@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseEnumPipe,
@@ -246,5 +247,49 @@ export class TaskController {
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<TaskResponseDto> {
     return this.taskService.update(anthologyId, taskId, updateTaskDto);
+  }
+
+  @ApiBearerAuth()
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
+  @ApiOperation({
+    summary: 'Delete a task',
+    description:
+      'Removes a task and its attachments. Restricted to anthology owners and managers.',
+  })
+  @ApiOkResponse({
+    description: 'Task deleted successfully',
+    schema: {
+      example: {
+        message: 'Task deleted successfully',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User is not an owner or manager on this anthology',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Forbidden resource',
+        error: 'Forbidden',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Task not found in this anthology',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Task with ID 1 not found in this anthology',
+        error: 'Not Found',
+      },
+    },
+  })
+  @Delete(':anthologyId/tasks/:taskId')
+  async remove(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+  ): Promise<{ message: string }> {
+    await this.taskService.remove(anthologyId, taskId);
+    return { message: 'Task deleted successfully' };
   }
 }

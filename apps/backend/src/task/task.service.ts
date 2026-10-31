@@ -129,6 +129,19 @@ export class TaskService {
     return this.toResponseDto(await this.taskRepository.save(task));
   }
 
+  async remove(anthologyId: number, taskId: number): Promise<void> {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId, anthology: { id: anthologyId } },
+    });
+    if (!task) {
+      throw new NotFoundException(
+        `Task with ID ${taskId} not found in this anthology`,
+      );
+    }
+
+    await this.taskRepository.remove(task);
+  }
+
   private toResponseDto(t: Task): TaskResponseDto {
     return {
       id: t.id,

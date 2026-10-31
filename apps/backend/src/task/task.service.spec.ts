@@ -22,6 +22,7 @@ describe('TaskService', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    remove: jest.fn(),
   };
 
   const mockAnthologyRepository = {
@@ -339,6 +340,35 @@ describe('TaskService', () => {
         personInCharge: { id: 3, firstName: 'Jane', lastName: 'Smith' },
         attachments: [],
       });
+    });
+  });
+
+  describe('remove', () => {
+    const existingTask = {
+      id: 1,
+      name: 'Draft Check-Point',
+      status: TaskStatus.NOT_STARTED,
+      anthology: { id: 1 } as Anthology,
+      createdAt: new Date('2026-10-01'),
+      updatedAt: new Date('2026-10-01'),
+    } as Task;
+
+    it('should throw NotFoundException if task not found in this anthology', async () => {
+      mockTaskRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove(1, 999)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should successfully delete a task', async () => {
+      mockTaskRepository.findOne.mockResolvedValue(existingTask);
+      mockTaskRepository.remove.mockResolvedValue(existingTask);
+
+      await service.remove(1, 1);
+
+      expect(taskRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, anthology: { id: 1 } },
+      });
+      expect(taskRepository.remove).toHaveBeenCalledWith(existingTask);
     });
   });
 });

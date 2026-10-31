@@ -15,6 +15,7 @@ describe('TaskController', () => {
     findByAnthologyId: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -110,6 +111,17 @@ describe('TaskController', () => {
 
       expect(service.update).toHaveBeenCalledWith(1, 2, updateTaskDto);
       expect(result).toEqual(mockTask);
+    });
+  });
+
+  describe('remove', () => {
+    it('should delete a task in the anthology', async () => {
+      mockTaskService.remove.mockResolvedValue(undefined);
+
+      const result = await controller.remove(1, 2);
+
+      expect(service.remove).toHaveBeenCalledWith(1, 2);
+      expect(result).toEqual({ message: 'Task deleted successfully' });
     });
   });
 });
