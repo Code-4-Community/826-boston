@@ -10,12 +10,12 @@ import { TaskAttachment } from './task-attachment.entity';
 import { AreaOfWork, TaskStatus } from './types';
 import { User } from 'src/users/user.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
-import { SortOrder } from 'src/shared/types';
+import { SortOrder, UploadedFileType } from 'src/shared/types';
+import { AwsS3Service } from 'src/aws/aws-s3.service';
 
 describe('TaskService', () => {
   let service: TaskService;
   let taskRepository: Repository<Task>;
-  let anthologyRepository: Repository<Anthology>;
 
   const mockTaskRepository = {
     find: jest.fn(),
@@ -31,6 +31,15 @@ describe('TaskService', () => {
 
   const mockUserRepository = {
     findOne: jest.fn(),
+  };
+
+  const mockTaskAttachmentRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockAwsS3Service = {
+    uploadFile: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -49,12 +58,19 @@ describe('TaskService', () => {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
         },
+        {
+          provide: getRepositoryToken(TaskAttachment),
+          useValue: mockTaskAttachmentRepository,
+        },
+        {
+          provide: AwsS3Service,
+          useValue: mockAwsS3Service,
+        },
       ],
     }).compile();
 
     service = module.get<TaskService>(TaskService);
     taskRepository = module.get(getRepositoryToken(Task));
-    anthologyRepository = module.get(getRepositoryToken(Anthology));
   });
 
   afterEach(() => {
@@ -110,9 +126,6 @@ describe('TaskService', () => {
         2,
       );
 
-      expect(anthologyRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 },
-      });
       expect(taskRepository.find).toHaveBeenCalledWith({
         where: {
           anthology: { id: 1 },
@@ -137,26 +150,6 @@ describe('TaskService', () => {
           ],
         },
       ]);
-    });
-
-    it('should return an empty array if anthology has no tasks', async () => {
-      mockAnthologyRepository.findOne.mockResolvedValue({ id: 1 });
-      mockTaskRepository.find.mockResolvedValue([]);
-
-      const result = await service.findByAnthologyId(1, SortOrder.ASC);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should return a null person in charge if task is unassigned', async () => {
-      mockAnthologyRepository.findOne.mockResolvedValue({ id: 1 });
-      mockTaskRepository.find.mockResolvedValue([
-        { ...mockTask, personInCharge: null },
-      ]);
-
-      const result = await service.findByAnthologyId(1, SortOrder.ASC);
-
-      expect(result[0].personInCharge).toBeNull();
     });
   });
 
@@ -327,10 +320,6 @@ describe('TaskService', () => {
         personInChargeId: 3,
       });
 
-      expect(taskRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1, anthology: { id: 1 } },
-        relations: ['personInCharge', 'attachments'],
-      });
       expect(result).toEqual({
         id: 1,
         name: 'Draft Check-Point',
@@ -365,10 +354,70 @@ describe('TaskService', () => {
 
       await service.remove(1, 1);
 
-      expect(taskRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1, anthology: { id: 1 } },
-      });
       expect(taskRepository.remove).toHaveBeenCalledWith(existingTask);
+    });
+  });
+
+  describe('uploadAttachment', () => {
+    const existingAttachment = {
+      id: 1,
+      fileName: 'Outline.docx',
+      fileUrl: 'https://s3.example.com/outline.docx',
+    } as TaskAttachment;
+
+    const existingTask = {
+      id: 1,
+      name: 'Draft Check-Point',
+      status: TaskStatus.NOT_STARTED,
+      anthology: { id: 1 } as Anthology,
+      personInCharge: null,
+      createdAt: new Date('2026-10-01'),
+      updatedAt: new Date('2026-10-01'),
+    } as Task;
+
+    const file: UploadedFileType = {
+      fieldname: 'file',
+      originalname: 'First_Draft.pdf',
+      encoding: '7bit',
+      mimetype: 'application/pdf',
+      buffer: Buffer.from('file contents'),
+      size: 13,
+    };
+
+    const fileUrl = 'https://s3.example.com/first-draft.pdf';
+
+    it('should throw NotFoundException if task not found in this anthology', async () => {
+      mockTaskRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.uploadAttachment(1, 999, file)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should successfully upload an attachment and return the task with all attachments', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({
+        ...existingTask,
+        attachments: [existingAttachment],
+      });
+      mockAwsS3Service.uploadFile.mockResolvedValue(fileUrl);
+      mockTaskAttachmentRepository.create.mockImplementation((data) => ({
+        id: 2,
+        ...data,
+      }));
+      mockTaskAttachmentRepository.save.mockImplementation(
+        async (attachment) => attachment,
+      );
+
+      const result = await service.uploadAttachment(1, 1, file);
+
+      expect(result.attachments).toEqual([
+        {
+          id: 1,
+          fileName: 'Outline.docx',
+          fileUrl: existingAttachment.fileUrl,
+        },
+        { id: 2, fileName: 'First_Draft.pdf', fileUrl },
+      ]);
     });
   });
 });

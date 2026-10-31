@@ -6,14 +6,19 @@ import {
   Get,
   Param,
   ParseEnumPipe,
+  ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -24,12 +29,13 @@ import {
 } from '@nestjs/swagger';
 import { TaskService } from './task.service';
 import { AreaOfWork, TaskStatus } from './types';
-import { SortOrder } from 'src/shared/types';
+import { SortOrder, UploadedFileType } from 'src/shared/types';
 import { OmchaiRoles } from 'src/auth/roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
 import { TaskResponseDto } from './dtos/task-response.dto';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { UpdateTaskDto } from './dtos/update-task.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Tasks')
 @Controller('anthologies')
@@ -291,5 +297,87 @@ export class TaskController {
   ): Promise<{ message: string }> {
     await this.taskService.remove(anthologyId, taskId);
     return { message: 'Task deleted successfully' };
+  }
+
+  @ApiBearerAuth()
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
+  @ApiOperation({
+    summary: 'Upload a task attachment',
+    description:
+      'Uploads a file to S3 and attaches it to a task. Restricted to anthology owners and managers.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'Attachment uploaded successfully',
+    schema: {
+      example: {
+        id: 1,
+        name: 'Draft Check-Point',
+        note: 'Collect first drafts from all classes',
+        areaOfWork: 'CHECKPOINT',
+        status: 'IN_PROGRESS',
+        timeFrame: '2026-10-05',
+        dueBy: '2026-10-10',
+        createdAt: '2026-10-01T12:00:00.000Z',
+        updatedAt: '2026-10-01T12:00:00.000Z',
+        personInCharge: { id: 1, firstName: 'John', lastName: 'Doe' },
+        attachments: [
+          {
+            id: 1,
+            fileName: 'First_Draft.pdf',
+            fileUrl:
+              'https://bucket-name.s3.us-east-1.amazonaws.com/task-attachments/1-1-1759320000000.pdf',
+          },
+        ],
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'No file was uploaded',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'File is required',
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User is not an owner or manager on this anthology',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Forbidden resource',
+        error: 'Forbidden',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Task not found in this anthology',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Task with ID 1 not found in this anthology',
+        error: 'Not Found',
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @Post(':anthologyId/tasks/:taskId/attachments')
+  async uploadAttachment(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @UploadedFile('file', ParseFilePipe) file: UploadedFileType,
+  ): Promise<TaskResponseDto> {
+    return this.taskService.uploadAttachment(anthologyId, taskId, file);
   }
 }

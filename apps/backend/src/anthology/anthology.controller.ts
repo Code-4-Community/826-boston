@@ -23,11 +23,9 @@ import {
   ApiBearerAuth,
   ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiConflictResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { FilterSortAnthologyDto } from './dtos/filter-anthology.dto';
@@ -39,16 +37,8 @@ import { Role } from 'src/users/types';
 import { AwsS3Service } from '../aws/aws-s3.service';
 import { InventoryHoldingService } from '../inventory-holding/inventory-holding.service';
 import { AnthologyInventoryDto } from '../inventory-holding/dto/anthology-inventory.dto';
-
-interface UploadedFileType {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  buffer: Buffer;
-  size: number;
-}
 import { AnthologyPubLevel, AnthologyStatus } from './types';
+import { UploadedFileType } from 'src/shared/types';
 
 @ApiTags('Anthologies')
 @Controller('anthologies')
