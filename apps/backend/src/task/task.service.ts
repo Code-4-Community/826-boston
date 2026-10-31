@@ -183,6 +183,26 @@ export class TaskService {
     return this.toResponseDto(task);
   }
 
+  async removeAttachment(
+    anthologyId: number,
+    taskId: number,
+    attachmentId: number,
+  ): Promise<void> {
+    const taskAttachment = await this.taskAttachmentRepository.findOne({
+      where: {
+        id: attachmentId,
+        task: { id: taskId, anthology: { id: anthologyId } },
+      },
+    });
+    if (!taskAttachment) {
+      throw new NotFoundException(
+        `Attachment with ID ${attachmentId} not found for this task in this anthology`,
+      );
+    }
+
+    await this.taskAttachmentRepository.remove(taskAttachment);
+  }
+
   private toResponseDto(t: Task): TaskResponseDto {
     return {
       id: t.id,

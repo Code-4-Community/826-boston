@@ -34,8 +34,10 @@ describe('TaskService', () => {
   };
 
   const mockTaskAttachmentRepository = {
+    findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    remove: jest.fn(),
   };
 
   const mockAwsS3Service = {
@@ -418,6 +420,35 @@ describe('TaskService', () => {
         },
         { id: 2, fileName: 'First_Draft.pdf', fileUrl },
       ]);
+    });
+  });
+
+  describe('removeAttachment', () => {
+    const existingAttachment = {
+      id: 1,
+      fileName: 'First_Draft.pdf',
+      fileUrl: 'https://s3.example.com/first-draft.pdf',
+    } as TaskAttachment;
+
+    it('should throw NotFoundException if attachment not found for this task in this anthology', async () => {
+      mockTaskAttachmentRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.removeAttachment(1, 1, 999)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should successfully delete an attachment', async () => {
+      mockTaskAttachmentRepository.findOne.mockResolvedValue(
+        existingAttachment,
+      );
+      mockTaskAttachmentRepository.remove.mockResolvedValue(existingAttachment);
+
+      await service.removeAttachment(1, 1, 1);
+
+      expect(mockTaskAttachmentRepository.remove).toHaveBeenCalledWith(
+        existingAttachment,
+      );
     });
   });
 });

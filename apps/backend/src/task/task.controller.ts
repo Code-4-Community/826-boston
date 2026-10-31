@@ -380,4 +380,50 @@ export class TaskController {
   ): Promise<TaskResponseDto> {
     return this.taskService.uploadAttachment(anthologyId, taskId, file);
   }
+
+  @ApiBearerAuth()
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
+  @ApiOperation({
+    summary: 'Delete a task attachment',
+    description:
+      'Removes an attachment from a task. Restricted to anthology owners and managers.',
+  })
+  @ApiOkResponse({
+    description: 'Attachment deleted successfully',
+    schema: {
+      example: {
+        message: 'Attachment deleted successfully',
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User is not an owner or manager on this anthology',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Forbidden resource',
+        error: 'Forbidden',
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Attachment not found for this task in this anthology',
+    schema: {
+      example: {
+        statusCode: 404,
+        message:
+          'Attachment with ID 1 not found for this task in this anthology',
+        error: 'Not Found',
+      },
+    },
+  })
+  @Delete(':anthologyId/tasks/:taskId/attachments/:attachmentId')
+  async removeAttachment(
+    @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @Param('attachmentId', ParseIntPipe) attachmentId: number,
+  ): Promise<{ message: string }> {
+    await this.taskService.removeAttachment(anthologyId, taskId, attachmentId);
+    return { message: 'Attachment deleted successfully' };
+  }
 }

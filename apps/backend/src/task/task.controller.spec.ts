@@ -17,6 +17,7 @@ describe('TaskController', () => {
     update: jest.fn(),
     remove: jest.fn(),
     uploadAttachment: jest.fn(),
+    removeAttachment: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -158,6 +159,17 @@ describe('TaskController', () => {
 
       expect(service.uploadAttachment).toHaveBeenCalledWith(1, 2, file);
       expect(result).toEqual(mockTask);
+    });
+  });
+
+  describe('removeAttachment', () => {
+    it('should delete an attachment from a task in the anthology', async () => {
+      mockTaskService.removeAttachment.mockResolvedValue(undefined);
+
+      const result = await controller.removeAttachment(1, 2, 3);
+
+      expect(service.removeAttachment).toHaveBeenCalledWith(1, 2, 3);
+      expect(result).toEqual({ message: 'Attachment deleted successfully' });
     });
   });
 });
