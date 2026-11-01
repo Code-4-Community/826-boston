@@ -32,90 +32,13 @@
 }
 
 .ppv-breadcrumb-sep {
-  color: var(--neutral-600);
+  color: var(--neutral-400);
 }
 
 .ppv-content {
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-
-.ppv-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-}
-
-.ppv-cover-image {
-  width: 160px;
-  height: 160px;
-  flex: 0 0 160px;
-  border-radius: 10px;
-  overflow: visible;
-  position: relative;
-}
-
-.ppv-cover-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: 50% 50%;
-  border-radius: 10px;
-}
-
-.ppv-cover-upload-input {
-  display: none;
-}
-
-.ppv-cover-upload-btn {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.65);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 5px 12px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  white-space: nowrap;
-}
-
-.ppv-cover-image:hover .ppv-cover-upload-btn {
-  opacity: 1;
-}
-
-.ppv-cover-upload-btn:disabled {
-  cursor: not-allowed;
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.ppv-cover-upload-error {
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #d32f2f;
-  font-family: var(--font-body);
-  font-size: 11px;
-  margin: 0;
-}
-
-.ppv-title {
-  font-family: var(--font-heading);
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--neutral-600);
-  margin: 0;
-  align-self: center;
 }
 
 .publication-tabs button.publication-tab {

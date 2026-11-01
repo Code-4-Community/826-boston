@@ -2,24 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import Role from '../../api/dtos/role';
 import { Anthology, OmchaiRole } from '../../types';
-import { THEMES } from '../create-publication-modal/constants';
-
-const GENRES = [
-  'Poetry',
-  'Fiction',
-  'Nonfiction',
-  'Memoir',
-  'Essay',
-  'Short Story',
-  'Personal Narrative',
-  'Graphic Narrative',
-  'Play',
-  'Interview',
-  'Letters',
-  'Mixed Genre',
-  'Civic Engagement',
-  'Multicultural',
-];
+import { GENRES, THEMES } from '../create-publication-modal/constants';
 
 const PUB_LEVELS = [
   ['Zine', 'Zine'],
@@ -29,10 +12,10 @@ const PUB_LEVELS = [
 ] as const;
 
 const STATUSES = [
-  ['Draft', 'Not Started'],
-  ['In Revision', 'Drafting'],
-  ['In Production', 'In Production'],
-  ['Published', 'Can Be Shared'],
+  ['Not Started', 'Not Started'],
+  ['Drafting', 'Drafting'],
+  ['Awaiting Review', 'Awaiting Review'],
+  ['Can Be Shared', 'Can Be Shared'],
   ['Archived', 'Archived'],
 ] as const;
 

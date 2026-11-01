@@ -1,8 +1,8 @@
 export enum AnthologyStatus {
-  DRAFT = 'Draft',
-  IN_REVISION = 'In Revision',
-  IN_PRODUCTION = 'In Production',
-  PUBLISHED = 'Published',
+  NOT_STARTED = 'Not Started',
+  DRAFTING = 'Drafting',
+  AWAITING_REVIEW = 'Awaiting Review',
+  CAN_BE_SHARED = 'Can Be Shared',
   ARCHIVED = 'Archived',
 }
 

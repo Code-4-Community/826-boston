@@ -19,7 +19,7 @@ const mockAnthology1: Anthology = {
   publishedDate: new Date('2020-01-01'),
   programs: ['after-school'],
   sponsors: [],
-  status: AnthologyStatus.IN_PRODUCTION,
+  status: AnthologyStatus.AWAITING_REVIEW,
   pubLevel: AnthologyPubLevel.ZINE,
   photoUrl: '',
   isbn: '',
@@ -47,7 +47,7 @@ const mockAnthology2: Anthology = {
   publishedDate: new Date('2022-06-15'),
   programs: ['summer'],
   sponsors: [],
-  status: AnthologyStatus.IN_REVISION,
+  status: AnthologyStatus.DRAFTING,
   pubLevel: AnthologyPubLevel.CHAPBOOK,
   photoUrl: '',
   isbn: '',
@@ -75,7 +75,7 @@ const mockAnthology3: Anthology = {
   publishedDate: new Date('2018-03-20'),
   programs: ['in-school'],
   sponsors: [],
-  status: AnthologyStatus.DRAFT,
+  status: AnthologyStatus.NOT_STARTED,
   pubLevel: AnthologyPubLevel.PERFECT_BOUND,
   photoUrl: '',
   isbn: '',
@@ -261,7 +261,7 @@ describe('AnthologyService', () => {
     const complete = (overrides: Partial<Anthology> = {}): Anthology =>
       ({
         ...mockAnthology1,
-        status: AnthologyStatus.DRAFT,
+        status: AnthologyStatus.NOT_STARTED,
         title: 'Title',
         description: 'desc',
         genres: ['mystery'],
@@ -281,7 +281,7 @@ describe('AnthologyService', () => {
       );
 
       await expect(
-        service.update(1, { status: AnthologyStatus.IN_REVISION }),
+        service.update(1, { status: AnthologyStatus.DRAFTING }),
       ).rejects.toMatchObject({
         response: { missingFields: ['description', 'genres'] },
       });
@@ -292,10 +292,10 @@ describe('AnthologyService', () => {
       mockRepository.findOneBy.mockResolvedValue(complete());
 
       const result = await service.update(1, {
-        status: AnthologyStatus.IN_REVISION,
+        status: AnthologyStatus.DRAFTING,
       });
 
-      expect(result.status).toBe(AnthologyStatus.IN_REVISION);
+      expect(result.status).toBe(AnthologyStatus.DRAFTING);
     });
 
     it('allows non-status edits with missing fields', async () => {
@@ -312,7 +312,7 @@ describe('AnthologyService', () => {
         mockRepository.findOneBy.mockResolvedValue(complete({ pubLevel }));
 
         await expect(
-          service.update(1, { status: AnthologyStatus.PUBLISHED }),
+          service.update(1, { status: AnthologyStatus.CAN_BE_SHARED }),
         ).rejects.toMatchObject({ response: { missingFields: ['ISBN'] } });
       },
     );
@@ -326,10 +326,10 @@ describe('AnthologyService', () => {
       );
 
       const result = await service.update(1, {
-        status: AnthologyStatus.PUBLISHED,
+        status: AnthologyStatus.CAN_BE_SHARED,
       });
 
-      expect(result.status).toBe(AnthologyStatus.PUBLISHED);
+      expect(result.status).toBe(AnthologyStatus.CAN_BE_SHARED);
     });
   });
 });

@@ -29,7 +29,6 @@ export class AnthologyService {
   async create(
     title: string,
     description: string,
-    status: AnthologyStatus,
     pubLevel: AnthologyPubLevel,
     programs?: string[],
     photoUrl?: string,
@@ -42,7 +41,6 @@ export class AnthologyService {
     const anthology = this.repo.create({
       title,
       description,
-      status,
       pubLevel,
       programs,
       photoUrl,
@@ -89,7 +87,10 @@ export class AnthologyService {
 
     const updated = Object.assign(anthology, attrs);
 
-    if (attrs.status !== undefined && attrs.status !== AnthologyStatus.DRAFT) {
+    if (
+      attrs.status !== undefined &&
+      attrs.status !== AnthologyStatus.NOT_STARTED
+    ) {
       const missingFields: string[] = [];
       if (!updated.title?.trim()) missingFields.push('title');
       if (!updated.description?.trim()) missingFields.push('description');
@@ -106,7 +107,7 @@ export class AnthologyService {
     }
 
     if (
-      updated.status === AnthologyStatus.PUBLISHED &&
+      updated.status === AnthologyStatus.CAN_BE_SHARED &&
       (updated.pubLevel === AnthologyPubLevel.PERFECT_BOUND ||
         updated.pubLevel === AnthologyPubLevel.SIGNATURE) &&
       !updated.isbn?.trim()

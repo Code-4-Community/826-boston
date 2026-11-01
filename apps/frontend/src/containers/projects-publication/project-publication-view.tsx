@@ -80,8 +80,8 @@ const ProjectPublicationView: React.FC = () => {
   return (
     <div className="ppv-wrapper">
       <div className="ppv-breadcrumb">
-        <a href="/projects/drafts" className="ppv-breadcrumb-link">
-          Projects
+        <a href="/tracker/all" className="ppv-breadcrumb-link">
+          Tracker
         </a>
         <span className="ppv-breadcrumb-sep">›</span>
         <span>{anthology.title}</span>
