@@ -256,4 +256,80 @@ describe('AnthologyService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('update status rules', () => {
+    const complete = (overrides: Partial<Anthology> = {}): Anthology =>
+      ({
+        ...mockAnthology1,
+        status: AnthologyStatus.DRAFT,
+        title: 'Title',
+        description: 'desc',
+        genres: ['mystery'],
+        programs: ['after-school'],
+        pubLevel: AnthologyPubLevel.ZINE,
+        isbn: '',
+        ...overrides,
+      } as Anthology);
+
+    beforeEach(() => {
+      mockRepository.save.mockImplementation(async (a) => a);
+    });
+
+    it('rejects leaving Not Started with missing fields, naming them', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({ description: '', genres: [] }),
+      );
+
+      await expect(
+        service.update(1, { status: AnthologyStatus.IN_REVISION }),
+      ).rejects.toMatchObject({
+        response: { missingFields: ['description', 'genres'] },
+      });
+      expect(mockRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('allows leaving Not Started when required fields are set', async () => {
+      mockRepository.findOneBy.mockResolvedValue(complete());
+
+      const result = await service.update(1, {
+        status: AnthologyStatus.IN_REVISION,
+      });
+
+      expect(result.status).toBe(AnthologyStatus.IN_REVISION);
+    });
+
+    it('allows non-status edits with missing fields', async () => {
+      mockRepository.findOneBy.mockResolvedValue(complete({ title: '' }));
+
+      await expect(
+        service.update(1, { description: 'new' }),
+      ).resolves.toBeDefined();
+    });
+
+    it.each([AnthologyPubLevel.PERFECT_BOUND, AnthologyPubLevel.SIGNATURE])(
+      'requires an ISBN for %s before Can Be Shared',
+      async (pubLevel) => {
+        mockRepository.findOneBy.mockResolvedValue(complete({ pubLevel }));
+
+        await expect(
+          service.update(1, { status: AnthologyStatus.PUBLISHED }),
+        ).rejects.toMatchObject({ response: { missingFields: ['ISBN'] } });
+      },
+    );
+
+    it('allows Can Be Shared for Perfect Bound with an ISBN', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({
+          pubLevel: AnthologyPubLevel.PERFECT_BOUND,
+          isbn: '978-0-00-000000-0',
+        }),
+      );
+
+      const result = await service.update(1, {
+        status: AnthologyStatus.PUBLISHED,
+      });
+
+      expect(result.status).toBe(AnthologyStatus.PUBLISHED);
+    });
+  });
 });

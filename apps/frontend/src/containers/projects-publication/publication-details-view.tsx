@@ -41,10 +41,10 @@ const THEMES = [
 ];
 
 const PUB_LEVELS = [
-  ['Zine', 'Level 0 (Zines)'],
-  ['Chapbook', 'Level 1 (Chapbooks)'],
-  ['PerfectBound', 'Level 2 (Perfect Bound)'],
-  ['Signature', 'Level 3 (Signature Publications)'],
+  ['Zine', 'Zine'],
+  ['Chapbook', 'Chapbook'],
+  ['PerfectBound', 'Perfect Bound'],
+  ['Signature', 'Signature'],
 ] as const;
 
 const STATUSES = [
@@ -82,16 +82,21 @@ const PublicationDetailsView: React.FC<Props> = ({
 
   useEffect(() => {
     const isAdmin = String(currentUser?.role ?? '').toLowerCase() === 'admin';
-    apiClient.getOmchaiByAnthology(anthologyId).then((entries) => {
-      const assignment = entries.find(
-        (entry) => entry.userId === currentUser?.id,
-      );
-      setEditable(
-        isAdmin ||
+    setEditable(isAdmin);
+    if (isAdmin) return;
+    // The endpoint 404s when a publication has no assignments yet
+    apiClient
+      .getOmchaiByAnthology(anthologyId)
+      .then((entries) => {
+        const assignment = entries.find(
+          (entry) => entry.userId === currentUser?.id,
+        );
+        setEditable(
           assignment?.role === OmchaiRole.OWNER ||
-          assignment?.role === OmchaiRole.MANAGER,
-      );
-    });
+            assignment?.role === OmchaiRole.MANAGER,
+        );
+      })
+      .catch(() => setEditable(false));
   }, [anthologyId, currentUser]);
 
   useEffect(
@@ -101,24 +106,33 @@ const PublicationDetailsView: React.FC<Props> = ({
     [],
   );
 
-  const save = async (field: string, body: Record<string, unknown>) => {
+  const save = async (
+    field: string,
+    body: Record<string, unknown>,
+  ): Promise<boolean> => {
     setSavingField(field);
     setSaveError(null);
     try {
       const updated = await apiClient.updateAnthology(anthologyId, body);
       setValues((prev) => ({ ...prev, ...updated }));
       onChange(updated);
+      return true;
     } catch (error: unknown) {
-      const response = (
-        error as { response?: { data?: { message?: unknown } } }
-      ).response?.data?.message;
+      const data = (
+        error as {
+          response?: { data?: { message?: unknown; missingFields?: string[] } };
+        }
+      ).response?.data;
+      const message =
+        typeof data?.message === 'string'
+          ? data.message
+          : 'Save failed. Please try again.';
       setSaveError(
-        typeof response === 'string'
-          ? response
-          : (response as { missingFields?: string[] })?.missingFields?.join(
-              ', ',
-            ) ?? 'Save failed. Please try again.',
+        data?.missingFields?.length
+          ? `${message}: ${data.missingFields.join(', ')}`
+          : message,
       );
+      return false;
     } finally {
       setSavingField(null);
     }
@@ -134,11 +148,14 @@ const PublicationDetailsView: React.FC<Props> = ({
     );
   };
 
-  const saveImmediately = (field: string, value: unknown) => {
+  const saveImmediately = async (field: string, value: unknown) => {
+    const previous = (values as unknown as Record<string, unknown>)[field];
     setValues((prev) => ({ ...prev, [field]: value } as Anthology));
-    const bodyField =
-      field === 'pub_level' ? { pub_level: value } : { [field]: value };
-    void save(field, bodyField);
+    const saved = await save(field, { [field]: value });
+    // Roll back so a rejected change (e.g. blocked status) isn't left showing
+    if (!saved) {
+      setValues((prev) => ({ ...prev, [field]: previous } as Anthology));
+    }
   };
 
   const currentStatus =
@@ -334,6 +351,7 @@ const PublicationDetailsView: React.FC<Props> = ({
 
         <MultiSelect
           label="Genre(s)"
+          placeholder="Add field."
           options={GENRES}
           selected={values.genres ?? []}
           disabled={!editable}
@@ -341,6 +359,7 @@ const PublicationDetailsView: React.FC<Props> = ({
         />
         <MultiSelect
           label="Theme(s)"
+          placeholder="Add themes."
           options={THEMES}
           selected={values.themes ?? []}
           disabled={!editable}
@@ -366,55 +385,122 @@ const PublicationDetailsView: React.FC<Props> = ({
 
 const MultiSelect: React.FC<{
   label: string;
+  placeholder: string;
   options: string[];
   selected: string[];
   disabled: boolean;
   onChange: (value: string[]) => void;
-}> = ({ label, options, selected, disabled, onChange }) => {
+}> = ({ label, placeholder, options, selected, disabled, onChange }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const wrapRef = useRef<HTMLDivElement>(null);
   const filtered = options.filter((option) =>
     option.toLowerCase().includes(query.toLowerCase()),
   );
 
+  useEffect(() => {
+    if (!open) return undefined;
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!wrapRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+        setQuery('');
+      }
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
+  }, [open]);
+
+  const toggle = (option: string) =>
+    onChange(
+      selected.includes(option)
+        ? selected.filter((item) => item !== option)
+        : [...selected, option],
+    );
+
   return (
     <div className="publication-details__field publication-details__multi">
       <span>{label}</span>
-      <button
-        type="button"
-        className="publication-details__multi-button"
-        disabled={disabled}
-        onClick={() => setOpen((value) => !value)}
-      >
-        {selected.length
-          ? selected.join(', ')
-          : `Select ${label.toLowerCase()}`}
-      </button>
-      {open && (
-        <div className="publication-details__multi-menu">
-          <input
-            placeholder="Search..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          {filtered.map((option) => (
-            <label key={option}>
-              <input
-                type="checkbox"
-                checked={selected.includes(option)}
-                onChange={() => {
-                  onChange(
-                    selected.includes(option)
-                      ? selected.filter((item) => item !== option)
-                      : [...selected, option],
-                  );
-                }}
-              />
-              {option}
-            </label>
+      <div className="publication-details__multi-wrap" ref={wrapRef}>
+        <div
+          className={`publication-details__multi-control${
+            open ? ' publication-details__multi-control--open' : ''
+          }`}
+          role="button"
+          tabIndex={disabled ? -1 : 0}
+          aria-disabled={disabled}
+          onClick={() => !disabled && setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.target === event.currentTarget && event.key === 'Enter') {
+              setOpen(true);
+            }
+          }}
+        >
+          {selected.map((item) => (
+            <span key={item} className="publication-details__chip">
+              {item}
+              {!disabled && (
+                <button
+                  type="button"
+                  aria-label={`Remove ${item}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggle(item);
+                  }}
+                >
+                  ×
+                </button>
+              )}
+            </span>
           ))}
+          {open ? (
+            <>
+              <input
+                autoFocus
+                className="publication-details__multi-search"
+                placeholder={selected.length ? '' : 'Search...'}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </>
+          ) : (
+            !selected.length && (
+              <span className="publication-details__multi-placeholder">
+                {placeholder}
+              </span>
+            )
+          )}
         </div>
-      )}
+        {open && (
+          <div className="publication-details__multi-menu">
+            {filtered.map((option) => (
+              <label key={option}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(option)}
+                  onChange={() => toggle(option)}
+                />
+                {option}
+              </label>
+            ))}
+            {!filtered.length && (
+              <p className="publication-details__multi-empty">No matches</p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
