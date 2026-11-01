@@ -13,6 +13,11 @@ export class CreateAnthologyDto {
   @IsString()
   title: string;
 
+  @ApiPropertyOptional({ description: 'Byline of the anthology' })
+  @IsOptional()
+  @IsString()
+  byline?: string;
+
   @ApiProperty({ description: 'Description of the anthology' })
   @IsString()
   description: string;
