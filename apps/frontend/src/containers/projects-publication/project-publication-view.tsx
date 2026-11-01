@@ -112,15 +112,6 @@ const ProjectPublicationView: React.FC = () => {
           <button
             type="button"
             className={`publication-tab${
-              activeTab === 'tasks' ? ' publication-tab--active' : ''
-            }`}
-            onClick={() => setActiveTab('tasks')}
-          >
-            Tasks
-          </button>
-          <button
-            type="button"
-            className={`publication-tab${
               activeTab === 'documents' ? ' publication-tab--active' : ''
             }`}
             onClick={() => setActiveTab('documents')}
@@ -137,6 +128,15 @@ const ProjectPublicationView: React.FC = () => {
             onClick={() => setActiveTab('approved-documents')}
           >
             Approved Documents
+          </button>
+          <button
+            type="button"
+            className={`publication-tab${
+              activeTab === 'tasks' ? ' publication-tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('tasks')}
+          >
+            Tasks
           </button>
           <button
             type="button"

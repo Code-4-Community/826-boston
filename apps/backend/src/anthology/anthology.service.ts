@@ -35,6 +35,9 @@ export class AnthologyService {
     photoUrl?: string,
     isbn?: string,
     shopifyUrl?: string,
+    genres?: string[],
+    themes?: string[],
+    publishedDate?: Date,
   ) {
     const anthology = this.repo.create({
       title,
@@ -45,6 +48,9 @@ export class AnthologyService {
       photoUrl,
       isbn,
       shopifyUrl,
+      genres,
+      themes,
+      publishedDate,
     });
 
     return this.repo.save(anthology);

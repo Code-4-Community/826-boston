@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import Role from '../../api/dtos/role';
 import { Anthology, OmchaiRole } from '../../types';
+import { THEMES } from '../create-publication-modal/constants';
 
 const GENRES = [
   'Poetry',
@@ -18,26 +19,6 @@ const GENRES = [
   'Mixed Genre',
   'Civic Engagement',
   'Multicultural',
-];
-
-const THEMES = [
-  'Short Stories',
-  'Healthy Foods',
-  'Recipes',
-  'Creative Writing',
-  'Transportation',
-  'Culture',
-  'Food',
-  'Identity',
-  'Mystery',
-  'Adventure',
-  'School',
-  'Relationships',
-  'Family',
-  'Environment',
-  'Coming of Age',
-  'Belonging',
-  'Youth',
 ];
 
 const PUB_LEVELS = [
