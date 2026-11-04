@@ -3,6 +3,7 @@ import apiClient from '../../api/apiClient';
 import Role from '../../api/dtos/role';
 import { Anthology, OmchaiRole } from '../../types';
 import { GENRES, THEMES } from '../create-publication-modal/constants';
+import { PROGRAM_OPTIONS } from '../archived-publications/filter-modal/constants';
 
 const PUB_LEVELS = [
   ['Zine', 'Zine'],
@@ -143,6 +144,12 @@ const PublicationDetailsView: React.FC<Props> = ({
       if (fileRef.current) fileRef.current.value = '';
     }
   };
+
+  const programs = useMemo(() => {
+    const value = values.programs;
+    if (Array.isArray(value)) return value;
+    return value ? [value] : [];
+  }, [values.programs]);
 
   const dateValue = useMemo(() => {
     const value = values.publishedDate;
@@ -342,6 +349,15 @@ const PublicationDetailsView: React.FC<Props> = ({
             }}
           />
         </label>
+
+        <MultiSelect
+          label="Program(s)"
+          placeholder="Add programs."
+          options={PROGRAM_OPTIONS.map((option) => option.displayLabel)}
+          selected={programs}
+          disabled={!editable}
+          onChange={(value) => saveImmediately('programs', value)}
+        />
       </div>
     </div>
   );
@@ -358,7 +374,12 @@ const MultiSelect: React.FC<{
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const wrapRef = useRef<HTMLDivElement>(null);
-  const filtered = options.filter((option) =>
+  // Stored values outside the standard list (e.g. seeded program codes) stay listed
+  const allOptions = [
+    ...options,
+    ...selected.filter((item) => !options.includes(item)),
+  ];
+  const filtered = allOptions.filter((option) =>
     option.toLowerCase().includes(query.toLowerCase()),
   );
 
