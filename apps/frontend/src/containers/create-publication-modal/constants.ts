@@ -1,3 +1,20 @@
+export const GENRES: string[] = [
+  'Poetry',
+  'Fiction',
+  'Nonfiction',
+  'Memoir',
+  'Essay',
+  'Short Story',
+  'Personal Narrative',
+  'Graphic Narrative',
+  'Play',
+  'Interview',
+  'Letters',
+  'Mixed Genre',
+  'Civic Engagement',
+  'Multicultural',
+];
+
 export const THEMES: string[] = [
   // 826 categories from notion archive
   'Short Stories',

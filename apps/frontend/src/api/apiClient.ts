@@ -213,7 +213,7 @@ export class ApiClient {
 
   public async updateAnthology(
     id: number,
-    body: Nullable<{ shopify_url: string; isbn: string }>,
+    body: Nullable<Record<string, unknown>>,
   ): Promise<Anthology> {
     const data = await this.patch(`/api/anthologies/${id}`, body);
     return normalizeAnthology(data);
