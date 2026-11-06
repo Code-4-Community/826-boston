@@ -39,7 +39,6 @@ const PublicationDetailsView: React.FC<Props> = ({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [statusOpen, setStatusOpen] = useState(false);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setValues(anthology);
@@ -126,25 +125,6 @@ const PublicationDetailsView: React.FC<Props> = ({
   const currentStatus =
     STATUSES.find(([value]) => value === values.status)?.[1] ?? values.status;
 
-  const uploadCover = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setSavingField('cover');
-    try {
-      const updated = await apiClient.uploadAnthologyCoverImage(
-        anthologyId,
-        file,
-      );
-      setValues((prev) => ({ ...prev, photo_url: updated.photo_url }));
-      onChange(updated);
-    } catch {
-      setSaveError('Cover upload failed. Please try again.');
-    } finally {
-      setSavingField(null);
-      if (fileRef.current) fileRef.current.value = '';
-    }
-  };
-
   const programs = useMemo(() => {
     const value = values.programs;
     if (Array.isArray(value)) return value;
@@ -166,15 +146,11 @@ const PublicationDetailsView: React.FC<Props> = ({
               alt="Publication cover"
             />
           ) : (
-            <button
-              type="button"
+            <div
               className="publication-details__cover-placeholder"
-              onClick={() => editable && fileRef.current?.click()}
-              disabled={!editable}
-              aria-label="Upload cover image"
+              aria-hidden="true"
             >
               <svg
-                aria-hidden="true"
                 viewBox="0 0 24 24"
                 width="32"
                 height="32"
@@ -188,25 +164,8 @@ const PublicationDetailsView: React.FC<Props> = ({
                 <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
                 <path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5" />
               </svg>
-            </button>
+            </div>
           )}
-          {values.photo_url && editable && (
-            <button
-              type="button"
-              className="publication-details__cover-button"
-              onClick={() => fileRef.current?.click()}
-            >
-              Change cover
-            </button>
-          )}
-          <input
-            ref={fileRef}
-            className="publication-details__file"
-            type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
-            onChange={uploadCover}
-            disabled={!editable}
-          />
         </div>
 
         <div className="publication-details__form">

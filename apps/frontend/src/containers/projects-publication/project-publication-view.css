@@ -182,21 +182,11 @@
 }
 
 .publication-details__cover-placeholder {
-  border: 0;
   background: var(--neutral-200);
   color: var(--neutral-400);
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.publication-details__cover-button {
-  margin-top: 8px;
-}
-
-.publication-details__file {
-  display: none;
 }
 
 .publication-details__status-row {
