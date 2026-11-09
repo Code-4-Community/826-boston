@@ -262,8 +262,13 @@ export class ApiClient {
       /** null clears the stored grade. */
       grade?: number | null;
     },
+    /** Draft the edit is made from; the API checks edit rights on its publication. */
+    storyDraftId: number,
   ): Promise<Author> {
-    return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
+    return this.put(
+      `/api/author/${authorId}?storyDraftId=${storyDraftId}`,
+      body,
+    ) as Promise<Author>;
   }
 
   public async updateStoryDraft(

@@ -8,6 +8,8 @@ interface Props {
   anthologyId: number;
   shopifyUrl?: string;
   isbn?: string;
+  // Owner, Manager and admins; everyone else sees the values read-only
+  canEdit?: boolean;
 }
 
 function getErrorMessage(err: unknown): string {
@@ -28,6 +30,7 @@ interface EditableCellProps {
   type?: 'text' | 'number';
   format?: (value: string | number) => string;
   requireNonNegative?: boolean;
+  readOnly?: boolean;
   onSave: (newValue: string) => Promise<void>;
 }
 
@@ -37,6 +40,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   type = 'text',
   format,
   requireNonNegative,
+  readOnly = false,
   onSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -85,6 +89,23 @@ const EditableCell: React.FC<EditableCellProps> = ({
     }
   };
 
+  const display =
+    value != null ? (
+      format ? (
+        format(value)
+      ) : (
+        value
+      )
+    ) : (
+      <span className="production-info-placeholder">
+        {readOnly ? '—' : placeholder}
+      </span>
+    );
+
+  if (readOnly) {
+    return <span className="production-info-cell">{display}</span>;
+  }
+
   if (isEditing) {
     return (
       <div className="production-info-edit">
@@ -115,15 +136,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
       className="production-info-cell"
       onClick={startEditing}
     >
-      {value != null ? (
-        format ? (
-          format(value)
-        ) : (
-          value
-        )
-      ) : (
-        <span className="production-info-placeholder">{placeholder}</span>
-      )}
+      {display}
     </button>
   );
 };
@@ -132,6 +145,7 @@ const ProductionInfoView: React.FC<Props> = ({
   anthologyId,
   shopifyUrl: initialShopifyUrl,
   isbn: initialIsbn,
+  canEdit = false,
 }) => {
   const [productionInfo, setProductionInfo] = useState<ProductionInfo | null>(
     null,
@@ -271,6 +285,7 @@ const ProductionInfoView: React.FC<Props> = ({
                   type={row.type}
                   format={row.format}
                   requireNonNegative={row.requireNonNegative}
+                  readOnly={!canEdit}
                   onSave={row.onSave}
                 />
               </td>
