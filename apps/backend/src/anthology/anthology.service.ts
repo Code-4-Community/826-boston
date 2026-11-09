@@ -15,6 +15,9 @@ import {
   AnthologySortOption,
   FilterSortAnthologyDto,
 } from './dtos/filter-anthology.dto';
+import { TrackerAnthologyDto } from './dtos/tracker-anthology.dto';
+import { User } from '../users/user.entity';
+import { Role } from '../users/types';
 
 @Injectable()
 export class AnthologyService {
@@ -66,6 +69,24 @@ export class AnthologyService {
 
   findByYear(publishedDate: Date) {
     return this.repo.find({ where: { publishedDate } });
+  }
+
+  findForTracker(dto: TrackerAnthologyDto, user: User): Promise<Anthology[]> {
+    const where: FindOptionsWhere<Anthology> = {};
+
+    if (dto.status) {
+      where.status = dto.status;
+    }
+
+    if (user.role !== Role.ADMIN) {
+      where.id = In(
+        (user.omchaiAssignments ?? []).map(
+          (assignment) => assignment.anthology.id,
+        ),
+      );
+    }
+
+    return this.repo.find({ where });
   }
 
   async update(id: number, attrs: Partial<Anthology>) {

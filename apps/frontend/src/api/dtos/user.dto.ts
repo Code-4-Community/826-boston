@@ -12,6 +12,8 @@ interface User {
   title: string;
 
   role: Role;
+
+  omchaiAssignmentCount: number;
 }
 
 export default User;
