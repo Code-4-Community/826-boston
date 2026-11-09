@@ -4,6 +4,9 @@ import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
 import { AgeCategory, AnthologyStatus, AnthologyPubLevel } from './types';
 import { AnthologySortOption } from './dtos/filter-anthology.dto';
+import { TrackerAnthologyDto } from './dtos/tracker-anthology.dto';
+import { Role } from '../users/types';
+import { User } from '../users/user.entity';
 
 const mockAnthology1: Anthology = {
   id: 1,
@@ -233,6 +236,39 @@ describe('AnthologyService', () => {
             ]
           : [['a.id', 'ASC']],
       );
+    });
+  });
+
+  describe('findForTracker', () => {
+    const statusDto: TrackerAnthologyDto = {
+      status: AnthologyStatus.DRAFTING,
+    };
+
+    it('returns every publication for an admin and applies status in the query', async () => {
+      mockRepository.find.mockResolvedValue([mockAnthology2]);
+
+      const result = await service.findForTracker(statusDto, {
+        role: Role.ADMIN,
+      } as User);
+
+      expect(result).toEqual([mockAnthology2]);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { status: AnthologyStatus.DRAFTING },
+      });
+    });
+
+    it('scopes standard users to their assigned anthology ids in the query', async () => {
+      mockRepository.find.mockResolvedValue([mockAnthology1]);
+
+      const result = await service.findForTracker({}, {
+        role: Role.STANDARD,
+        omchaiAssignments: [{ anthology: mockAnthology1 }],
+      } as User);
+
+      expect(result).toEqual([mockAnthology1]);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { id: In([mockAnthology1.id]) },
+      });
     });
   });
 });
