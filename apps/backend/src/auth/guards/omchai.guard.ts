@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { OMCHAI_ROLES } from '../roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
 import { User } from 'src/users/user.entity';
+import { Role } from 'src/users/types';
 
 @Injectable()
 export class OmchaiGuard implements CanActivate {
@@ -28,6 +29,10 @@ export class OmchaiGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const user = request.user as User;
+
+    if (user?.role === Role.ADMIN) {
+      return true;
+    }
 
     // no omchai
     if (!user || !user.omchaiAssignments) {

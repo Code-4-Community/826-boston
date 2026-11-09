@@ -314,6 +314,11 @@ export class AnthologyController {
       createAnthologyDto.photo_url,
       createAnthologyDto.isbn,
       createAnthologyDto.shopify_url,
+      createAnthologyDto.genres,
+      createAnthologyDto.themes,
+      createAnthologyDto.publicationDate
+        ? new Date(createAnthologyDto.publicationDate)
+        : undefined,
     );
   }
 
@@ -365,7 +370,8 @@ export class AnthologyController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAnthologyDto: UpdateAnthologyDto,
   ): Promise<Anthology> {
-    const { photo_url, shopify_url, pub_level, ...rest } = updateAnthologyDto;
+    const { photo_url, shopify_url, pub_level, publicationDate, ...rest } =
+      updateAnthologyDto;
     const attrs: Partial<Anthology> = { ...rest };
 
     // DTO fields use snake_case to match the create payload, but the entity's
@@ -374,16 +380,21 @@ export class AnthologyController {
     if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
     if (pub_level !== undefined)
       attrs.pubLevel = pub_level as AnthologyPubLevel;
+    // An empty value clears the date (the column is nullable)
+    if (publicationDate !== undefined)
+      attrs.publishedDate = publicationDate
+        ? new Date(publicationDate)
+        : (null as unknown as undefined);
 
     return this.anthologyService.update(id, attrs);
   }
 
   @ApiBearerAuth()
-  @UserStatus(Role.ADMIN)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @ApiOperation({
     summary: 'Upload anthology cover image',
     description:
-      'Uploads a cover image for an anthology. Accepts JPEG, PNG, GIF, or WebP images up to 5MB. Admin-only endpoint.',
+      'Uploads a cover image for an anthology. Accepts JPEG, PNG, GIF, or WebP images up to 5MB. Requires OWNER or MANAGER role (admins are always allowed).',
   })
   @ApiOkResponse({
     description: 'Cover image uploaded successfully',

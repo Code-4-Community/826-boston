@@ -73,6 +73,9 @@ describe('AnthologyController', () => {
         dto.photo_url,
         dto.isbn,
         dto.shopify_url,
+        dto.genres,
+        dto.themes,
+        new Date(dto.publicationDate as Date),
       );
       expect(result).toBe(created);
     });

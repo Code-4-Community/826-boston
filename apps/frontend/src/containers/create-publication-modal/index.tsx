@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import './styles.css';
-import { THEMES, OMCHAI_ROLES, OmchaiRole } from './constants';
+import { GENRES, THEMES, OMCHAI_ROLES, OmchaiRole } from './constants';
 import User from '@api/dtos/user.dto';
 import apiClient from '@api/apiClient';
 import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
@@ -45,23 +45,6 @@ const PUBLICATION_TYPES = [
   { value: 'Chapbook', label: 'Level 1 (Chapbooks)' },
   { value: 'PerfectBound', label: 'Level 2 (Perfect Bound)' },
   { value: 'Signature', label: 'Level 3 (Signature Publications)' },
-];
-
-const GENRES = [
-  'Poetry',
-  'Fiction',
-  'Nonfiction',
-  'Memoir',
-  'Essay',
-  'Short Story',
-  'Personal Narrative',
-  'Graphic Narrative',
-  'Play',
-  'Interview',
-  'Letters',
-  'Mixed Genre',
-  'Civic Engagement',
-  'Multicultural',
 ];
 
 const INITIAL_FORM: PublicationFormState = {
