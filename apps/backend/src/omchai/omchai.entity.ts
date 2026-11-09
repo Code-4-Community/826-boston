@@ -29,7 +29,11 @@ export class Omchai {
   })
   role: OmchaiRole;
 
-  @Column({ type: 'date', name: 'datetime_assigned' })
+  @Column({
+    type: 'date',
+    name: 'datetime_assigned',
+    default: () => 'CURRENT_DATE',
+  })
   datetimeAssigned: Date;
 
   @ManyToOne(() => User, (user) => user.omchaiAssignments)

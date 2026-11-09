@@ -30,7 +30,7 @@ export class Anthology {
   @Column({ nullable: true, default: '' })
   subtitle?: string;
 
-  @Column()
+  @Column({ default: '' })
   description: string;
 
   @Column({ type: 'simple-array', default: [] })
