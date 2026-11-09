@@ -63,7 +63,7 @@
   height: auto;
   min-height: 0;
   padding: 16px 0 24px;
-  overflow: visible;
+  overflow-y: auto;
 }
 
 .filter-modal-section {
