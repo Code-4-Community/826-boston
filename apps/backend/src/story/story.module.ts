@@ -7,6 +7,7 @@ import { AnthologyModule } from '../anthology/anthology.module';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { AuthorModule } from '../author/author.module';
+import { OmchaiModule } from '../omchai/omchai.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthorModule } from '../author/author.module';
     UsersModule,
     AuthModule,
     AuthorModule,
+    OmchaiModule,
   ],
   controllers: [StoryController],
   providers: [StoryService],
