@@ -61,7 +61,9 @@ interface PublicationsPageProps {
 
 const SORT_OPTION_TO_BACKEND: Partial<Record<SortOption, string>> = {
   [SortOption.TITLE_ASC]: 'title-asc',
-  [SortOption.AUTHOR_ASC]: 'title-asc',
+  [SortOption.TITLE_DESC]: 'title-desc',
+  [SortOption.AUTHOR_ASC]: 'author-asc',
+  [SortOption.AUTHOR_DESC]: 'author-desc',
   [SortOption.DATE_NEWEST]: 'date-recent',
   [SortOption.DATE_OLDEST]: 'date-oldest',
 };
@@ -75,11 +77,13 @@ function buildFilterSortBody(filters: FilterState): FilterSortAnthologyBody {
   }
 
   if (filters.pubDateStart || filters.pubDateEnd) {
+    const normalizeDate = (value: string, endOfYear: boolean) => {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+      return value ? `${value}-${endOfYear ? '12-31' : '01-01'}` : undefined;
+    };
     body.pubDateRange = {
-      start: filters.pubDateStart
-        ? `${filters.pubDateStart}-01-01`
-        : '1900-01-01',
-      end: filters.pubDateEnd ? `${filters.pubDateEnd}-12-31` : '2100-12-31',
+      start: normalizeDate(filters.pubDateStart, false) ?? '1900-01-01',
+      end: normalizeDate(filters.pubDateEnd, true) ?? '2100-12-31',
     };
   }
 
@@ -94,34 +98,23 @@ function buildFilterSortBody(filters: FilterState): FilterSortAnthologyBody {
   if (filters.genres.length > 0) {
     body.genres = [...filters.genres];
   }
+  if (filters.themes.length > 0) {
+    body.themes = [...filters.themes];
+  }
+
+  if (filters.inventoryLocations.length > 0) {
+    body.inventoryLocations = [...filters.inventoryLocations];
+  }
 
   return body;
 }
 
-function applyLocalFilters(
-  pubs: Anthology[],
-  search: string,
-  filters: FilterState,
-): Anthology[] {
+function applyLocalFilters(pubs: Anthology[], search: string): Anthology[] {
   let result = [...pubs];
 
   if (search) {
     const q = search.toLowerCase();
     result = result.filter((p) => p.title.toLowerCase().includes(q));
-  }
-
-  if (filters.inventoryMin) {
-    const min = parseInt(filters.inventoryMin, 10);
-    if (!Number.isNaN(min)) {
-      result = result.filter((p) => (p.inventory ?? 0) >= min);
-    }
-  }
-
-  if (filters.inventoryMax) {
-    const max = parseInt(filters.inventoryMax, 10);
-    if (!Number.isNaN(max)) {
-      result = result.filter((p) => (p.inventory ?? Infinity) <= max);
-    }
   }
 
   return result;
@@ -175,7 +168,6 @@ export default function ArchivedPublications({
   const filteredPublications = applyLocalFilters(
     statusFilteredPublications,
     searchQuery,
-    appliedFilters,
   );
 
   return (

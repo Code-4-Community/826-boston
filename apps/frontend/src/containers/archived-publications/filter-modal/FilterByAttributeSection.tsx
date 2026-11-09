@@ -1,70 +1,69 @@
-import {
-  AnthologyGenre,
-  AnthologyProgram,
-  AnthologyPubLevel,
-  FilterState,
-} from '../../../types';
-import TabFilterRow from './TabFilterRow';
+import { FilterState } from '../../../types';
 import RangeFilterRow from './RangeFilterRow';
-import { PUB_LEVEL_OPTIONS, PROGRAM_OPTIONS, GENRE_OPTIONS } from './constants';
+import SearchableMultiSelectRow from './SearchableMultiSelectRow';
 
 interface FilterByAttributeSectionProps {
   draft: FilterState;
   update: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void;
+  genres: string[];
+  themes: string[];
+  programs: string[];
+  inventoryLocations: string[];
 }
 
 export default function FilterByAttributeSection({
   draft,
   update,
+  genres,
+  themes,
+  programs,
+  inventoryLocations,
 }: FilterByAttributeSectionProps) {
   return (
     <section className="filter-modal-section">
       <h3 className="filter-modal-section-title">Filter By Attribute</h3>
 
-      <RangeFilterRow
-        label="Inventory"
-        minValue={draft.inventoryMin}
-        maxValue={draft.inventoryMax}
-        minPlaceholder="Min Copies"
-        maxPlaceholder="Max Copies"
-        onMinChange={(v) => update('inventoryMin', v)}
-        onMaxChange={(v) => update('inventoryMax', v)}
+      <SearchableMultiSelectRow
+        label="Programs(s)"
+        placeholder="Search for a program..."
+        options={programs}
+        selected={draft.programs}
+        onChange={(value) => update('programs', value)}
       />
 
-      <TabFilterRow
-        label="Publication Level"
-        options={PUB_LEVEL_OPTIONS}
-        multiSelect={true}
-        selected={draft.pubLevels}
-        onChange={(value) => update('pubLevels', value as AnthologyPubLevel[])}
-        allowDeselect={true}
+      <SearchableMultiSelectRow
+        label="Location(s)"
+        placeholder="Search for a location..."
+        options={inventoryLocations}
+        selected={draft.inventoryLocations}
+        onChange={(value) => update('inventoryLocations', value)}
       />
 
       <RangeFilterRow
         label="Publication Date"
         minValue={draft.pubDateStart}
         maxValue={draft.pubDateEnd}
-        minPlaceholder="Start Year"
-        maxPlaceholder="End Year"
+        minPlaceholder="mm/dd/yyyy"
+        maxPlaceholder="mm/dd/yyyy"
+        inputType="text"
         onMinChange={(v) => update('pubDateStart', v)}
         onMaxChange={(v) => update('pubDateEnd', v)}
       />
 
-      <TabFilterRow
-        label="Program"
-        options={PROGRAM_OPTIONS}
-        multiSelect={true}
-        selected={draft.programs}
-        onChange={(value) => update('programs', value as AnthologyProgram[])}
-        allowDeselect={true}
+      <SearchableMultiSelectRow
+        label="Theme(s)"
+        placeholder="Search for a theme..."
+        options={themes}
+        selected={draft.themes}
+        onChange={(value) => update('themes', value)}
       />
 
-      <TabFilterRow
-        label="Genre"
-        options={GENRE_OPTIONS}
-        multiSelect={true}
+      <SearchableMultiSelectRow
+        label="Genre(s)"
+        placeholder="Search for a genre..."
+        options={genres}
         selected={draft.genres}
-        onChange={(values) => update('genres', values as AnthologyGenre[])}
+        onChange={(value) => update('genres', value)}
       />
     </section>
   );
