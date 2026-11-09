@@ -199,6 +199,16 @@ export class OmchaiController {
 
   @ApiBearerAuth()
   @ApiOperation({
+    summary: 'Get Omchai assignments for a user',
+    description: 'Retrieves anthology assignments for a specific user.',
+  })
+  @Get('user/:userId')
+  findByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.omchaiService.findByUserId(userId);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
     summary: 'Update an Omchai assignment',
     description:
       'Updates an existing Omchai assignment. Requires authentication.',

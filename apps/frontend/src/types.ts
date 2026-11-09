@@ -136,6 +136,7 @@ export interface OmchaiEntry {
   role: OmchaiRole;
   datetimeAssigned: string;
   user: OmchaiUser;
+  anthology?: Anthology;
 }
 
 export interface Anthology {
@@ -162,6 +163,7 @@ export interface Anthology {
   sponsors?: string[];
   triggers?: string[];
   ageCategories?: string[];
+  stories?: Story[];
 }
 
 /** Production metadata for an anthology, from GET /production-info/:anthologyId. */

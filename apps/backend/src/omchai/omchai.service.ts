@@ -37,6 +37,13 @@ export class OmchaiService {
     });
   }
 
+  findByUserId(userId: number) {
+    return this.repo.find({
+      where: { user: { id: userId } },
+      relations: ['anthology', 'anthology.stories', 'anthology.stories.author'],
+    });
+  }
+
   async update(id: number, updateOmchaiDto: EditOmchaiDto) {
     const omchai = await this.repo.findOneBy({ id });
 
