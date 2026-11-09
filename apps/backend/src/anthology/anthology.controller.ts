@@ -15,7 +15,9 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
@@ -39,6 +41,8 @@ import { Role } from 'src/users/types';
 import { AwsS3Service } from '../aws/aws-s3.service';
 import { InventoryHoldingService } from '../inventory-holding/inventory-holding.service';
 import { AnthologyInventoryDto } from '../inventory-holding/dto/anthology-inventory.dto';
+import { TrackerAnthologyDto } from './dtos/tracker-anthology.dto';
+import { User } from '../users/user.entity';
 
 interface UploadedFileType {
   fieldname: string;
@@ -97,6 +101,22 @@ export class AnthologyController {
   @Post('filter-sort')
   filterSort(@Body() dto: FilterSortAnthologyDto): Promise<Anthology[]> {
     return this.anthologyService.findWithFilterSort(dto);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get publications for the current user’s tracker',
+    description:
+      'Admins receive every publication. Standard users receive only publications where they have an Omchai assignment.',
+  })
+  @ApiOkResponse({ description: 'Tracker publications retrieved successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid tracker parameters' })
+  @Post('tracker')
+  tracker(
+    @Body() dto: TrackerAnthologyDto,
+    @Req() request: Request & { user: User },
+  ): Promise<Anthology[]> {
+    return this.anthologyService.findForTracker(dto, request.user);
   }
 
   @Public()

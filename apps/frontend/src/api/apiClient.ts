@@ -12,6 +12,7 @@ import {
   Story,
   StoryDraft,
   SubmissionRound,
+  AnthologyStatus,
 } from '../types';
 import User from './dtos/user.dto';
 import Role from './dtos/role';
@@ -25,6 +26,10 @@ export interface FilterSortAnthologyBody {
   programs?: string[];
   genres?: string[];
   sortBy?: string;
+}
+
+export interface TrackerAnthologyBody {
+  status?: AnthologyStatus;
 }
 
 export interface StoryDocumentRow {
@@ -179,6 +184,13 @@ export class ApiClient {
     body: FilterSortAnthologyBody,
   ): Promise<Anthology[]> {
     const data = await this.post('/api/anthologies/filter-sort', body);
+    return normalizeAnthologies(data);
+  }
+
+  public async getTrackerAnthologies(
+    body: TrackerAnthologyBody,
+  ): Promise<Anthology[]> {
+    const data = await this.post('/api/anthologies/tracker', body);
     return normalizeAnthologies(data);
   }
 

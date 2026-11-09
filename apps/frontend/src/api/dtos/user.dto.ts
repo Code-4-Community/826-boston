@@ -14,6 +14,8 @@ interface User {
   pronouns?: string | null;
 
   role: Role;
+
+  omchaiAssignmentCount: number;
 }
 
 export default User;

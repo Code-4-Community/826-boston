@@ -3,7 +3,8 @@ import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom';
 import './styles.css';
 import apiClient from '../../api/apiClient';
 import { type FilterSortAnthologyBody } from '../../api/apiClient';
-import { MOCK_LAST_MODIFIED } from '@utils/mock-data';
+import useAuth from '../../hooks/useAuth';
+import Role from '../../api/dtos/role';
 import {
   Anthology,
   AnthologyStatus,
@@ -140,6 +141,7 @@ export default function ArchivedPublications({
     useState<FilterState>(DEFAULT_FILTER_STATE);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [createPubModalOpen, setCreatePubModalOpen] = useState(false);
+  const [, , currentUser] = useAuth();
 
   const navigate = useNavigate();
   const { tab } = useParams<{ tab?: string }>();
@@ -149,9 +151,15 @@ export default function ArchivedPublications({
 
   useEffect(() => {
     const body = buildFilterSortBody(appliedFilters);
+    const trackerBody =
+      mode === 'tracker' && activeTrackerTab?.status
+        ? { status: activeTrackerTab.status }
+        : {};
 
-    apiClient
-      .filterSortAnthologies(body)
+    (mode === 'tracker'
+      ? apiClient.getTrackerAnthologies(trackerBody ?? {})
+      : apiClient.filterSortAnthologies(body)
+    )
       .then((data) => {
         if (Array.isArray(data)) {
           setPublications(data as Anthology[]);
@@ -160,7 +168,7 @@ export default function ArchivedPublications({
       .catch((err) => {
         console.log(err);
       });
-  }, [appliedFilters]);
+  }, [activeTrackerTab?.status, appliedFilters, mode]);
 
   if (mode === 'tracker' && !activeTrackerTab) {
     return <Navigate to="/tracker/all" replace />;
@@ -169,7 +177,7 @@ export default function ArchivedPublications({
   const statusFilteredPublications = publications.filter((pub) =>
     mode === 'archive'
       ? pub.status === ARCHIVE_TAB_STATUS[activeArchiveTab]
-      : !activeTrackerTab?.status || pub.status === activeTrackerTab.status,
+      : true,
   );
 
   const filteredPublications = applyLocalFilters(
@@ -270,59 +278,71 @@ export default function ArchivedPublications({
           )}
 
           <div className="publication-cards-grid">
-            {filteredPublications.map((pub) => (
-              <button
-                key={pub.id}
-                type="button"
-                className="publication-card"
-                onClick={() =>
-                  navigate(
-                    mode === 'tracker'
-                      ? `/tracker/publication/${pub.id}`
-                      : `/library/publication/${pub.id}`,
-                  )
-                }
-              >
-                <div className="publication-card-image">
-                  <img
-                    src={
-                      pub.photo_url ||
-                      pub.photoUrl ||
-                      '/src/assets/images/covers/booktemp.avif'
-                    }
-                    alt={pub.title}
-                    className="publication-card-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        '/src/assets/images/covers/booktemp.avif';
-                    }}
-                  />
-                  <img
-                    src={BookmarkIcon}
-                    alt=""
-                    className="publication-card-bookmark"
-                  />
-                </div>
+            {filteredPublications.length === 0 ? (
+              <p className="publication-empty-state">
+                {mode === 'tracker' &&
+                currentUser?.role === Role.STANDARD &&
+                currentUser.omchaiAssignmentCount === 0
+                  ? "You haven't been added to any publications yet"
+                  : mode === 'tracker' && activeTrackerTab?.status
+                  ? `No publications in ${activeTrackerTab.label}`
+                  : 'No publications'}
+              </p>
+            ) : (
+              filteredPublications.map((pub) => (
+                <button
+                  key={pub.id}
+                  type="button"
+                  className="publication-card"
+                  onClick={() =>
+                    navigate(
+                      mode === 'tracker'
+                        ? `/tracker/publication/${pub.id}`
+                        : `/library/publication/${pub.id}`,
+                    )
+                  }
+                >
+                  <div className="publication-card-image">
+                    <img
+                      src={
+                        pub.photo_url ||
+                        pub.photoUrl ||
+                        '/src/assets/images/covers/booktemp.avif'
+                      }
+                      alt={pub.title}
+                      className="publication-card-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          '/src/assets/images/covers/booktemp.avif';
+                      }}
+                    />
+                    <img
+                      src={BookmarkIcon}
+                      alt=""
+                      className="publication-card-bookmark"
+                    />
+                  </div>
 
-                <div className="publication-card-info">
-                  <div className="publication-card-details">
-                    <h3 className="publication-card-title">{pub.title}</h3>
-                    <div className="publication-card-meta">
-                      <span className="publication-card-modified">
-                        {pub.published_year
-                          ? `Last modified ${pub.published_year}`
-                          : ''}
-                      </span>
-                      <img
-                        src={MenuDotsIcon}
-                        alt=""
-                        className="publication-card-menu"
-                      />
+                  <div className="publication-card-info">
+                    <div className="publication-card-details">
+                      <h3 className="publication-card-title">{pub.title}</h3>
+                      <div className="publication-card-meta">
+                        <span className="publication-card-modified">
+                          {pub.published_year
+                            ? `Last modified ${pub.published_year}`
+                            : ''}
+                        </span>
+                        <img
+                          src={MenuDotsIcon}
+                          alt=""
+                          className="publication-card-menu"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              ))
+            )}
           </div>
         </div>
       </section>
