@@ -15,7 +15,10 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
@@ -29,8 +32,10 @@ import {
   ApiNotFoundResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { FilterSortAnthologyDto } from './dtos/filter-anthology.dto';
+import { User } from '../users/user.entity';
 import { OmchaiRoles, Public, UserStatus } from '../auth/roles.decorator';
 import { OmchaiRole } from 'src/omchai/omchai.entity';
 import { CreateAnthologyDto } from './dtos/create-anthology.dto';
@@ -94,8 +99,19 @@ export class AnthologyController {
       },
     },
   })
+  @ApiUnauthorizedResponse({
+    description: 'staffIds was sent without logging in',
+  })
   @Post('filter-sort')
-  filterSort(@Body() dto: FilterSortAnthologyDto): Promise<Anthology[]> {
+  filterSort(
+    @Body() dto: FilterSortAnthologyDto,
+    @Req() request: Request & { user?: Partial<User> },
+  ): Promise<Anthology[]> {
+    // the route is public, but OMCHAI assignments aren't, so filtering by staff needs a
+    // logged-in user from our DB (a token-only stand-in from JwtStrategy has no id)
+    if (dto.staffIds?.length && typeof request.user?.id !== 'number') {
+      throw new UnauthorizedException('Log in to filter by staff');
+    }
     return this.anthologyService.findWithFilterSort(dto);
   }
 

@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from 'react-query';
 import './styles.css';
 import apiClient from '../../api/apiClient';
 import { type FilterSortAnthologyBody } from '../../api/apiClient';
-import { MOCK_LAST_MODIFIED } from '@utils/mock-data';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
 import {
   Anthology,
   AnthologyStatus,
   FilterState,
   DEFAULT_FILTER_STATE,
   SortOption,
+  TrackerFilterState,
+  DEFAULT_TRACKER_FILTER_STATE,
 } from '../../types';
 import FilterModal from './filter-modal/FilterModal';
+import TrackerFilterModal from './filter-modal/TrackerFilterModal';
 
 import SearchIcon from '../../assets/icons/search.svg';
 import FilterIcon from '../../assets/icons/filter.svg';
@@ -55,13 +59,16 @@ const TRACKER_TABS: TrackerTab[] = [
   { slug: 'archived', label: 'Archive', status: AnthologyStatus.ARCHIVED },
 ];
 
+const SEARCH_MAX_LENGTH = 100;
+const SEARCH_DEBOUNCE_MS = 300;
+
 interface PublicationsPageProps {
   mode?: PublicationsPageMode;
 }
 
 const SORT_OPTION_TO_BACKEND: Partial<Record<SortOption, string>> = {
   [SortOption.TITLE_ASC]: 'title-asc',
-  [SortOption.AUTHOR_ASC]: 'title-asc',
+  [SortOption.AUTHOR_ASC]: 'byline-asc',
   [SortOption.DATE_NEWEST]: 'date-recent',
   [SortOption.DATE_OLDEST]: 'date-oldest',
 };
@@ -96,6 +103,36 @@ function buildFilterSortBody(filters: FilterState): FilterSortAnthologyBody {
   }
 
   return body;
+}
+
+function buildTrackerBody(
+  search: string,
+  filters: TrackerFilterState,
+): FilterSortAnthologyBody {
+  const body: FilterSortAnthologyBody = { sortBy: filters.sortBy };
+
+  if (search) {
+    body.search = search;
+  }
+
+  if (filters.programs.length > 0) {
+    body.programs = [...filters.programs];
+  }
+
+  if (filters.staffIds.length > 0) {
+    body.staffIds = [...filters.staffIds];
+  }
+
+  return body;
+}
+
+// each picked program and staff member counts, plus one for a non-default sort
+function countActiveTrackerFilters(filters: TrackerFilterState): number {
+  return (
+    filters.programs.length +
+    filters.staffIds.length +
+    (filters.sortBy !== DEFAULT_TRACKER_FILTER_STATE.sortBy ? 1 : 0)
+  );
 }
 
 function applyLocalFilters(
@@ -138,16 +175,39 @@ export default function ArchivedPublications({
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedFilters, setAppliedFilters] =
     useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [trackerFilters, setTrackerFilters] = useState<TrackerFilterState>(
+    DEFAULT_TRACKER_FILTER_STATE,
+  );
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [createPubModalOpen, setCreatePubModalOpen] = useState(false);
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { tab } = useParams<{ tab?: string }>();
 
   const activeArchiveTab: ArchiveTab = isArchiveTab(tab) ? tab : 'published';
   const activeTrackerTab = TRACKER_TABS.find((t) => t.slug === tab);
 
+  const debouncedSearch = useDebouncedValue(
+    searchQuery.trim(),
+    SEARCH_DEBOUNCE_MS,
+  );
+
+  // the Tracker searches, filters and sorts on the server; status tabs filter the
+  // result below, so switching tabs doesn't refetch
+  const trackerQuery = useQuery({
+    queryKey: ['tracker', debouncedSearch, trackerFilters],
+    queryFn: () =>
+      apiClient.filterSortAnthologies(
+        buildTrackerBody(debouncedSearch, trackerFilters),
+      ),
+    enabled: mode === 'tracker' && !!activeTrackerTab,
+    keepPreviousData: true,
+  });
+
   useEffect(() => {
+    if (mode !== 'archive') return;
+
     const body = buildFilterSortBody(appliedFilters);
 
     apiClient
@@ -160,23 +220,51 @@ export default function ArchivedPublications({
       .catch((err) => {
         console.log(err);
       });
-  }, [appliedFilters]);
+  }, [mode, appliedFilters]);
 
   if (mode === 'tracker' && !activeTrackerTab) {
     return <Navigate to="/tracker/all" replace />;
   }
 
-  const statusFilteredPublications = publications.filter((pub) =>
-    mode === 'archive'
-      ? pub.status === ARCHIVE_TAB_STATUS[activeArchiveTab]
-      : !activeTrackerTab?.status || pub.status === activeTrackerTab.status,
-  );
+  const filteredPublications =
+    mode === 'tracker'
+      ? (trackerQuery.data ?? []).filter(
+          (pub) =>
+            !activeTrackerTab?.status || pub.status === activeTrackerTab.status,
+        )
+      : applyLocalFilters(
+          publications.filter(
+            (pub) => pub.status === ARCHIVE_TAB_STATUS[activeArchiveTab],
+          ),
+          searchQuery,
+          appliedFilters,
+        );
 
-  const filteredPublications = applyLocalFilters(
-    statusFilteredPublications,
-    searchQuery,
-    appliedFilters,
-  );
+  const activeTrackerFilterCount = countActiveTrackerFilters(trackerFilters);
+
+  const hasTrackerSearchOrFilters =
+    !!debouncedSearch ||
+    trackerFilters.programs.length > 0 ||
+    trackerFilters.staffIds.length > 0;
+
+  const renderTrackerMessage = (): string | null => {
+    if (trackerQuery.isError) {
+      return "Couldn't load publications. Try again.";
+    }
+    if (trackerQuery.isIdle || trackerQuery.isLoading) {
+      return 'Loading publications...';
+    }
+    if (
+      trackerQuery.isSuccess &&
+      filteredPublications.length === 0 &&
+      hasTrackerSearchOrFilters
+    ) {
+      return 'No publications match these filters';
+    }
+    return null;
+  };
+
+  const gridMessage = mode === 'tracker' ? renderTrackerMessage() : null;
 
   return (
     <div className="archive-wrapper">
@@ -193,6 +281,7 @@ export default function ArchivedPublications({
                     className="publication-search-input"
                     placeholder="Search for a title..."
                     value={searchQuery}
+                    maxLength={SEARCH_MAX_LENGTH}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <img
@@ -207,7 +296,11 @@ export default function ArchivedPublications({
                 type="button"
                 className="publication-filter-btn publication-filter-btn--text"
                 onClick={() => setIsFilterModalOpen(true)}
-                aria-label="Open sort and filter"
+                aria-label={
+                  mode === 'tracker' && activeTrackerFilterCount > 0
+                    ? `Open sort and filter, ${activeTrackerFilterCount} active`
+                    : 'Open sort and filter'
+                }
               >
                 <img
                   src={FilterIcon}
@@ -215,6 +308,11 @@ export default function ArchivedPublications({
                   className="publication-filter-icon"
                 />
                 <span>Filters</span>
+                {mode === 'tracker' && activeTrackerFilterCount > 0 && (
+                  <span className="publication-filter-badge" aria-hidden="true">
+                    {activeTrackerFilterCount}
+                  </span>
+                )}
               </button>
 
               {mode === 'tracker' && (
@@ -269,74 +367,87 @@ export default function ArchivedPublications({
             </div>
           )}
 
-          <div className="publication-cards-grid">
-            {filteredPublications.map((pub) => (
-              <button
-                key={pub.id}
-                type="button"
-                className="publication-card"
-                onClick={() =>
-                  navigate(
-                    mode === 'tracker'
-                      ? `/tracker/publication/${pub.id}`
-                      : `/library/publication/${pub.id}`,
-                  )
-                }
-              >
-                <div className="publication-card-image">
-                  <img
-                    src={
-                      pub.photo_url ||
-                      pub.photoUrl ||
-                      '/src/assets/images/covers/booktemp.avif'
-                    }
-                    alt={pub.title}
-                    className="publication-card-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        '/src/assets/images/covers/booktemp.avif';
-                    }}
-                  />
-                  <img
-                    src={BookmarkIcon}
-                    alt=""
-                    className="publication-card-bookmark"
-                  />
-                </div>
+          {gridMessage ? (
+            <p className="publication-grid-message" role="status">
+              {gridMessage}
+            </p>
+          ) : (
+            <div className="publication-cards-grid">
+              {filteredPublications.map((pub) => (
+                <button
+                  key={pub.id}
+                  type="button"
+                  className="publication-card"
+                  onClick={() =>
+                    navigate(
+                      mode === 'tracker'
+                        ? `/tracker/publication/${pub.id}`
+                        : `/library/publication/${pub.id}`,
+                    )
+                  }
+                >
+                  <div className="publication-card-image">
+                    <img
+                      src={
+                        pub.photo_url ||
+                        pub.photoUrl ||
+                        '/src/assets/images/covers/booktemp.avif'
+                      }
+                      alt={pub.title}
+                      className="publication-card-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          '/src/assets/images/covers/booktemp.avif';
+                      }}
+                    />
+                    <img
+                      src={BookmarkIcon}
+                      alt=""
+                      className="publication-card-bookmark"
+                    />
+                  </div>
 
-                <div className="publication-card-info">
-                  <div className="publication-card-details">
-                    <h3 className="publication-card-title">{pub.title}</h3>
-                    <div className="publication-card-meta">
-                      <span className="publication-card-modified">
-                        {pub.published_year
-                          ? `Last modified ${pub.published_year}`
-                          : ''}
-                      </span>
-                      <img
-                        src={MenuDotsIcon}
-                        alt=""
-                        className="publication-card-menu"
-                      />
+                  <div className="publication-card-info">
+                    <div className="publication-card-details">
+                      <h3 className="publication-card-title">{pub.title}</h3>
+                      <div className="publication-card-meta">
+                        <span className="publication-card-modified">
+                          {pub.published_year
+                            ? `Last modified ${pub.published_year}`
+                            : ''}
+                        </span>
+                        <img
+                          src={MenuDotsIcon}
+                          alt=""
+                          className="publication-card-menu"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
-            ))}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {isFilterModalOpen && (
+      {isFilterModalOpen && mode === 'archive' && (
         <FilterModal
           initialFilters={appliedFilters}
           onApply={(filters) => setAppliedFilters(filters)}
           onClose={() => setIsFilterModalOpen(false)}
         />
       )}
+      {isFilterModalOpen && mode === 'tracker' && (
+        <TrackerFilterModal
+          initialFilters={trackerFilters}
+          onApply={(filters) => setTrackerFilters(filters)}
+          onClose={() => setIsFilterModalOpen(false)}
+        />
+      )}
       {createPubModalOpen && (
         <CreatePublicationModal
-          setPublications={setPublications}
+          onCreated={() => queryClient.invalidateQueries(['tracker'])}
           onClose={() => setCreatePubModalOpen(false)}
           onSave={() => {
             setCreatePubModalOpen(false);
