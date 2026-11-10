@@ -15,6 +15,8 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnthologyService } from './anthology.service';
@@ -49,6 +51,10 @@ interface UploadedFileType {
   size: number;
 }
 import { AnthologyPubLevel } from './types';
+import { isLibraryRequest } from './library-eligibility';
+
+// On @Public() routes the JWT guard still sets `user` when a valid token is sent
+type MaybeAuthedRequest = { user?: unknown };
 
 @ApiTags('Anthologies')
 @Controller('anthologies')
@@ -95,8 +101,14 @@ export class AnthologyController {
     },
   })
   @Post('filter-sort')
-  filterSort(@Body() dto: FilterSortAnthologyDto): Promise<Anthology[]> {
-    return this.anthologyService.findWithFilterSort(dto);
+  filterSort(
+    @Body() dto: FilterSortAnthologyDto,
+    @Req() req?: MaybeAuthedRequest,
+  ): Promise<Anthology[]> {
+    return this.anthologyService.findWithFilterSort(
+      dto,
+      isLibraryRequest(req?.user, dto.library),
+    );
   }
 
   @Public()
@@ -123,8 +135,11 @@ export class AnthologyController {
     },
   })
   @Get()
-  async getAllAnthologies(): Promise<Anthology[]> {
-    return this.anthologyService.findAll();
+  async getAllAnthologies(
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
+  ): Promise<Anthology[]> {
+    return this.anthologyService.findAll(isLibraryRequest(req?.user, library));
   }
 
   @Public()
@@ -161,8 +176,14 @@ export class AnthologyController {
   @Get(':id')
   async getAnthology(
     @Param('id', ParseIntPipe) id: number,
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
   ): Promise<Anthology> {
-    const anthology = await this.anthologyService.findOne(id);
+    // An ineligible publication 404s the same as a missing one
+    const anthology = await this.anthologyService.findOne(
+      id,
+      isLibraryRequest(req?.user, library),
+    );
 
     if (!anthology) {
       throw new NotFoundException(`Anthology with ID ${id} not found`);
@@ -215,8 +236,13 @@ export class AnthologyController {
   @Get(':id/inventory')
   async getAnthologyInventory(
     @Param('id', ParseIntPipe) id: number,
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
   ): Promise<AnthologyInventoryDto> {
-    const anthology = await this.anthologyService.findOne(id);
+    const anthology = await this.anthologyService.findOne(
+      id,
+      isLibraryRequest(req?.user, library),
+    );
 
     if (!anthology) {
       throw new NotFoundException(`Anthology with ID ${id} not found`);

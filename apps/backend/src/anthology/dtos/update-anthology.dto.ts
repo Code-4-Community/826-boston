@@ -1,6 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, ValidateIf } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 import { CreateAnthologyDto } from './create-anthology.dto';
 import { AnthologyStatus } from '../types';
 
@@ -16,4 +22,17 @@ export class UpdateAnthologyDto extends PartialType(CreateAnthologyDto) {
   @ValidateIf((_, value) => value !== undefined)
   @IsEnum(AnthologyStatus)
   status?: AnthologyStatus;
+
+  @ApiPropertyOptional({ description: 'Whether release forms are on file' })
+  // Same reasoning as status: null would hit the NOT NULL column
+  @ValidateIf((_, value) => value !== undefined)
+  @IsBoolean()
+  releaseFormsOnFile?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Optional link to the release forms (null clears it)',
+  })
+  @IsOptional()
+  @IsString()
+  releaseFormsUrl?: string | null;
 }

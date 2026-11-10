@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import Role from '../../api/dtos/role';
-import { Anthology, OmchaiRole } from '../../types';
+import { Anthology } from '../../types';
+import { useCanEditAnthology } from '../../hooks/useCanEditAnthology';
 import { GENRES, THEMES } from '../create-publication-modal/constants';
 import { PROGRAM_OPTIONS } from '../archived-publications/filter-modal/constants';
 
@@ -34,7 +35,7 @@ const PublicationDetailsView: React.FC<Props> = ({
   onChange,
 }) => {
   const [values, setValues] = useState(anthology);
-  const [editable, setEditable] = useState(false);
+  const editable = useCanEditAnthology(anthologyId, currentUser);
   const [savingField, setSavingField] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [statusOpen, setStatusOpen] = useState(false);
@@ -43,25 +44,6 @@ const PublicationDetailsView: React.FC<Props> = ({
   useEffect(() => {
     setValues(anthology);
   }, [anthology]);
-
-  useEffect(() => {
-    const isAdmin = String(currentUser?.role ?? '').toLowerCase() === 'admin';
-    setEditable(isAdmin);
-    if (isAdmin) return;
-    // The endpoint 404s when a publication has no assignments yet
-    apiClient
-      .getOmchaiByAnthology(anthologyId)
-      .then((entries) => {
-        const assignment = entries.find(
-          (entry) => entry.userId === currentUser?.id,
-        );
-        setEditable(
-          assignment?.role === OmchaiRole.OWNER ||
-            assignment?.role === OmchaiRole.MANAGER,
-        );
-      })
-      .catch(() => setEditable(false));
-  }, [anthologyId, currentUser]);
 
   useEffect(
     () => () => {
@@ -181,18 +163,30 @@ const PublicationDetailsView: React.FC<Props> = ({
               </button>
               {statusOpen && (
                 <div className="publication-status-menu">
-                  {STATUSES.map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => {
-                        saveImmediately('status', value);
-                        setStatusOpen(false);
-                      }}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                  {STATUSES.map(([value, label]) => {
+                    // The API enforces this too; the UI just explains it
+                    const blocked =
+                      value === 'Can Be Shared' && !values.releaseFormsOnFile;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        disabled={blocked}
+                        onClick={() => {
+                          saveImmediately('status', value);
+                          setStatusOpen(false);
+                        }}
+                      >
+                        {label}
+                        {blocked && (
+                          <span className="publication-status-menu__reason">
+                            Mark release forms on file in Production &amp;
+                            Distribution first.
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

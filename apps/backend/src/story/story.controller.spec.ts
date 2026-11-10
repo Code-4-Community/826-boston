@@ -54,11 +54,69 @@ describe('StoryController', () => {
   });
 
   describe('get stories by anthology', () => {
-    it('get stories given anthology id', () => {
+    const staff = { user: { id: 1 } };
+
+    it('get stories given anthology id', async () => {
       mockService.getStoriesByAnthology.mockResolvedValue([StoriesSeed[0]]);
-      const result = controller.getStoriesByAnthology(999);
-      expect(result).resolves.toEqual([StoriesSeed[0]]);
-      expect(mockService.getStoriesByAnthology).toHaveBeenCalledWith(999);
+      const result = await controller.getStoriesByAnthology(
+        999,
+        undefined,
+        staff,
+      );
+      expect(result).toEqual([StoriesSeed[0]]);
+      expect(mockService.getStoriesByAnthology).toHaveBeenCalledWith(
+        999,
+        false,
+      );
+      expect(mockAnthologyService.findOne).not.toHaveBeenCalled();
+    });
+
+    it('404s for an anonymous caller when the publication is not in the Library', async () => {
+      mockAnthologyService.findOne.mockResolvedValue(null);
+
+      await expect(
+        controller.getStoriesByAnthology(7, undefined, { user: undefined }),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockAnthologyService.findOne).toHaveBeenCalledWith(7, true);
+      expect(mockService.getStoriesByAnthology).not.toHaveBeenCalled();
+    });
+
+    it('returns stories to an anonymous caller for a Library publication', async () => {
+      mockAnthologyService.findOne.mockResolvedValue({ id: 7 });
+      mockService.getStoriesByAnthology.mockResolvedValue([StoriesSeed[0]]);
+
+      await expect(
+        controller.getStoriesByAnthology(7, undefined, { user: undefined }),
+      ).resolves.toEqual([StoriesSeed[0]]);
+      expect(mockService.getStoriesByAnthology).toHaveBeenCalledWith(7, true);
+    });
+
+    it('applies the Library rule for staff when library=true', async () => {
+      mockAnthologyService.findOne.mockResolvedValue(null);
+
+      await expect(
+        controller.getStoriesByAnthology(7, 'true', staff),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('get library story', () => {
+    it('passes the Library rule to the query for an anonymous caller', async () => {
+      mockService.findByAnthologyAndId.mockResolvedValue(StoriesSeed[0]);
+
+      await controller.getStory(7, 3, undefined, { user: undefined });
+      expect(mockService.findByAnthologyAndId).toHaveBeenCalledWith(7, 3, true);
+    });
+
+    it('does not apply it for staff without the flag', async () => {
+      mockService.findByAnthologyAndId.mockResolvedValue(StoriesSeed[0]);
+
+      await controller.getStory(7, 3, undefined, { user: { id: 1 } });
+      expect(mockService.findByAnthologyAndId).toHaveBeenCalledWith(
+        7,
+        3,
+        false,
+      );
     });
   });
 

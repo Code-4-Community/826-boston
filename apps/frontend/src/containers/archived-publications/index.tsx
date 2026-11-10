@@ -148,7 +148,12 @@ export default function ArchivedPublications({
   const activeTrackerTab = TRACKER_TABS.find((t) => t.slug === tab);
 
   useEffect(() => {
-    const body = buildFilterSortBody(appliedFilters);
+    // The Library shows only eligible publications, even to logged-in staff;
+    // the Tracker (same component, same route until #197) shows everything
+    const body = {
+      ...buildFilterSortBody(appliedFilters),
+      library: mode === 'archive',
+    };
 
     apiClient
       .filterSortAnthologies(body)
@@ -160,7 +165,7 @@ export default function ArchivedPublications({
       .catch((err) => {
         console.log(err);
       });
-  }, [appliedFilters]);
+  }, [appliedFilters, mode]);
 
   if (mode === 'tracker' && !activeTrackerTab) {
     return <Navigate to="/tracker/all" replace />;

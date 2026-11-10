@@ -21,6 +21,7 @@ export const mockAnthology: Anthology = {
   ageCategories: [],
   publishedDate: undefined,
   status: AnthologyStatus.ARCHIVED,
+  releaseFormsOnFile: true,
   pubLevel: AnthologyPubLevel.ZINE,
   photoUrl: '',
   isbn: '',

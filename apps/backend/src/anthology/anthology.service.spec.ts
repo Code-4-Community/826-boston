@@ -5,6 +5,11 @@ import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
 import { AgeCategory, AnthologyStatus, AnthologyPubLevel } from './types';
 import { AnthologySortOption } from './dtos/filter-anthology.dto';
+import {
+  isLibraryEligible,
+  isLibraryRequest,
+  LIBRARY_STATUSES,
+} from './library-eligibility';
 
 const mockAnthology1: Anthology = {
   id: 1,
@@ -20,6 +25,7 @@ const mockAnthology1: Anthology = {
   programs: ['after-school'],
   sponsors: [],
   status: AnthologyStatus.AWAITING_REVIEW,
+  releaseFormsOnFile: false,
   pubLevel: AnthologyPubLevel.ZINE,
   photoUrl: '',
   isbn: '',
@@ -48,6 +54,7 @@ const mockAnthology2: Anthology = {
   programs: ['summer'],
   sponsors: [],
   status: AnthologyStatus.DRAFTING,
+  releaseFormsOnFile: false,
   pubLevel: AnthologyPubLevel.CHAPBOOK,
   photoUrl: '',
   isbn: '',
@@ -76,6 +83,7 @@ const mockAnthology3: Anthology = {
   programs: ['in-school'],
   sponsors: [],
   status: AnthologyStatus.NOT_STARTED,
+  releaseFormsOnFile: false,
   pubLevel: AnthologyPubLevel.PERFECT_BOUND,
   photoUrl: '',
   isbn: '',
@@ -322,6 +330,7 @@ describe('AnthologyService', () => {
         complete({
           pubLevel: AnthologyPubLevel.PERFECT_BOUND,
           isbn: '978-0-00-000000-0',
+          releaseFormsOnFile: true,
         }),
       );
 
@@ -330,6 +339,150 @@ describe('AnthologyService', () => {
       });
 
       expect(result.status).toBe(AnthologyStatus.CAN_BE_SHARED);
+    });
+
+    it('blocks Can Be Shared without release forms', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({ releaseFormsOnFile: false }),
+      );
+
+      await expect(
+        service.update(1, { status: AnthologyStatus.CAN_BE_SHARED }),
+      ).rejects.toMatchObject({
+        response: { missingFields: ['release forms'] },
+      });
+      expect(mockRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('allows Can Be Shared with release forms', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({ releaseFormsOnFile: true }),
+      );
+
+      const result = await service.update(1, {
+        status: AnthologyStatus.CAN_BE_SHARED,
+      });
+
+      expect(result.status).toBe(AnthologyStatus.CAN_BE_SHARED);
+    });
+
+    it('allows marking release forms and Can Be Shared in one update', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({ releaseFormsOnFile: false }),
+      );
+
+      const result = await service.update(1, {
+        status: AnthologyStatus.CAN_BE_SHARED,
+        releaseFormsOnFile: true,
+      });
+
+      expect(result.status).toBe(AnthologyStatus.CAN_BE_SHARED);
+    });
+
+    it('allows unmarking release forms on a shared publication', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({
+          status: AnthologyStatus.CAN_BE_SHARED,
+          releaseFormsOnFile: true,
+        }),
+      );
+
+      const result = await service.update(1, { releaseFormsOnFile: false });
+
+      expect(result.releaseFormsOnFile).toBe(false);
+      expect(result.status).toBe(AnthologyStatus.CAN_BE_SHARED);
+    });
+
+    it('applies the same rules through updateStatus', async () => {
+      mockRepository.findOneBy.mockResolvedValue(
+        complete({ releaseFormsOnFile: false }),
+      );
+
+      await expect(
+        service.updateStatus(1, AnthologyStatus.CAN_BE_SHARED),
+      ).rejects.toMatchObject({
+        response: { missingFields: ['release forms'] },
+      });
+    });
+  });
+
+  describe('Library eligibility', () => {
+    it.each([
+      [AnthologyStatus.NOT_STARTED, false, false],
+      [AnthologyStatus.NOT_STARTED, true, false],
+      [AnthologyStatus.DRAFTING, false, false],
+      [AnthologyStatus.DRAFTING, true, false],
+      [AnthologyStatus.AWAITING_REVIEW, false, false],
+      [AnthologyStatus.AWAITING_REVIEW, true, false],
+      [AnthologyStatus.CAN_BE_SHARED, false, false],
+      [AnthologyStatus.CAN_BE_SHARED, true, true],
+      [AnthologyStatus.ARCHIVED, false, false],
+      [AnthologyStatus.ARCHIVED, true, true],
+    ])(
+      '%s with release forms on file = %s is eligible: %s',
+      (status, releaseFormsOnFile, expected) => {
+        expect(isLibraryEligible({ status, releaseFormsOnFile })).toBe(
+          expected,
+        );
+      },
+    );
+
+    it.each([
+      [undefined, undefined, true],
+      [undefined, 'true', true],
+      [{ id: 1 }, undefined, false],
+      [{ id: 1 }, 'false', false],
+      [{ id: 1 }, 'true', true],
+      [{ id: 1 }, true, true],
+    ])('isLibraryRequest(user=%j, flag=%j) → %s', (user, flag, expected) => {
+      expect(isLibraryRequest(user, flag)).toBe(expected);
+    });
+
+    const libraryCondition = {
+      status: In(LIBRARY_STATUSES),
+      releaseFormsOnFile: true,
+    };
+
+    it('findOne filters by eligibility in the query when libraryOnly', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(service.findOne(1, true)).resolves.toBeNull();
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({
+        id: 1,
+        ...libraryCondition,
+      });
+    });
+
+    it('findOne does not filter by default', async () => {
+      mockRepository.findOneBy.mockResolvedValue(mockAnthology2);
+
+      await service.findOne(1);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+    });
+
+    it('findAll filters by eligibility in the query when libraryOnly', async () => {
+      mockRepository.find.mockResolvedValue([]);
+
+      await service.findAll(true);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: libraryCondition,
+      });
+    });
+
+    it('findWithFilterSort combines eligibility with the other filters', async () => {
+      mockRepository.find.mockResolvedValue([]);
+
+      await service.findWithFilterSort(
+        { pubLevels: [AnthologyPubLevel.ZINE] },
+        true,
+      );
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: {
+          ...libraryCondition,
+          pubLevel: In([AnthologyPubLevel.ZINE]),
+        },
+        order: {},
+      });
     });
   });
 });
