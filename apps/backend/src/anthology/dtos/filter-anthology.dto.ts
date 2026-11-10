@@ -5,6 +5,7 @@ import {
   IsOptional,
   ValidateNested,
   IsArray,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { IntersectionType } from '@nestjs/swagger';
@@ -45,6 +46,11 @@ export class FilterAnthologyDto {
   @IsArray()
   @IsString({ each: true })
   genres?: string[];
+
+  // Set by the Library page so logged-in staff see exactly what the public sees
+  @IsOptional()
+  @IsBoolean()
+  library?: boolean;
 }
 
 export class SortAnthologyDto {

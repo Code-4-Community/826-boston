@@ -190,6 +190,10 @@ const ProjectPublicationView: React.FC = () => {
               anthologyId={anthology.id}
               shopifyUrl={anthology.shopify_url || anthology.shopifyUrl}
               isbn={anthology.isbn}
+              releaseFormsOnFile={anthology.releaseFormsOnFile}
+              releaseFormsUrl={anthology.releaseFormsUrl}
+              currentUser={currentUser}
+              onAnthologyChange={setAnthology}
             />
           </div>
         )}

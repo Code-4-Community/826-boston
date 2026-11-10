@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { AnthologyController } from './anthology.controller';
 import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
@@ -12,13 +13,21 @@ describe('AnthologyController', () => {
   let service: {
     create: jest.Mock;
     update: jest.Mock;
+    findOne: jest.Mock;
+    findAll: jest.Mock;
+    findWithFilterSort: jest.Mock;
   };
+  let inventoryHoldingService: { findLocationsByAnthology: jest.Mock };
 
   beforeEach(async () => {
     service = {
       create: jest.fn(),
       update: jest.fn(),
+      findOne: jest.fn(),
+      findAll: jest.fn(),
+      findWithFilterSort: jest.fn(),
     };
+    inventoryHoldingService = { findLocationsByAnthology: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AnthologyController],
@@ -27,7 +36,7 @@ describe('AnthologyController', () => {
         { provide: AwsS3Service, useValue: { uploadFile: jest.fn() } },
         {
           provide: InventoryHoldingService,
-          useValue: { findLocationsByAnthology: jest.fn() },
+          useValue: inventoryHoldingService,
         },
       ],
     }).compile();
@@ -131,6 +140,74 @@ describe('AnthologyController', () => {
       });
 
       expect(result).toBe(updated);
+    });
+  });
+
+  describe('Library gating on public routes', () => {
+    const anonymous = { user: undefined };
+    const staff = { user: { id: 1 } };
+
+    it('getAnthology 404s for an anonymous caller on an ineligible publication', async () => {
+      service.findOne.mockResolvedValue(null);
+
+      await expect(
+        controller.getAnthology(1, undefined, anonymous),
+      ).rejects.toThrow(NotFoundException);
+      expect(service.findOne).toHaveBeenCalledWith(1, true);
+    });
+
+    it('getAnthology does not filter for staff without the library flag', async () => {
+      service.findOne.mockResolvedValue({ id: 1 });
+
+      await controller.getAnthology(1, undefined, staff);
+      expect(service.findOne).toHaveBeenCalledWith(1, false);
+    });
+
+    it('getAnthology filters for staff with library=true', async () => {
+      service.findOne.mockResolvedValue(null);
+
+      await expect(controller.getAnthology(1, 'true', staff)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(service.findOne).toHaveBeenCalledWith(1, true);
+    });
+
+    it('getAnthologyInventory 404s for an anonymous caller on an ineligible publication', async () => {
+      service.findOne.mockResolvedValue(null);
+
+      await expect(
+        controller.getAnthologyInventory(1, undefined, anonymous),
+      ).rejects.toThrow(NotFoundException);
+      expect(service.findOne).toHaveBeenCalledWith(1, true);
+      expect(
+        inventoryHoldingService.findLocationsByAnthology,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('getAllAnthologies filters for anonymous callers only', async () => {
+      service.findAll.mockResolvedValue([]);
+
+      await controller.getAllAnthologies(undefined, anonymous);
+      expect(service.findAll).toHaveBeenLastCalledWith(true);
+
+      await controller.getAllAnthologies(undefined, staff);
+      expect(service.findAll).toHaveBeenLastCalledWith(false);
+    });
+
+    it('filterSort filters for anonymous callers and Library requests, not the Tracker', async () => {
+      service.findWithFilterSort.mockResolvedValue([]);
+
+      await controller.filterSort({}, anonymous);
+      expect(service.findWithFilterSort).toHaveBeenLastCalledWith({}, true);
+
+      await controller.filterSort({ library: true }, staff);
+      expect(service.findWithFilterSort).toHaveBeenLastCalledWith(
+        { library: true },
+        true,
+      );
+
+      await controller.filterSort({}, staff);
+      expect(service.findWithFilterSort).toHaveBeenLastCalledWith({}, false);
     });
   });
 });

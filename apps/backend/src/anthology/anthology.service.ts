@@ -19,6 +19,7 @@ import {
   AnthologySortOption,
   FilterSortAnthologyDto,
 } from './dtos/filter-anthology.dto';
+import { libraryWhere } from './library-eligibility';
 
 @Injectable()
 export class AnthologyService {
@@ -54,16 +55,18 @@ export class AnthologyService {
     return this.repo.save(anthology);
   }
 
-  findOne(id: number) {
+  findOne(id: number, libraryOnly = false) {
     if (!id) {
       return null;
     }
 
-    return this.repo.findOneBy({ id });
+    return this.repo.findOneBy(libraryOnly ? { id, ...libraryWhere } : { id });
   }
 
-  findAll() {
-    return this.repo.find();
+  findAll(libraryOnly = false) {
+    return libraryOnly
+      ? this.repo.find({ where: libraryWhere })
+      : this.repo.find();
   }
 
   findByStatus(status: AnthologyStatus) {
@@ -118,6 +121,19 @@ export class AnthologyService {
       });
     }
 
+    // Only checked when the status is being changed, so unmarking release
+    // forms on an already-shared publication is allowed (it just leaves the Library)
+    if (
+      attrs.status === AnthologyStatus.CAN_BE_SHARED &&
+      !updated.releaseFormsOnFile
+    ) {
+      throw new BadRequestException({
+        message:
+          'Release forms must be on file before this publication can be shared',
+        missingFields: ['release forms'],
+      });
+    }
+
     return this.repo.save(anthology);
   }
 
@@ -131,19 +147,18 @@ export class AnthologyService {
     return this.repo.remove(anthology);
   }
 
+  // Goes through update() so status rules (e.g. release forms) can't be skipped
   async updateStatus(id: number, status: AnthologyStatus) {
-    const anthology = await this.findOne(id);
-
-    if (!anthology) {
-      throw new NotFoundException('Anthology not found');
-    }
-
-    anthology.status = status;
-    return this.repo.save(anthology);
+    return this.update(id, { status });
   }
 
-  findWithFilterSort(dto: FilterSortAnthologyDto): Promise<Anthology[]> {
-    const where: FindOptionsWhere<Anthology> = {};
+  findWithFilterSort(
+    dto: FilterSortAnthologyDto,
+    libraryOnly = false,
+  ): Promise<Anthology[]> {
+    const where: FindOptionsWhere<Anthology> = libraryOnly
+      ? { ...libraryWhere }
+      : {};
     const order: FindOptionsOrder<Anthology> = {};
 
     if (dto.pubDateRange) {

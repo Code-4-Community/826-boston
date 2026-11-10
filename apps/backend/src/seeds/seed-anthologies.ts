@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { ProductionInfo } from 'src/production-info/production-info.entity';
+import { AnthologyStatus } from 'src/anthology/types';
 import { AnthologiesSeed } from './anthologies.seed';
 import { ProductionInfoSeed } from './production-info.seed';
 
@@ -17,7 +18,14 @@ export async function seedAnthologies(dataSource: DataSource) {
 
     if (!exists) {
       const savedAnthology = await anthologyRepo.save(
-        anthologyRepo.create(data),
+        anthologyRepo.create({
+          // Public publications default to on file, matching the migration
+          // backfill; an explicit value in the seed data wins
+          releaseFormsOnFile:
+            data.status === AnthologyStatus.CAN_BE_SHARED ||
+            data.status === AnthologyStatus.ARCHIVED,
+          ...data,
+        }),
       );
       console.log(`  ✓ Created anthology: ${savedAnthology.title}`);
     } else {

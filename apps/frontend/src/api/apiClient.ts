@@ -25,7 +25,17 @@ export interface FilterSortAnthologyBody {
   programs?: string[];
   genres?: string[];
   sortBy?: string;
+  /** Only Library-eligible publications, even for logged-in staff. */
+  library?: boolean;
 }
+
+/** Options for public reads; `library` applies the public Library rule. */
+export interface LibraryOptions {
+  library?: boolean;
+}
+
+const libraryQuery = ({ library }: LibraryOptions = {}) =>
+  library ? '?library=true' : '';
 
 export interface StoryDocumentRow {
   storyId: number;
@@ -111,13 +121,20 @@ export class ApiClient {
     return this.get('/api') as Promise<string>;
   }
 
-  public async getAnthologies(): Promise<Anthology[]> {
-    const data = await this.get('/api/anthologies');
+  public async getAnthologies(
+    options: LibraryOptions = {},
+  ): Promise<Anthology[]> {
+    const data = await this.get(`/api/anthologies${libraryQuery(options)}`);
     return normalizeAnthologies(data);
   }
 
-  public async getAnthology(id: string | number): Promise<Anthology> {
-    const data = await this.get(`/api/anthologies/${id}`);
+  public async getAnthology(
+    id: string | number,
+    options: LibraryOptions = {},
+  ): Promise<Anthology> {
+    const data = await this.get(
+      `/api/anthologies/${id}${libraryQuery(options)}`,
+    );
     return normalizeAnthology(data);
   }
 
@@ -127,9 +144,10 @@ export class ApiClient {
    */
   public async getAnthologyInventory(
     id: string | number,
+    options: LibraryOptions = {},
   ): Promise<AnthologyInventory> {
     return this.get(
-      `/api/anthologies/${id}/inventory`,
+      `/api/anthologies/${id}/inventory${libraryQuery(options)}`,
     ) as Promise<AnthologyInventory>;
   }
 
@@ -145,10 +163,11 @@ export class ApiClient {
 
   public async getStoriesByAnthology(
     anthologyId: string | number,
+    options: LibraryOptions = {},
   ): Promise<Story[]> {
-    return this.get(`/api/stories/anthology/${anthologyId}`) as Promise<
-      Story[]
-    >;
+    return this.get(
+      `/api/stories/anthology/${anthologyId}${libraryQuery(options)}`,
+    ) as Promise<Story[]>;
   }
 
   public async getStoryDocuments(

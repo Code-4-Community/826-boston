@@ -216,14 +216,17 @@ const PublicationView: React.FC = () => {
   useEffect(() => {
     if (id) {
       setLoading(true);
+      // Library pages only show eligible publications, logged in or not; the
+      // API 404s otherwise and we show the "isn't available" page below
       apiClient
-        .getAnthology(id)
+        .getAnthology(id, { library: true })
         .then((data) => {
           setAnthology(data);
           setLoading(false);
         })
         .catch((err) => {
           console.error(err);
+          setAnthology(null);
           setLoading(false);
         });
     } else {
@@ -235,7 +238,7 @@ const PublicationView: React.FC = () => {
   useEffect(() => {
     if (anthology?.id) {
       apiClient
-        .getStoriesByAnthology(anthology.id)
+        .getStoriesByAnthology(anthology.id, { library: true })
         .then((stories: Story[]) => {
           const authorNames = [
             ...new Set(stories.map((s) => s.author?.name).filter(Boolean)),
@@ -251,7 +254,7 @@ const PublicationView: React.FC = () => {
   useEffect(() => {
     if (id) {
       apiClient
-        .getAnthologyInventory(id)
+        .getAnthologyInventory(id, { library: true })
         .then((data) => {
           setInventoryLocations(data.locations ?? []);
           setTotalCopies(data.totalCopies ?? 0);
@@ -280,7 +283,12 @@ const PublicationView: React.FC = () => {
 
   if (loading) return <div className="publication-view">Loading...</div>;
   if (!anthology)
-    return <div className="publication-view">No anthology found</div>;
+    return (
+      <div className="publication-view publication-view--unavailable">
+        <h2>This publication isn't available</h2>
+        <p>It may not be published yet, or the link may be incorrect.</p>
+      </div>
+    );
 
   const fullDescription = anthology.description || 'No description available.';
 

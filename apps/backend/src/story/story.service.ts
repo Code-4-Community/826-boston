@@ -4,6 +4,7 @@ import { In, Repository } from 'typeorm';
 
 import { Story } from './story.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
+import { libraryWhere } from 'src/anthology/library-eligibility';
 import { Author } from 'src/author/author.entity';
 import { StoryDraft } from 'src/story-draft/story-draft.entity';
 import {
@@ -46,9 +47,13 @@ export class StoryService {
     return this.repo.find();
   }
 
-  async getStoriesByAnthology(anthologyId: number) {
+  async getStoriesByAnthology(anthologyId: number, libraryOnly = false) {
     return this.repo.find({
-      where: { anthology: { id: anthologyId } },
+      where: {
+        anthology: libraryOnly
+          ? { id: anthologyId, ...libraryWhere }
+          : { id: anthologyId },
+      },
       relations: ['storyDraft', 'author', 'anthology'],
     });
   }
@@ -164,11 +169,14 @@ export class StoryService {
   async findByAnthologyAndId(
     anthologyId: number,
     storyId: number,
+    libraryOnly = false,
   ): Promise<Story> {
     const story = await this.repo.findOne({
       where: {
         id: storyId,
-        anthology: { id: anthologyId },
+        anthology: libraryOnly
+          ? { id: anthologyId, ...libraryWhere }
+          : { id: anthologyId },
       },
     });
 

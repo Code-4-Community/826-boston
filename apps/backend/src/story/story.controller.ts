@@ -11,6 +11,7 @@ import {
   NotFoundException,
   ParseBoolPipe,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { StoryService } from './story.service';
 import { Story } from './story.entity';
@@ -33,6 +34,10 @@ import {
   StoryDocumentsFilters,
 } from './dtos/story-document-row.dto';
 import { Public } from 'src/auth/roles.decorator';
+import { isLibraryRequest } from '../anthology/library-eligibility';
+
+// On @Public() routes the JWT guard still sets `user` when a valid token is sent
+type MaybeAuthedRequest = { user?: unknown };
 
 const MAX_DOCUMENTS_PAGE_SIZE = 100;
 const DOCUMENT_CHECKPOINTS: DocumentCheckpoint[] = [
@@ -119,10 +124,20 @@ export class StoryController {
   @Get('/anthology/:anthologyId')
   async getStoriesByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
   ): Promise<Story[]> {
-    const stories = await this.storyService.getStoriesByAnthology(anthologyId);
+    const libraryOnly = isLibraryRequest(req?.user, library);
 
-    return stories;
+    // A hidden publication should 404, not return an empty list
+    if (
+      libraryOnly &&
+      !(await this.anthologyService.findOne(anthologyId, true))
+    ) {
+      throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
+    }
+
+    return this.storyService.getStoriesByAnthology(anthologyId, libraryOnly);
   }
 
   @Public()
@@ -262,8 +277,14 @@ export class StoryController {
   async getStory(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
     @Param('storyId', ParseIntPipe) storyId: number,
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
   ): Promise<Story> {
-    return this.storyService.findByAnthologyAndId(anthologyId, storyId);
+    return this.storyService.findByAnthologyAndId(
+      anthologyId,
+      storyId,
+      isLibraryRequest(req?.user, library),
+    );
   }
 
   @ApiBearerAuth()

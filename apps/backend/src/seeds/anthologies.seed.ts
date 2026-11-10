@@ -23,6 +23,9 @@ export interface AnthologySeedItem {
   shopifyUrl?: string;
   subtitle?: string;
   productionInfoId?: number;
+  // Defaults to true for Can Be Shared/Archived in seed-anthologies.ts
+  releaseFormsOnFile?: boolean;
+  releaseFormsUrl?: string;
 }
 
 export const AnthologiesSeed: AnthologySeedItem[] = [
@@ -132,6 +135,8 @@ export const AnthologiesSeed: AnthologySeedItem[] = [
     programs: ['YABP', 'YLAB'],
     sponsors: ["Finding One's Voice Inc.", 'Mass Cultural Council'],
     status: AnthologyStatus.CAN_BE_SHARED,
+    // No release forms, so it's hidden from the Library (tests the gate)
+    releaseFormsOnFile: false,
     pubLevel: AnthologyPubLevel.SIGNATURE,
     isbn: '979-8-88694-106-7',
     photoUrl:
