@@ -125,14 +125,6 @@ export class TaskService {
       task.personInCharge = user;
     }
 
-    if (fields.name === null) {
-      throw new BadRequestException('Task name cannot be null');
-    }
-
-    if (fields.status === null) {
-      throw new BadRequestException('Task status cannot be null');
-    }
-
     this.validateDates(
       fields.timeFrame ?? task.timeFrame,
       fields.dueBy ?? task.dueBy,

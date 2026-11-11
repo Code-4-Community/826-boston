@@ -312,22 +312,6 @@ describe('TaskService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw BadRequestException if name is null', async () => {
-      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
-
-      await expect(
-        service.update(1, 1, { name: null } as unknown as UpdateTaskDto),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException if status is null', async () => {
-      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
-
-      await expect(
-        service.update(1, 1, { status: null } as unknown as UpdateTaskDto),
-      ).rejects.toThrow(BadRequestException);
-    });
-
     it('should throw BadRequestException if due date is before time frame', async () => {
       mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
 
