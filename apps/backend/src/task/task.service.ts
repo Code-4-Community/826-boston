@@ -63,6 +63,8 @@ export class TaskService {
     anthologyId: number,
     createTaskDto: CreateTaskDto,
   ): Promise<TaskResponseDto> {
+    this.validateDates(createTaskDto.timeFrame, createTaskDto.dueBy);
+
     const anthology = await this.anthologyRepository.findOne({
       where: { id: anthologyId },
     });
@@ -130,6 +132,11 @@ export class TaskService {
     if (fields.status === null) {
       throw new BadRequestException('Task status cannot be null');
     }
+
+    this.validateDates(
+      fields.timeFrame ?? task.timeFrame,
+      fields.dueBy ?? task.dueBy,
+    );
 
     Object.assign(task, fields);
     return this.toResponseDto(await this.taskRepository.save(task));
@@ -201,6 +208,12 @@ export class TaskService {
     }
 
     await this.taskAttachmentRepository.remove(taskAttachment);
+  }
+
+  private validateDates(timeFrame: Date, dueBy: Date): void {
+    if (new Date(dueBy) < new Date(timeFrame)) {
+      throw new BadRequestException('Due date cannot be before the time frame');
+    }
   }
 
   private toResponseDto(t: Task): TaskResponseDto {

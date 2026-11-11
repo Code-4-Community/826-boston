@@ -73,7 +73,11 @@ describe('TaskController', () => {
   });
 
   describe('create', () => {
-    const createTaskDto: CreateTaskDto = { name: 'Draft Check-Point' };
+    const createTaskDto: CreateTaskDto = {
+      name: 'Draft Check-Point',
+      timeFrame: new Date('2026-10-05'),
+      dueBy: new Date('2026-10-10'),
+    };
     const mockTask: TaskResponseDto = {
       id: 1,
       name: 'Draft Check-Point',

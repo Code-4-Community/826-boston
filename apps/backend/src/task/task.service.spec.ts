@@ -89,6 +89,7 @@ describe('TaskService', () => {
       name: 'Draft Check-Point',
       areaOfWork: AreaOfWork.CHECKPOINT,
       status: TaskStatus.NOT_STARTED,
+      timeFrame: new Date('2026-10-05'),
       dueBy: new Date('2026-10-10'),
       personInCharge: {
         id: 2,
@@ -167,6 +168,8 @@ describe('TaskService', () => {
       name: 'Draft Check-Point',
       areaOfWork: AreaOfWork.CHECKPOINT,
       personInChargeId: 2,
+      timeFrame: new Date('2026-10-05'),
+      dueBy: new Date('2026-10-10'),
     };
     const savedTask = {
       id: 1,
@@ -194,6 +197,15 @@ describe('TaskService', () => {
       await expect(service.create(1, createTaskDto)).rejects.toThrow(
         BadRequestException,
       );
+    });
+
+    it('should throw BadRequestException if due date is before time frame', async () => {
+      mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+
+      await expect(
+        service.create(1, { ...createTaskDto, dueBy: new Date('2026-10-01') }),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should successfully create a task', async () => {
@@ -227,10 +239,16 @@ describe('TaskService', () => {
       mockTaskRepository.create.mockReturnValue(unassignedTask);
       mockTaskRepository.save.mockResolvedValue(unassignedTask);
 
-      const result = await service.create(1, { name: 'Draft Check-Point' });
+      const result = await service.create(1, {
+        name: 'Draft Check-Point',
+        timeFrame: new Date('2026-10-05'),
+        dueBy: new Date('2026-10-10'),
+      });
 
       expect(taskRepository.create).toHaveBeenCalledWith({
         name: 'Draft Check-Point',
+        timeFrame: new Date('2026-10-05'),
+        dueBy: new Date('2026-10-10'),
         anthology: mockAnthology,
         personInCharge: undefined,
       });
@@ -252,6 +270,8 @@ describe('TaskService', () => {
       id: 1,
       name: 'Draft Check-Point',
       status: TaskStatus.NOT_STARTED,
+      timeFrame: new Date('2026-10-05'),
+      dueBy: new Date('2026-10-10'),
       anthology: { id: 1 } as Anthology,
       personInCharge: {
         id: 2,
@@ -308,6 +328,33 @@ describe('TaskService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should throw BadRequestException if due date is before time frame', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+
+      await expect(
+        service.update(1, 1, {
+          timeFrame: new Date('2026-10-12'),
+          dueBy: new Date('2026-10-11'),
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if new due date is before saved time frame', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+
+      await expect(
+        service.update(1, 1, { dueBy: new Date('2026-10-01') }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if new time frame is after saved due date', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+
+      await expect(
+        service.update(1, 1, { timeFrame: new Date('2026-10-12') }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should successfully update a task', async () => {
       mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
       mockUserRepository.findOne.mockResolvedValue({
@@ -326,6 +373,8 @@ describe('TaskService', () => {
         id: 1,
         name: 'Draft Check-Point',
         status: TaskStatus.COMPLETE,
+        timeFrame: new Date('2026-10-05'),
+        dueBy: new Date('2026-10-10'),
         createdAt: new Date('2026-10-01'),
         updatedAt: new Date('2026-10-01'),
         personInCharge: { id: 3, firstName: 'Jane', lastName: 'Smith' },

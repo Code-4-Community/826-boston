@@ -39,11 +39,11 @@ export class Task {
   @JoinColumn({ name: 'person_in_charge_id' })
   personInCharge?: Relation<User> | null;
 
-  @Column({ type: 'date', nullable: true })
-  timeFrame?: Date;
+  @Column({ type: 'date' })
+  timeFrame: Date;
 
-  @Column({ type: 'date', nullable: true })
-  dueBy?: Date;
+  @Column({ type: 'date' })
+  dueBy: Date;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.tasks, {
     nullable: false,

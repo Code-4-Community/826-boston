@@ -42,16 +42,14 @@ export class CreateTaskDto {
   @IsInt()
   personInChargeId?: number;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description:
       'Start of the week the task happens in. Displayed as "Week of MM/DD".',
   })
-  @IsOptional()
   @IsDateString()
-  timeFrame?: Date;
+  timeFrame: Date;
 
-  @ApiPropertyOptional({ description: 'Task deadline' })
-  @IsOptional()
+  @ApiProperty({ description: 'Task deadline' })
   @IsDateString()
-  dueBy?: Date;
+  dueBy: Date;
 }
