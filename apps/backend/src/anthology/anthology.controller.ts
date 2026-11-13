@@ -23,11 +23,9 @@ import {
   ApiBearerAuth,
   ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiConflictResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
 import { FilterSortAnthologyDto } from './dtos/filter-anthology.dto';
@@ -48,7 +46,6 @@ interface UploadedFileType {
   buffer: Buffer;
   size: number;
 }
-import { AnthologyPubLevel } from './types';
 
 @ApiTags('Anthologies')
 @Controller('anthologies')
@@ -281,13 +278,11 @@ export class AnthologyController {
       example: {
         id: 42,
         title: 'New Anthology 2024',
-        description: 'A new collection of student works',
+        description: '',
         status: 'Not Started',
-        pubLevel: 'internal',
-        programs: ['after-school', 'workshop'],
-        photoUrl: null,
-        isbn: null,
-        shopifyUrl: null,
+        pubLevel: 'Zine',
+        programs: ['Tutoring'],
+        publishedDate: '2026-06-01',
       },
     },
   })
@@ -301,6 +296,16 @@ export class AnthologyController {
       },
     },
   })
+  @ApiNotFoundResponse({
+    description: 'One or more owner IDs do not match a user',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Owners not found: 99',
+        error: 'Not Found',
+      },
+    },
+  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createAnthology(
@@ -308,12 +313,10 @@ export class AnthologyController {
   ): Promise<Anthology> {
     return this.anthologyService.create(
       createAnthologyDto.title,
-      createAnthologyDto.description,
-      createAnthologyDto.pub_level as AnthologyPubLevel,
+      createAnthologyDto.pub_level,
+      createAnthologyDto.owner_ids,
       createAnthologyDto.programs,
-      createAnthologyDto.photo_url,
-      createAnthologyDto.isbn,
-      createAnthologyDto.shopify_url,
+      createAnthologyDto.publicationDate,
     );
   }
 
@@ -365,17 +368,7 @@ export class AnthologyController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAnthologyDto: UpdateAnthologyDto,
   ): Promise<Anthology> {
-    const { photo_url, shopify_url, pub_level, ...rest } = updateAnthologyDto;
-    const attrs: Partial<Anthology> = { ...rest };
-
-    // DTO fields use snake_case to match the create payload, but the entity's
-    // TS properties (and therefore what TypeORM actually persists) are camelCase.
-    if (photo_url !== undefined) attrs.photoUrl = photo_url;
-    if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
-    if (pub_level !== undefined)
-      attrs.pubLevel = pub_level as AnthologyPubLevel;
-
-    return this.anthologyService.update(id, attrs);
+    return this.anthologyService.update(id, updateAnthologyDto);
   }
 
   @ApiBearerAuth()
@@ -449,8 +442,6 @@ export class AnthologyController {
       key,
       file.mimetype,
     );
-    return this.anthologyService.update(id, {
-      photoUrl: url,
-    } as UpdateAnthologyDto);
+    return this.anthologyService.update(id, { photo_url: url });
   }
 }

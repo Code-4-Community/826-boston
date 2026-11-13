@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   ArrayOverlap,
   Between,
+  DataSource,
   FindOptionsOrder,
   FindOptionsWhere,
   In,
@@ -10,38 +11,68 @@ import {
 } from 'typeorm';
 
 import { Anthology } from './anthology.entity';
-import { AgeCategory, AnthologyStatus, AnthologyPubLevel } from './types';
+import { OmchaiRole } from '../omchai/omchai.entity';
+import { OmchaiService } from '../omchai/omchai.service';
+import { User } from '../users/user.entity';
+import { AnthologyStatus, AnthologyPubLevel } from './types';
 import {
   AnthologySortOption,
   FilterSortAnthologyDto,
 } from './dtos/filter-anthology.dto';
+import { UpdateAnthologyDto } from './dtos/update-anthology.dto';
 
 @Injectable()
 export class AnthologyService {
   constructor(
     @InjectRepository(Anthology) private repo: Repository<Anthology>,
+    private dataSource: DataSource,
+    private omchaiService: OmchaiService,
   ) {}
 
   async create(
     title: string,
-    description: string,
     pubLevel: AnthologyPubLevel,
+    ownerIds: number[],
     programs?: string[],
-    photoUrl?: string,
-    isbn?: string,
-    shopifyUrl?: string,
+    publishedDate?: string,
   ) {
-    const anthology = this.repo.create({
-      title,
-      description,
-      pubLevel,
-      programs,
-      photoUrl,
-      isbn,
-      shopifyUrl,
-    });
+    // create an anthology and assign its owner in one all-or-nothing transaction
+    // prevents accidentally creating an unassigned anthology if a failure occurs
+    return this.dataSource.transaction(async (transactionManager) => {
+      const owners = await transactionManager.findBy(User, {
+        id: In(ownerIds),
+      });
+      if (owners.length !== ownerIds.length) {
+        const foundIds = new Set(owners.map((owner) => owner.id));
+        const missingIds = ownerIds.filter((id) => !foundIds.has(id));
+        throw new NotFoundException(
+          `Owners not found: ${missingIds.join(', ')}`,
+        );
+      }
 
-    return this.repo.save(anthology);
+      const transactionRepo = transactionManager.getRepository(Anthology);
+      const newAnthology = transactionRepo.create({
+        title,
+        pubLevel,
+        programs,
+      });
+      // only convert to a Date if a publishedDate was provided
+      if (publishedDate) {
+        newAnthology.publishedDate = new Date(publishedDate);
+      }
+      const anthology = await transactionRepo.save(newAnthology);
+
+      await this.omchaiService.createMany(
+        ownerIds.map((ownerId) => ({
+          anthologyId: anthology.id,
+          userId: ownerId,
+          role: OmchaiRole.OWNER,
+        })),
+        transactionManager,
+      );
+
+      return anthology;
+    });
   }
 
   findOne(id: number) {
@@ -68,12 +99,24 @@ export class AnthologyService {
     return this.repo.find({ where: { publishedDate } });
   }
 
-  async update(id: number, attrs: Partial<Anthology>) {
+  async update(id: number, updateAnthologyDto: UpdateAnthologyDto) {
     const anthology = await this.findOne(id);
 
     if (!anthology) {
       throw new NotFoundException('Anthology not found');
     }
+
+    const { photo_url, shopify_url, pub_level, publicationDate, ...rest } =
+      updateAnthologyDto;
+    const attrs: Partial<Anthology> = { ...rest };
+
+    // DTO fields use snake_case to match the create payload, but the entity's
+    // TS properties (and therefore what TypeORM actually persists) are camelCase.
+    // TODO: switch to consistent naming so we no longer need this block below
+    if (photo_url !== undefined) attrs.photoUrl = photo_url;
+    if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
+    if (pub_level !== undefined) attrs.pubLevel = pub_level;
+    if (publicationDate) attrs.publishedDate = new Date(publicationDate);
 
     Object.assign(anthology, attrs);
 

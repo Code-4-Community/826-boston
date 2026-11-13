@@ -1,9 +1,12 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ArrayOverlap, Between, In } from 'typeorm';
+import { ArrayOverlap, Between, DataSource, In } from 'typeorm';
 import { AnthologyService } from './anthology.service';
 import { Anthology } from './anthology.entity';
-import { AgeCategory, AnthologyStatus, AnthologyPubLevel } from './types';
+import { OmchaiRole } from '../omchai/omchai.entity';
+import { OmchaiService } from '../omchai/omchai.service';
+import { AnthologyStatus, AnthologyPubLevel } from './types';
 import { AnthologySortOption } from './dtos/filter-anthology.dto';
 
 const mockAnthology1: Anthology = {
@@ -102,6 +105,24 @@ describe('AnthologyService', () => {
     remove: jest.fn(),
   };
 
+  const mockTransactionRepo = {
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockTransactionManager = {
+    findBy: jest.fn(),
+    getRepository: jest.fn().mockReturnValue(mockTransactionRepo),
+  };
+
+  const mockDataSource = {
+    transaction: jest.fn((run) => run(mockTransactionManager)),
+  };
+
+  const mockOmchaiService = {
+    createMany: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -110,6 +131,8 @@ describe('AnthologyService', () => {
           provide: getRepositoryToken(Anthology),
           useValue: mockRepository,
         },
+        { provide: DataSource, useValue: mockDataSource },
+        { provide: OmchaiService, useValue: mockOmchaiService },
       ],
     }).compile();
 
@@ -122,6 +145,95 @@ describe('AnthologyService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('create', () => {
+    const anthology = { id: 42, title: 'New Anthology' } as Anthology;
+
+    it('saves the anthology and its owners in the same transaction', async () => {
+      mockTransactionManager.findBy.mockResolvedValue([{ id: 3 }, { id: 7 }]);
+      mockTransactionRepo.create.mockImplementation((data) => ({ ...data }));
+      mockTransactionRepo.save.mockResolvedValue(anthology);
+
+      const result = await service.create(
+        'New Anthology',
+        AnthologyPubLevel.ZINE,
+        [3, 7],
+        ['Tutoring'],
+        '2026-06-01',
+      );
+
+      expect(mockDataSource.transaction).toHaveBeenCalledTimes(1);
+      expect(mockTransactionRepo.save).toHaveBeenCalledWith({
+        title: 'New Anthology',
+        pubLevel: AnthologyPubLevel.ZINE,
+        programs: ['Tutoring'],
+        publishedDate: new Date('2026-06-01'),
+      });
+      expect(mockOmchaiService.createMany).toHaveBeenCalledWith(
+        [3, 7].map((userId) => ({
+          anthologyId: anthology.id,
+          userId,
+          role: OmchaiRole.OWNER,
+        })),
+        mockTransactionManager,
+      );
+      expect(result).toBe(anthology);
+    });
+
+    it('leaves publishedDate unset when no date is given', async () => {
+      mockTransactionManager.findBy.mockResolvedValue([{ id: 3 }]);
+      mockTransactionRepo.create.mockImplementation((data) => ({ ...data }));
+      mockTransactionRepo.save.mockResolvedValue(anthology);
+
+      await service.create('New Anthology', AnthologyPubLevel.ZINE, [3]);
+
+      expect(mockTransactionRepo.save.mock.calls[0][0]).not.toHaveProperty(
+        'publishedDate',
+      );
+    });
+
+    it('rethrows the error if assigning the owner fails', async () => {
+      mockTransactionManager.findBy.mockResolvedValue([{ id: 3 }]);
+      mockTransactionRepo.create.mockReturnValue(anthology);
+      mockTransactionRepo.save.mockResolvedValue(anthology);
+      mockOmchaiService.createMany.mockRejectedValueOnce(
+        new Error('assigning the owner failed'),
+      );
+
+      await expect(
+        service.create('New Anthology', AnthologyPubLevel.ZINE, [3]),
+      ).rejects.toThrow('assigning the owner failed');
+    });
+
+    it('throws NotFoundException if owners are missing', async () => {
+      mockTransactionManager.findBy.mockResolvedValue([{ id: 3 }]);
+
+      await expect(
+        service.create('New Anthology', AnthologyPubLevel.ZINE, [3, 99]),
+      ).rejects.toThrow(new NotFoundException('Owners not found: 99'));
+    });
+  });
+
+  describe('update', () => {
+    it('throws NotFoundException if the anthology does not exist', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      await expect(service.update(999, { title: 'Renamed' })).rejects.toThrow(
+        new NotFoundException('Anthology not found'),
+      );
+    });
+
+    it('only changes the fields that were sent', async () => {
+      mockRepository.findOneBy.mockResolvedValue({ ...mockAnthology1 });
+
+      await service.update(1, { title: 'Renamed' });
+
+      expect(mockRepository.save).toHaveBeenCalledWith({
+        ...mockAnthology1,
+        title: 'Renamed',
+      });
+    });
   });
 
   describe('findWithFilterSort', () => {

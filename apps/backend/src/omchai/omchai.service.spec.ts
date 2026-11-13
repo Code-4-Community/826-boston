@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
 import { OmchaiService } from './omchai.service';
 import { Omchai, OmchaiRole } from './omchai.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
@@ -64,6 +65,59 @@ describe('OmchaiService', () => {
       expect(mockRepository.create).toHaveBeenCalledWith(dto);
       expect(mockRepository.save).toHaveBeenCalledWith(mockOmchai);
       expect(result).toEqual(mockOmchai);
+    });
+  });
+
+  describe('createMany', () => {
+    const dto: CreateOmchaiDto = {
+      anthologyId: 1,
+      userId: 3,
+      role: OmchaiRole.OWNER,
+      datetimeAssigned: new Date(),
+    };
+
+    const expected = {
+      anthology: { id: 1 },
+      user: { id: 3 },
+      role: OmchaiRole.OWNER,
+      datetimeAssigned: dto.datetimeAssigned,
+    };
+
+    it('should use its own repo if a transaction manager is not provided', async () => {
+      mockRepository.create.mockImplementation((omchai) => omchai);
+      mockRepository.save.mockResolvedValue([mockOmchai]);
+
+      await service.createMany([dto]);
+
+      expect(mockRepository.save).toHaveBeenCalledWith([expected]);
+    });
+
+    it('should use the transaction repo when the transaction manager is provided', async () => {
+      const transactionRepo = {
+        create: jest.fn((omchai) => omchai),
+        save: jest.fn().mockResolvedValue([mockOmchai]),
+      };
+      const transactionManager = {
+        getRepository: jest.fn().mockReturnValue(transactionRepo),
+      } as unknown as EntityManager;
+
+      await service.createMany([dto], transactionManager);
+
+      expect(transactionRepo.save).toHaveBeenCalledWith([expected]);
+    });
+
+    it('should create one omchai per dto', async () => {
+      mockRepository.create.mockImplementation((omchai) => omchai);
+      mockRepository.save.mockResolvedValue([mockOmchai, mockOmchai]);
+
+      const result = await service.createMany([dto, { ...dto, userId: 7 }]);
+
+      expect(mockRepository.create).toHaveBeenCalledTimes(2);
+      expect(mockRepository.save).toHaveBeenCalledWith([
+        expected,
+        { ...expected, user: { id: 7 } },
+      ]);
+      expect(result).toEqual([mockOmchai, mockOmchai]);
     });
   });
 

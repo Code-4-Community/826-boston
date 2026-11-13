@@ -1,8 +1,6 @@
-import { IsNumber, IsEnum, IsDateString, IsObject } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsEnum, IsDateString, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OmchaiRole } from '../omchai.entity';
-import { Anthology } from 'src/anthology/anthology.entity';
-import { User } from 'src/users/user.entity';
 
 export class CreateOmchaiDto {
   @ApiProperty({ description: 'ID of the anthology' })
@@ -20,7 +18,8 @@ export class CreateOmchaiDto {
   @IsEnum(OmchaiRole)
   role: OmchaiRole;
 
-  @ApiProperty({ description: 'Date that the user was assigned' })
+  @ApiPropertyOptional({ description: 'Date that the user was assigned' })
+  @IsOptional()
   @IsDateString()
-  datetimeAssigned: Date;
+  datetimeAssigned?: Date;
 }

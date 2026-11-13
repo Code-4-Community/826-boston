@@ -46,15 +46,10 @@ describe('AnthologyController', () => {
   describe('createAnthology', () => {
     const dto: CreateAnthologyDto = {
       title: 'New Anthology',
-      description: 'A new collection of student works',
-      publicationDate: new Date('2026-06-01'),
       pub_level: AnthologyPubLevel.CHAPBOOK,
-      programs: ['after-school'],
-      photo_url: 'https://example.com/cover.jpg',
-      genres: ['fiction'],
-      themes: ['identity'],
-      isbn: '978-1-234567-89-0',
-      shopify_url: 'https://shop.example.com/new-anthology',
+      programs: ['Tutoring'],
+      publicationDate: '2026-06-01',
+      owner_ids: [3, 7],
     };
 
     // The service takes positional arguments, so a dropped or reordered one
@@ -67,12 +62,10 @@ describe('AnthologyController', () => {
 
       expect(service.create).toHaveBeenCalledWith(
         dto.title,
-        dto.description,
         dto.pub_level,
+        dto.owner_ids,
         dto.programs,
-        dto.photo_url,
-        dto.isbn,
-        dto.shopify_url,
+        dto.publicationDate,
       );
       expect(result).toBe(created);
     });
@@ -89,34 +82,6 @@ describe('AnthologyController', () => {
       expect(service.update).toHaveBeenCalledWith(5, {
         status: AnthologyStatus.DRAFTING,
       });
-    });
-
-    it('maps the snake_case dto fields to the entity property names', async () => {
-      service.update.mockResolvedValue({ id: 5 } as Anthology);
-
-      await controller.updateAnthology(5, {
-        photo_url: 'https://example.com/new.jpg',
-        shopify_url: 'https://shop.example.com/new',
-        pub_level: AnthologyPubLevel.SIGNATURE,
-      });
-
-      expect(service.update).toHaveBeenCalledWith(5, {
-        photoUrl: 'https://example.com/new.jpg',
-        shopifyUrl: 'https://shop.example.com/new',
-        pubLevel: AnthologyPubLevel.SIGNATURE,
-      });
-      const attrs = service.update.mock.calls[0][1];
-      expect(attrs).not.toHaveProperty('photo_url');
-      expect(attrs).not.toHaveProperty('shopify_url');
-      expect(attrs).not.toHaveProperty('pub_level');
-    });
-
-    it('only includes the fields that were sent', async () => {
-      service.update.mockResolvedValue({ id: 5 } as Anthology);
-
-      await controller.updateAnthology(5, { title: 'Renamed' });
-
-      expect(Object.keys(service.update.mock.calls[0][1])).toEqual(['title']);
     });
 
     it('returns the updated anthology', async () => {
