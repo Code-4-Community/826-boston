@@ -10,11 +10,17 @@ import StoryDraftDetailPanel, {
 import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
 import ApprovedDocumentsView from './approved-documents-view';
+import TasksView from './tasks-view';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
 
-type Tab = 'omchai' | 'documents' | 'approved-documents' | 'production-info';
+type Tab =
+  | 'omchai'
+  | 'documents'
+  | 'approved-documents'
+  | 'tasks'
+  | 'production-info';
 
 const ProjectPublicationView: React.FC = () => {
   const [, , currentUser] = useAuth();
@@ -193,6 +199,15 @@ const ProjectPublicationView: React.FC = () => {
           <button
             type="button"
             className={`publication-tab${
+              activeTab === 'tasks' ? ' publication-tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('tasks')}
+          >
+            Tasks
+          </button>
+          <button
+            type="button"
+            className={`publication-tab${
               activeTab === 'production-info' ? ' publication-tab--active' : ''
             }`}
             onClick={() => setActiveTab('production-info')}
@@ -222,6 +237,12 @@ const ProjectPublicationView: React.FC = () => {
               anthologyId={anthology.id}
               onRowClick={openDraftDetail}
             />
+          </div>
+        )}
+
+        {activeTab === 'tasks' && (
+          <div className="ppv-tab-content">
+            <TasksView anthologyId={anthology.id} />
           </div>
         )}
 

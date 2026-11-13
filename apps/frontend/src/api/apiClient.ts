@@ -12,6 +12,7 @@ import {
   Story,
   StoryDraft,
   SubmissionRound,
+  Task,
 } from '../types';
 import User from './dtos/user.dto';
 import Role from './dtos/role';
@@ -141,6 +142,10 @@ export class ApiClient {
       (data) => data as ProductionInfo,
       () => null,
     );
+  }
+
+  public async getTasks(anthologyId: string | number): Promise<Task[]> {
+    return this.get(`/api/anthologies/${anthologyId}/tasks`) as Promise<Task[]>;
   }
 
   public async getStoriesByAnthology(
