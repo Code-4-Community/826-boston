@@ -136,6 +136,7 @@ export interface OmchaiEntry {
   role: OmchaiRole;
   datetimeAssigned: string;
   user: OmchaiUser;
+  anthology?: Anthology;
 }
 
 export interface Anthology {
@@ -166,6 +167,33 @@ export interface Anthology {
   /** Required (with status Can Be Shared/Archived) for the public Library. */
   releaseFormsOnFile?: boolean;
   releaseFormsUrl?: string | null;
+  stories?: Story[];
+}
+
+export enum AreaOfWork {
+  PLANNING = 'PLANNING',
+  PROGRAMMING = 'PROGRAMMING',
+  CHECKPOINT = 'CHECKPOINT',
+  PRODUCTION = 'PRODUCTION',
+}
+
+export enum TaskStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETE = 'COMPLETE',
+}
+
+/** A task, from GET /anthologies/:anthologyId/tasks. */
+export interface Task {
+  id: number;
+  name: string;
+  areaOfWork?: AreaOfWork | null;
+  status: TaskStatus;
+  /** Postgres date columns, returned as YYYY-MM-DD strings. */
+  timeFrame: string;
+  dueBy: string;
+  personInCharge: { id: number; firstName: string; lastName: string } | null;
+  attachments: { id: number; fileName: string; fileUrl: string }[];
 }
 
 /** Production metadata for an anthology, from GET /production-info/:anthologyId. */

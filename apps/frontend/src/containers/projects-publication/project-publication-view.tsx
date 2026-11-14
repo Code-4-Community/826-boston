@@ -10,6 +10,7 @@ import OmchaiView from './omchai-view';
 import ProductionInfoView from './production-info-view';
 import ApprovedDocumentsView from './approved-documents-view';
 import PublicationDetailsView from './publication-details-view';
+import TasksView from './tasks-view';
 import useAuth from '../../hooks/useAuth';
 import './project-publication-view.css';
 
@@ -184,6 +185,12 @@ const ProjectPublicationView: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'tasks' && (
+          <div className="ppv-tab-content">
+            <TasksView anthologyId={anthology.id} />
+          </div>
+        )}
+
         {activeTab === 'production-info' && (
           <div className="ppv-tab-content">
             <ProductionInfoView
@@ -197,7 +204,6 @@ const ProjectPublicationView: React.FC = () => {
             />
           </div>
         )}
-        {activeTab === 'tasks' && <div className="ppv-tab-content">Tasks</div>}
       </div>
 
       {selectedDraft && (

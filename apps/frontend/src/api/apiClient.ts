@@ -12,6 +12,7 @@ import {
   Story,
   StoryDraft,
   SubmissionRound,
+  Task,
 } from '../types';
 import User from './dtos/user.dto';
 import Role from './dtos/role';
@@ -159,6 +160,10 @@ export class ApiClient {
       (data) => data as ProductionInfo,
       () => null,
     );
+  }
+
+  public async getTasks(anthologyId: string | number): Promise<Task[]> {
+    return this.get(`/api/anthologies/${anthologyId}/tasks`) as Promise<Task[]>;
   }
 
   public async getStoriesByAnthology(
@@ -313,6 +318,10 @@ export class ApiClient {
     return this.get(`/api/omchai/anthology/${anthologyId}`) as Promise<
       OmchaiEntry[]
     >;
+  }
+
+  public async getOmchaiByUser(userId: number): Promise<OmchaiEntry[]> {
+    return this.get(`/api/omchai/user/${userId}`) as Promise<OmchaiEntry[]>;
   }
 
   public async uploadAnthologyCoverImage(
