@@ -47,14 +47,6 @@
   margin: 0;
 }
 
-.filter-modal-subtitle {
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 12px;
-  color: #858585;
-  margin: 0;
-}
-
 .filter-modal-close {
   background: none;
   border: none;

@@ -91,7 +91,6 @@ export default function TrackerFilterModal({
         <FilterModalHeader
           onClose={onClose}
           title="Sort and Filter Results"
-          subtitle={null}
           closeIconSrc={CloseIcon}
         />
 

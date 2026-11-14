@@ -9,7 +9,10 @@ import {
   FilterSortAnthologyDto,
 } from './dtos/filter-anthology.dto';
 
-// escapes LIKE wildcards so user input is matched literally
+// escapes LIKE wildcards so user input is matched literally:
+//   %  matches any run of characters, including none
+//   _  matches exactly one character
+//   \  is Postgres's default LIKE escape character, so a raw one would escape the next character
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (char) => `\\${char}`);
 }
