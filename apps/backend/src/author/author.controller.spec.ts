@@ -1,5 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { Author } from './author.entity';
 import { AuthorController } from './author.controller';
 import { AuthorService } from './author.service';
@@ -8,6 +13,14 @@ import { EditAuthorDto } from './dtos/edit-author.dto';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from '../users/users.service';
+import { OmchaiService } from '../omchai/omchai.service';
+import { Omchai, OmchaiRole } from '../omchai/omchai.entity';
+import { Story } from '../story/story.entity';
+import { Anthology } from '../anthology/anthology.entity';
+import { Role } from '../users/types';
+
+const adminReq = { user: { id: 2, role: Role.ADMIN } } as never;
+const standardReq = { user: { id: 1, role: Role.STANDARD } } as never;
 
 export const mockCreateAuthor1Dto: CreateAuthorDto = {
   name: 'Regina George',
@@ -57,6 +70,8 @@ describe('AuthorController', () => {
     update: jest.fn(),
     create: jest.fn(),
   };
+  const omchaiRepo = { findOne: jest.fn() };
+  const storyRepo = { findOne: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -79,6 +94,10 @@ describe('AuthorController', () => {
           provide: AuthorService,
           useValue: mockAuthorService,
         },
+        OmchaiService,
+        { provide: getRepositoryToken(Omchai), useValue: omchaiRepo },
+        { provide: getRepositoryToken(Story), useValue: storyRepo },
+        { provide: getRepositoryToken(Anthology), useValue: {} },
       ],
     }).compile();
 
@@ -109,7 +128,11 @@ describe('AuthorController', () => {
     it('should successfully update author if id found', async () => {
       mockAuthorService.update.mockResolvedValue(mockAuthor2);
 
-      const result = await controller.updateAuthor(1, mockEditAuthor2Dto);
+      const result = await controller.updateAuthor(
+        1,
+        mockEditAuthor2Dto,
+        adminReq,
+      );
 
       expect(result).toEqual(mockAuthor2);
       expect(mockAuthorService.update).toHaveBeenCalledWith(
@@ -124,12 +147,81 @@ describe('AuthorController', () => {
       );
 
       await expect(
-        controller.updateAuthor(2, mockEditAuthor2Dto),
+        controller.updateAuthor(2, mockEditAuthor2Dto, adminReq),
       ).rejects.toThrow(NotFoundException);
       expect(mockAuthorService.update).toHaveBeenCalledWith(
         2,
         mockEditAuthor2Dto,
       );
+    });
+
+    describe('permissions', () => {
+      beforeEach(() => {
+        mockAuthorService.update.mockResolvedValue(mockAuthor2);
+        // draft 3 is by author 1, on anthology 5
+        storyRepo.findOne.mockResolvedValue({
+          anthology: { id: 5 },
+          author: { id: 1 },
+        });
+      });
+
+      it.each([
+        [OmchaiRole.OWNER, true],
+        [OmchaiRole.MANAGER, true],
+        [OmchaiRole.HELPER, true],
+        [OmchaiRole.APPROVER, false],
+        [OmchaiRole.CONSULTED, false],
+        [OmchaiRole.INFORMED, false],
+      ])('from a draft, as %s → allowed %s', async (role, allowed) => {
+        omchaiRepo.findOne.mockResolvedValue({ role });
+        const call = controller.updateAuthor(
+          1,
+          mockEditAuthor2Dto,
+          standardReq,
+          3,
+        );
+
+        if (allowed) {
+          await expect(call).resolves.toEqual(mockAuthor2);
+        } else {
+          await expect(call).rejects.toThrow(ForbiddenException);
+          expect(mockAuthorService.update).not.toHaveBeenCalled();
+        }
+      });
+
+      it('checks the role on the draft’s publication', async () => {
+        omchaiRepo.findOne.mockResolvedValue({ role: OmchaiRole.HELPER });
+
+        await controller.updateAuthor(1, mockEditAuthor2Dto, standardReq, 3);
+
+        expect(omchaiRepo.findOne).toHaveBeenCalledWith({
+          where: { user: { id: 1 }, anthology: { id: 5 } },
+        });
+      });
+
+      it('rejects a draft by a different author', async () => {
+        omchaiRepo.findOne.mockResolvedValue({ role: OmchaiRole.OWNER });
+
+        await expect(
+          controller.updateAuthor(7, mockEditAuthor2Dto, standardReq, 3),
+        ).rejects.toThrow(ForbiddenException);
+        expect(mockAuthorService.update).not.toHaveBeenCalled();
+      });
+
+      it('requires storyDraftId for non-admins', async () => {
+        await expect(
+          controller.updateAuthor(1, mockEditAuthor2Dto, standardReq),
+        ).rejects.toThrow(BadRequestException);
+        expect(mockAuthorService.update).not.toHaveBeenCalled();
+      });
+
+      it('rejects a user with no role on the publication', async () => {
+        omchaiRepo.findOne.mockResolvedValue(null);
+
+        await expect(
+          controller.updateAuthor(1, mockEditAuthor2Dto, standardReq, 3),
+        ).rejects.toThrow(ForbiddenException);
+      });
     });
   });
 

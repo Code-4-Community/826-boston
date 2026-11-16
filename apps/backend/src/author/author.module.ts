@@ -6,9 +6,15 @@ import { Author } from './author.entity';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
+import { OmchaiModule } from '../omchai/omchai.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Author]), AuthModule, UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Author]),
+    AuthModule,
+    UsersModule,
+    OmchaiModule,
+  ],
   controllers: [AuthorController],
   providers: [AuthorService, CurrentUserInterceptor],
   exports: [AuthorService],

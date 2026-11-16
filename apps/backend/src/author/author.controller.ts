@@ -9,7 +9,11 @@ import {
   Post,
   Body,
   Put,
+  Query,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 import {
@@ -20,19 +24,26 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthorService } from './author.service';
 import { Author } from './author.entity';
 import { CreateAuthorDto } from './dtos/create-author.dto';
 import { EditAuthorDto } from './dtos/edit-author.dto';
 import { Public } from 'src/auth/roles.decorator';
+import { OmchaiAction } from 'src/auth/omchai-permissions';
+import { OmchaiActor, OmchaiService } from 'src/omchai/omchai.service';
+import { Role } from 'src/users/types';
 
 @ApiTags('Author')
 @Controller('author')
 @UseGuards(AuthGuard('jwt'))
 @UseInterceptors(CurrentUserInterceptor)
 export class AuthorController {
-  constructor(private authorService: AuthorService) {}
+  constructor(
+    private authorService: AuthorService,
+    private omchaiService: OmchaiService,
+  ) {}
 
   @ApiBearerAuth()
   @ApiOperation({
@@ -74,7 +85,15 @@ export class AuthorController {
   @ApiOperation({
     summary: 'Update an author',
     description:
-      'Partially updates an author with new bio, name, and/or grade information. Requires authentication.',
+      'Partially updates an author with new bio, name, and/or grade information. ' +
+      'Non-admins must pass storyDraftId: a draft by this author on a publication ' +
+      'where they can edit drafts. The change shows on every publication the author is in.',
+  })
+  @ApiQuery({
+    name: 'storyDraftId',
+    required: false,
+    description:
+      'Draft the edit is made from. Required unless the caller is an admin.',
   })
   @ApiOkResponse({
     description: 'Author updated successfully',
@@ -113,7 +132,24 @@ export class AuthorController {
   async updateAuthor(
     @Param('authorId', ParseIntPipe) authorId: number,
     @Body() editAuthorDto: EditAuthorDto,
+    @Req() req: Request & { user?: OmchaiActor },
+    @Query('storyDraftId', new ParseIntPipe({ optional: true }))
+    storyDraftId?: number,
   ): Promise<Author> {
+    // Authors can appear in several publications, so the edit is checked
+    // against the publication of the draft it was made from.
+    if (req.user?.role !== Role.ADMIN) {
+      if (storyDraftId === undefined) {
+        throw new BadRequestException('storyDraftId is required');
+      }
+      const anthologyId = await this.omchaiService.anthologyIdForAuthorEdit(
+        authorId,
+        storyDraftId,
+      );
+      await this.omchaiService.assertCan(req.user, anthologyId, [
+        OmchaiAction.EDIT_DRAFTS,
+      ]);
+    }
     return this.authorService.update(authorId, editAuthorDto);
   }
 

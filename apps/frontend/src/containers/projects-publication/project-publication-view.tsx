@@ -12,6 +12,7 @@ import ProductionInfoView from './production-info-view';
 import ApprovedDocumentsView from './approved-documents-view';
 import TasksView from './tasks-view';
 import useAuth from '../../hooks/useAuth';
+import useOmchaiPermissions from '../../hooks/useOmchaiPermissions';
 import Role from '../../api/dtos/role';
 import './project-publication-view.css';
 
@@ -29,6 +30,7 @@ const ProjectPublicationView: React.FC = () => {
   const [anthology, setAnthology] = useState<Anthology | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('omchai');
+  const permissions = useOmchaiPermissions(anthology?.id);
   // Draft open in the detail panel, plus a reload for the table it came from
   const [selectedDraft, setSelectedDraft] = useState<{
     draft: StoryDraftDetail;
@@ -227,6 +229,8 @@ const ProjectPublicationView: React.FC = () => {
             <DocumentsTable
               anthologyId={anthology.id}
               onRowClick={openDraftDetail}
+              canAdd={permissions.canEditDrafts}
+              canEdit={permissions.canEditDrafts}
             />
           </div>
         )}
@@ -236,6 +240,8 @@ const ProjectPublicationView: React.FC = () => {
             <ApprovedDocumentsView
               anthologyId={anthology.id}
               onRowClick={openDraftDetail}
+              canManageManuscript={permissions.canManageManuscript}
+              canEditDrafts={permissions.canEditDrafts}
             />
           </div>
         )}
@@ -252,6 +258,7 @@ const ProjectPublicationView: React.FC = () => {
               anthologyId={anthology.id}
               shopifyUrl={anthology.shopify_url || anthology.shopifyUrl}
               isbn={anthology.isbn}
+              canEdit={permissions.canEditProduction}
             />
           </div>
         )}
@@ -263,6 +270,8 @@ const ProjectPublicationView: React.FC = () => {
           draft={selectedDraft.draft}
           onClose={() => setSelectedDraft(null)}
           onSaved={selectedDraft.reload}
+          canEditDrafts={permissions.canEditDrafts}
+          canTickCheckpoints={permissions.canTickCheckpoints}
         />
       )}
     </div>
