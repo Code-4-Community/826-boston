@@ -33,7 +33,7 @@ export class Anthology {
   @Column()
   description: string;
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column({ type: 'text', array: true, default: [] })
   genres: string[];
 
   @Column({ type: 'simple-array', default: [] })
@@ -56,7 +56,7 @@ export class Anthology {
   @Column({ type: 'date', nullable: true })
   publishedDate?: Date;
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column({ type: 'text', array: true, default: [] })
   programs: string[];
 
   @Column({ type: 'simple-array', default: [] })
