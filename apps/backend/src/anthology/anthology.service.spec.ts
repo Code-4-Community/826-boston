@@ -7,6 +7,7 @@ import { AnthologySortOption } from './dtos/filter-anthology.dto';
 import { TrackerAnthologyDto } from './dtos/tracker-anthology.dto';
 import { Role } from '../users/types';
 import { User } from '../users/user.entity';
+import { In } from 'typeorm';
 
 const mockAnthology1: Anthology = {
   id: 1,
@@ -245,13 +246,13 @@ describe('AnthologyService', () => {
     };
 
     it('returns every publication for an admin and applies status in the query', async () => {
-      mockRepository.find.mockResolvedValue([mockAnthology2]);
+      mockRepository.find.mockResolvedValue([mockAnthology1]);
 
       const result = await service.findForTracker(statusDto, {
         role: Role.ADMIN,
       } as User);
 
-      expect(result).toEqual([mockAnthology2]);
+      expect(result).toEqual([mockAnthology1]);
       expect(mockRepository.find).toHaveBeenCalledWith({
         where: { status: AnthologyStatus.DRAFTING },
       });
