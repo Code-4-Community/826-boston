@@ -5,6 +5,8 @@ import './styles.css';
 import apiClient from '../../api/apiClient';
 import { type FilterSortAnthologyBody } from '../../api/apiClient';
 import useDebouncedValue from '../../hooks/useDebouncedValue';
+import useAuth from '../../hooks/useAuth';
+import Role from '../../api/dtos/role';
 import {
   Anthology,
   AnthologyStatus,
@@ -180,6 +182,7 @@ export default function ArchivedPublications({
   );
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [createPubModalOpen, setCreatePubModalOpen] = useState(false);
+  const [, , currentUser] = useAuth();
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -209,7 +212,6 @@ export default function ArchivedPublications({
     if (mode !== 'archive') return;
 
     const body = buildFilterSortBody(appliedFilters);
-
     apiClient
       .filterSortAnthologies(body)
       .then((data) => {
@@ -260,6 +262,23 @@ export default function ArchivedPublications({
       hasTrackerSearchOrFilters
     ) {
       return 'No publications match these filters';
+    }
+    if (
+      mode === 'tracker' &&
+      trackerQuery.isSuccess &&
+      filteredPublications.length === 0 &&
+      currentUser?.role === Role.STANDARD &&
+      currentUser.omchaiAssignmentCount === 0
+    ) {
+      return "You haven't been added to any publications yet";
+    }
+    if (
+      mode === 'tracker' &&
+      trackerQuery.isSuccess &&
+      filteredPublications.length === 0 &&
+      activeTrackerTab?.status
+    ) {
+      return `No publications in ${activeTrackerTab.label}`;
     }
     return null;
   };
