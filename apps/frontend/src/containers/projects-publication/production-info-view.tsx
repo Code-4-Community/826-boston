@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../../api/apiClient';
-import { ProductionInfo } from '../../types';
-import EditableCell from './editable-cell';
+import { Anthology, ProductionInfo } from '../../types';
+import EditableCell, { getErrorMessage } from './editable-cell';
 import './production-info-view.css';
 
 interface Props {
   anthologyId: number;
   shopifyUrl?: string;
   isbn?: string;
-  // Owner, Manager and admins; everyone else sees the values read-only
+  releaseFormsOnFile?: boolean;
+  releaseFormsUrl?: string | null;
+  /** Called after release forms change so the status menu stays in sync. */
+  onAnthologyChange?: (anthology: Anthology) => void;
+  // Owner, Manager and admins; everyone else sees the values (and release forms) read-only
   canEdit?: boolean;
 }
 
@@ -16,6 +20,9 @@ const ProductionInfoView: React.FC<Props> = ({
   anthologyId,
   shopifyUrl: initialShopifyUrl,
   isbn: initialIsbn,
+  releaseFormsOnFile,
+  releaseFormsUrl,
+  onAnthologyChange,
   canEdit = false,
 }) => {
   const [productionInfo, setProductionInfo] = useState<ProductionInfo | null>(
@@ -24,6 +31,46 @@ const ProductionInfoView: React.FC<Props> = ({
   const [loading, setLoading] = useState(true);
   const [shopifyUrl, setShopifyUrl] = useState(initialShopifyUrl);
   const [isbn, setIsbn] = useState(initialIsbn);
+
+  // Release forms: only Owners/Managers (and admins) can change them
+  const canEditReleaseForms = canEdit;
+  const [formsOnFile, setFormsOnFile] = useState(!!releaseFormsOnFile);
+  const [formsUrl, setFormsUrl] = useState(releaseFormsUrl ?? '');
+  const [formsSaving, setFormsSaving] = useState(false);
+  const [formsError, setFormsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFormsOnFile(!!releaseFormsOnFile);
+  }, [releaseFormsOnFile]);
+
+  useEffect(() => {
+    setFormsUrl(releaseFormsUrl ?? '');
+  }, [releaseFormsUrl]);
+
+  const saveReleaseForms = async (body: Record<string, unknown>) => {
+    setFormsSaving(true);
+    try {
+      const updated = await apiClient.updateAnthology(anthologyId, body);
+      setFormsOnFile(!!updated.releaseFormsOnFile);
+      setFormsUrl(updated.releaseFormsUrl ?? '');
+      onAnthologyChange?.(updated);
+    } finally {
+      setFormsSaving(false);
+    }
+  };
+
+  const toggleReleaseForms = async (checked: boolean) => {
+    setFormsError(null);
+    try {
+      await saveReleaseForms({ releaseFormsOnFile: checked });
+    } catch (err) {
+      setFormsError(`Failed to save: ${getErrorMessage(err)}`);
+    }
+  };
+
+  // EditableCell shows its own error if this throws
+  const saveReleaseFormsUrl = (value: string) =>
+    saveReleaseForms({ releaseFormsUrl: value === '' ? null : value });
 
   useEffect(() => {
     setShopifyUrl(initialShopifyUrl);
@@ -118,7 +165,7 @@ const ProductionInfoView: React.FC<Props> = ({
       onSave: (value) => saveProductionInfoField('dimensions', value),
     },
     {
-      label: '# of Copies Printed',
+      label: '# of copies printed',
       placeholder: 'Add # of copies.',
       value: productionInfo?.print_run ?? null,
       type: 'number',
@@ -126,7 +173,7 @@ const ProductionInfoView: React.FC<Props> = ({
       onSave: (value) => saveProductionInfoField('print_run', value),
     },
     {
-      label: 'Total Printing Cost',
+      label: 'Total printing cost',
       placeholder: 'Add printing cost.',
       value: productionInfo?.printing_cost ?? null,
       type: 'number',
@@ -143,7 +190,7 @@ const ProductionInfoView: React.FC<Props> = ({
   ];
 
   return (
-    <div>
+    <div className="production-info">
       <table className="production-info-table">
         <tbody>
           {rows.map((row) => (
@@ -162,6 +209,43 @@ const ProductionInfoView: React.FC<Props> = ({
               </td>
             </tr>
           ))}
+          <tr>
+            <th>Release Forms</th>
+            <td>
+              <label className="production-info-release-forms">
+                <input
+                  type="checkbox"
+                  checked={formsOnFile}
+                  disabled={!canEditReleaseForms || formsSaving}
+                  onChange={(event) =>
+                    void toggleReleaseForms(event.target.checked)
+                  }
+                />
+                Release forms on file
+              </label>
+              {formsError && (
+                <span className="production-info-error">{formsError}</span>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <th>Release Forms Link</th>
+            <td>
+              {canEditReleaseForms ? (
+                <EditableCell
+                  value={formsUrl || null}
+                  placeholder="Add link (optional)."
+                  onSave={saveReleaseFormsUrl}
+                />
+              ) : formsUrl ? (
+                <a href={formsUrl} target="_blank" rel="noreferrer">
+                  {formsUrl}
+                </a>
+              ) : (
+                <span className="production-info-placeholder">—</span>
+              )}
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

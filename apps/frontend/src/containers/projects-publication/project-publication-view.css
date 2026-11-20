@@ -325,6 +325,31 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* Statuses that can't be picked yet (e.g. Can Be Shared before release forms
+   are on file): muted pill, with the reason in small text underneath */
+.publication-status-menu button:disabled {
+  flex-direction: column;
+  align-items: flex-end;
+  height: auto;
+  max-width: 220px;
+  padding-bottom: 6px;
+  color: var(--neutral-400);
+  white-space: normal;
+  text-align: right;
+  cursor: not-allowed;
+}
+
+.publication-status-menu button:disabled:hover {
+  background: var(--neutral-200);
+}
+
+.publication-status-menu__reason {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
 .publication-details__save-state {
   width: 64px;
   margin-left: 12px;

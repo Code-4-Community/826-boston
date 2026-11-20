@@ -5,6 +5,7 @@ import {
   IsOptional,
   ValidateNested,
   IsArray,
+  IsBoolean,
   IsInt,
   MaxLength,
   ArrayMaxSize,
@@ -64,6 +65,11 @@ export class FilterAnthologyDto {
   @ArrayMaxSize(200)
   @IsInt({ each: true })
   staffIds?: number[];
+
+  // Set by the Library page so logged-in staff see exactly what the public sees
+  @IsOptional()
+  @IsBoolean()
+  library?: boolean;
 }
 
 export class SortAnthologyDto {

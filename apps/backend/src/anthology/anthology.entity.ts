@@ -89,6 +89,12 @@ export class Anthology {
   @Column({ nullable: true })
   gradeLevel?: string;
 
+  @Column({ default: false })
+  releaseFormsOnFile: boolean;
+
+  @Column({ nullable: true })
+  releaseFormsUrl?: string;
+
   @Column({
     name: 'shopify_url',
     nullable: true,

@@ -186,6 +186,9 @@ export interface Anthology {
   sponsors?: string[];
   triggers?: string[];
   ageCategories?: string[];
+  /** Required (with status Can Be Shared/Archived) for the public Library. */
+  releaseFormsOnFile?: boolean;
+  releaseFormsUrl?: string | null;
   stories?: Story[];
 }
 
