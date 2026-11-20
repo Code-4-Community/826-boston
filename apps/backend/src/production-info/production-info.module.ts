@@ -4,9 +4,13 @@ import { ProductionInfo } from './production-info.entity';
 import { ProductionInfoController } from './production-info.controller';
 import { ProductionInfoService } from './production-info.service';
 import { Anthology } from '../anthology/anthology.entity';
+import { OmchaiModule } from '../omchai/omchai.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductionInfo, Anthology])],
+  imports: [
+    TypeOrmModule.forFeature([ProductionInfo, Anthology]),
+    OmchaiModule,
+  ],
   controllers: [ProductionInfoController],
   providers: [ProductionInfoService],
 })

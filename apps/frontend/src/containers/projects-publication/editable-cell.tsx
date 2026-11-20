@@ -21,6 +21,8 @@ interface EditableCellProps {
   format?: (value: string | number) => string;
   requireNonNegative?: boolean;
   disabled?: boolean;
+  // Plain text with a dash for empty values, for users without edit rights
+  readOnly?: boolean;
   onSave: (newValue: string) => Promise<void>;
 }
 
@@ -31,6 +33,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
   format,
   requireNonNegative,
   disabled = false,
+  readOnly = false,
   onSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -78,6 +81,22 @@ const EditableCell: React.FC<EditableCellProps> = ({
       setSaving(false);
     }
   };
+
+  if (readOnly) {
+    return (
+      <span className="production-info-cell">
+        {value != null && value !== '' ? (
+          format ? (
+            format(value)
+          ) : (
+            value
+          )
+        ) : (
+          <span className="production-info-placeholder">—</span>
+        )}
+      </span>
+    );
+  }
 
   if (isEditing && !disabled) {
     return (

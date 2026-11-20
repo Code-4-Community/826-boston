@@ -8,12 +8,15 @@ interface Props {
   anthologyId: number;
   shopifyUrl?: string;
   isbn?: string;
+  // Owner, Manager and admins; everyone else sees the values read-only
+  canEdit?: boolean;
 }
 
 const ProductionInfoView: React.FC<Props> = ({
   anthologyId,
   shopifyUrl: initialShopifyUrl,
   isbn: initialIsbn,
+  canEdit = false,
 }) => {
   const [productionInfo, setProductionInfo] = useState<ProductionInfo | null>(
     null,
@@ -153,6 +156,7 @@ const ProductionInfoView: React.FC<Props> = ({
                   type={row.type}
                   format={row.format}
                   requireNonNegative={row.requireNonNegative}
+                  readOnly={!canEdit}
                   onSave={row.onSave}
                 />
               </td>

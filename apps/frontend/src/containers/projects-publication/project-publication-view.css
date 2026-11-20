@@ -442,8 +442,12 @@ select.publication-details__control {
   text-decoration: none;
 }
 
+/* Centre the tags on the label's 28px line (they're only 20px tall) */
 .publication-details__multi {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 28px;
 }
 
 /* Shrinks to the box and carries its 5px outset, so the menu (left: 0;
@@ -454,7 +458,6 @@ select.publication-details__control {
   min-width: 0;
   max-width: 400px;
   margin-left: -5px;
-  vertical-align: top;
 }
 
 .publication-details__multi-control {
@@ -471,6 +474,8 @@ select.publication-details__control {
   border-radius: 8px;
   background: transparent;
   color: var(--neutral-400);
+  /* The row's 28px line-height would make the box taller than the tags */
+  line-height: 20px;
   cursor: pointer;
 }
 

@@ -6,7 +6,7 @@ import { GENRES, THEMES } from '../create-publication-modal/constants';
 import { PROGRAM_OPTIONS } from '../archived-publications/filter-modal/constants';
 import EditableCell from './editable-cell';
 import SearchSelectIcon from '../../assets/icons/search-select.svg';
-import CloseIcon from '../../assets/icons/close.svg';
+import CloseIcon from '../../assets/icons/close-tag.svg';
 import './production-info-view.css';
 
 const PUB_LEVELS = [
@@ -23,6 +23,19 @@ const STATUSES = [
   ['Can Be Shared', 'Can be Shared'],
   ['Archived', 'Archived'],
 ] as const;
+
+// List fields can arrive as a comma-separated string (e.g. a simple-array
+// column that hasn't been migrated to text[]), a lone value, or null
+function toList(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String);
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
 
 interface Props {
   anthology: Anthology;
@@ -56,8 +69,9 @@ const PublicationDetailsView: React.FC<Props> = ({
     apiClient
       .getOmchaiByAnthology(anthologyId)
       .then((entries) => {
+        // The endpoint loads the assignment's user rather than a userId
         const assignment = entries.find(
-          (entry) => entry.userId === currentUser?.id,
+          (entry) => entry.user?.id === currentUser?.id,
         );
         setEditable(
           assignment?.role === OmchaiRole.OWNER ||
@@ -133,11 +147,9 @@ const PublicationDetailsView: React.FC<Props> = ({
   const currentStatus =
     STATUSES.find(([value]) => value === values.status)?.[1] ?? values.status;
 
-  const programs = useMemo(() => {
-    const value = values.programs;
-    if (Array.isArray(value)) return value;
-    return value ? [value] : [];
-  }, [values.programs]);
+  const genres = useMemo(() => toList(values.genres), [values.genres]);
+  const themes = useMemo(() => toList(values.themes), [values.themes]);
+  const programs = useMemo(() => toList(values.programs), [values.programs]);
 
   const dateValue = useMemo(() => {
     const value = values.publishedDate;
@@ -301,7 +313,7 @@ const PublicationDetailsView: React.FC<Props> = ({
                 label="Genre(s)"
                 placeholder="Add genres."
                 options={GENRES}
-                selected={values.genres ?? []}
+                selected={genres}
                 disabled={!editable}
                 onChange={(value) => saveImmediately('genres', value)}
               />
@@ -314,7 +326,7 @@ const PublicationDetailsView: React.FC<Props> = ({
                 label="Theme(s)"
                 placeholder="Add themes."
                 options={THEMES}
-                selected={values.themes ?? []}
+                selected={themes}
                 disabled={!editable}
                 onChange={(value) => saveImmediately('themes', value)}
               />

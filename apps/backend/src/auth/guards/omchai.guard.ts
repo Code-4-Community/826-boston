@@ -30,6 +30,7 @@ export class OmchaiGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user as User;
 
+    // admins can do everything on every publication
     if (user?.role === Role.ADMIN) {
       return true;
     }
