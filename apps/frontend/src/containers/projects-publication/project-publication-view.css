@@ -111,36 +111,37 @@
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 24px;
+  gap: 12px;
   border-bottom: 1px solid var(--neutral-300);
   overflow-x: auto;
 }
 
+/* A real margin (not a transform) so the tab content keeps Figma's 36px gap below the bar */
 .ppv-content > .publication-tabs {
-  transform: translateY(20px);
+  margin-top: 20px;
 }
 
+/* Figma tabs: Roboto 16px regular, 8px padding, 12px apart */
 .publication-tabs button.publication-tab {
   display: inline-flex;
   align-items: center;
-  height: 42px;
-  padding: 0;
+  padding: 8px;
   background: none;
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   font-size: 16px;
-  font-weight: 600;
-  line-height: 1;
+  font-weight: 400;
+  line-height: normal;
   text-decoration: none;
-  color: var(--neutral-600);
+  color: var(--black);
   white-space: nowrap;
   border: none;
   border-bottom: 2px solid transparent;
 }
 
+/* Figma Accents/600 */
 .publication-tabs button.publication-tab--active {
-  color: var(--accent-500);
-  border-bottom-color: var(--accent-500);
-  font-weight: 700;
+  color: #aa5e00;
+  border-bottom-color: #aa5e00;
 }
 
 .publication-details,
@@ -161,19 +162,18 @@
 
 .publication-details__main {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  gap: 32px;
+  grid-template-columns: 185px minmax(0, 1fr);
+  gap: 40px;
 }
 
 .publication-details__cover {
   position: relative;
-  margin-top: 32px;
 }
 
 .publication-details__cover img,
 .publication-details__cover-placeholder {
-  width: 180px;
-  height: 180px;
+  width: 185px;
+  height: 186px;
   border-radius: 12px;
 }
 
@@ -203,10 +203,10 @@
   position: relative;
 }
 
+/* Figma: title (H2) and byline 2px apart, then 20px to the description */
 .publication-details__form > .publication-details__field:nth-of-type(1) {
-  padding-right: 120px;
-  margin-top: 32px;
-  margin-bottom: 0;
+  padding-right: 180px;
+  margin-bottom: 2px;
 }
 
 .publication-details__form > .publication-details__field:nth-of-type(1) > span {
@@ -214,9 +214,9 @@
 }
 
 .publication-details__form > .publication-details__field:nth-of-type(1) input {
-  padding-left: 0;
-  color: #000;
-  font-family: 'Roboto', sans-serif;
+  padding: 0;
+  color: var(--black);
+  font-family: var(--font-heading);
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
@@ -227,43 +227,34 @@
   display: none;
 }
 
-.publication-details__form > .publication-details__field:nth-of-type(2) input {
-  padding-left: 0;
-  color: var(--neutral-500);
-}
-
-.publication-details__form > .publication-details__field:nth-of-type(3) {
-  gap: 2px;
-}
-
-.publication-details__form > .publication-details__field:nth-of-type(3) > span,
-.publication-details__form > .publication-details__field:nth-of-type(3) textarea {
-  color: var(--neutral-400);
-}
-
 .publication-details__form > .publication-details__field:nth-of-type(2) {
-  margin-bottom: 16px;
+  padding-right: 180px;
+  margin-bottom: 20px;
 }
 
 .publication-details__form > .publication-details__field:nth-of-type(2) input {
-  color: #000;
-  font-family: 'Open Sans', sans-serif;
+  padding: 0;
+  color: var(--black);
+  font-family: var(--font-body);
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
 }
 
-.publication-details__form > .publication-details__field:nth-of-type(3) {
-  gap: 6px;
+/* Outranks .publication-details__field textarea so it lines up with title/byline */
+.publication-details__field.publication-details__description textarea {
+  max-width: 650px;
+  padding: 0;
+  color: var(--neutral-500);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
 }
 
-.publication-details__form > .publication-details__field:nth-of-type(3) > span {
-  padding-left: 0;
-}
-
-.publication-details__form > .publication-details__field:nth-of-type(3) textarea {
-  padding-left: 0;
+.publication-details__description textarea::placeholder {
+  color: var(--neutral-400);
 }
 
 .publication-details__status-wrap {
@@ -279,7 +270,7 @@
   border: 0;
   border-radius: 999px;
   background: var(--neutral-200);
-  color: var(--Neutral-500, #58504C);
+  color: var(--neutral-500);
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
   font-style: normal;
@@ -287,7 +278,42 @@
   line-height: normal;
 }
 
-.publication-status-menu,
+/* Figma: right-aligned stack of small badges under the status pill */
+.publication-status-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.publication-status-menu button {
+  display: flex;
+  height: 24px;
+  min-width: 78px;
+  padding: 4px 16px 6px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 13px;
+  background: var(--neutral-200);
+  color: var(--neutral-500);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.publication-status-menu button:hover,
+.publication-status-menu button:focus-visible {
+  background: var(--neutral-300);
+}
+
 .publication-details__multi-menu {
   position: absolute;
   z-index: 10;
@@ -297,15 +323,6 @@
   border-radius: 6px;
   background: white;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.publication-status-menu button {
-  display: block;
-  width: 100%;
-  border: 0;
-  background: white;
-  text-align: left;
-  padding: 8px;
 }
 
 .publication-details__save-state {
@@ -349,53 +366,109 @@
   border-color: var(--neutral-300);
 }
 
-.publication-details__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
-  margin-top: 0;
-}
-
-.publication-details__grid .publication-details__field {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 280px);
-  align-items: center;
-  gap: 24px;
-  min-height: 38px;
-  margin-bottom: 0;
-}
-
-.publication-details__grid .publication-details__field > span {
-  width: 200px;
-  max-width: 224px;
-  flex-shrink: 0;
-  color: var(--Neutral-500, #58504C);
-  font-family: Roboto, sans-serif;
+/* Rows reuse .production-info-table from the Production & Distribution tab */
+/* Figma: 36px below the header row; 33px rows, 16px apart */
+.production-info-table.publication-details__table {
+  margin-top: 36px;
   font-size: 16px;
-  font-style: normal;
+}
+
+/* Labels sit flush with the cover's left edge; values share one column */
+.production-info-table.publication-details__table th,
+.production-info-table.publication-details__table td {
+  height: 28px;
+  padding: 0 0 21px;
+  vertical-align: top;
+  line-height: 28px;
+}
+
+.production-info-table.publication-details__table tr:last-child th,
+.production-info-table.publication-details__table tr:last-child td {
+  padding-bottom: 0;
+}
+
+.production-info-table.publication-details__table th {
+  width: 216px;
+  box-sizing: border-box;
+  padding-right: 16px;
+  color: var(--neutral-500);
+  font-family: var(--font-heading);
   font-weight: 600;
-  line-height: normal;
+}
+
+.production-info-table.publication-details__table td {
+  color: var(--neutral-600);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.production-info-table.publication-details__table td {
+  position: relative;
+}
+
+.publication-details__control {
+  width: 100%;
+  max-width: 280px;
+  margin: -4px 0 -4px -8px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Match the plain-text look of the other rows (no dropdown arrow) */
+select.publication-details__control {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.publication-details__control:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.publication-details__control:not(:disabled):hover,
+.publication-details__control:focus {
+  border-color: var(--neutral-300);
+  outline: none;
+}
+
+.production-info-cell:disabled {
+  cursor: default;
+  text-decoration: none;
 }
 
 .publication-details__multi {
   position: relative;
 }
 
+/* Shrinks to the box and carries its 5px outset, so the menu (left: 0;
+   width: 100%) lines up exactly with the search box */
 .publication-details__multi-wrap {
   position: relative;
+  display: inline-block;
   min-width: 0;
+  max-width: 400px;
+  margin-left: -5px;
+  vertical-align: top;
 }
 
 .publication-details__multi-control {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  min-height: 38px;
+  gap: 4px;
+  max-width: 400px;
+  /* Tags stay on the value column; the outline sits 4px outside them */
+  margin: -5px 0;
   box-sizing: border-box;
-  padding: 4px 10px;
+  padding: 4px 12px 4px 4px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
   color: var(--neutral-400);
   cursor: pointer;
@@ -410,43 +483,65 @@
   border-color: var(--neutral-300);
 }
 
+/* Figma "Search Select": outlined box, tags then a search icon */
 .publication-details__multi-control--open {
-  background: white;
+  min-width: 212px;
+  width: fit-content;
 }
 
+.publication-details__multi-search-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: 6px;
+}
+
+/* Figma tag: 20px tall, Accents/400 fill, Accents/500 border, 12px text */
 .publication-details__chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 10px;
+  gap: 4px;
+  height: 20px;
+  box-sizing: border-box;
+  padding: 0 12px;
   border: 1px solid var(--accent-500);
-  border-radius: 999px;
-  background: #fdd9a0;
-  color: #000;
-  font-size: 14px;
+  border-radius: 12px;
+  background: #ffcc7f;
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .publication-details__chip button {
+  display: inline-flex;
+  align-items: center;
   padding: 0;
   border: 0;
   background: transparent;
-  color: inherit;
-  font-size: 16px;
-  line-height: 1;
   cursor: pointer;
 }
 
-.publication-details__field input.publication-details__multi-search {
+.publication-details__chip button img {
+  width: 14px;
+  height: 14px;
+}
+
+.publication-details__multi input.publication-details__multi-search {
   flex: 1;
   width: auto;
   min-width: 80px;
   padding: 2px 0;
   border: 0;
   outline: none;
+  font: inherit;
+  color: var(--neutral-600);
 }
 
 .publication-details__multi-menu {
-  top: calc(100% + 4px);
+  /* The box overhangs the wrapper by 5px (negative margin), so +13px = 8px below the box */
+  top: calc(100% + 13px);
   left: 0;
   width: 100%;
   box-sizing: border-box;
@@ -467,7 +562,7 @@
   background: var(--neutral-200);
 }
 
-.publication-details__field .publication-details__multi-menu input {
+.publication-details__multi-menu input {
   width: auto;
   padding: 0;
   margin: 0;

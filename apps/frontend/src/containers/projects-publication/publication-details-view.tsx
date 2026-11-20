@@ -4,6 +4,10 @@ import Role from '../../api/dtos/role';
 import { Anthology, OmchaiRole } from '../../types';
 import { GENRES, THEMES } from '../create-publication-modal/constants';
 import { PROGRAM_OPTIONS } from '../archived-publications/filter-modal/constants';
+import EditableCell from './editable-cell';
+import SearchSelectIcon from '../../assets/icons/search-select.svg';
+import CloseIcon from '../../assets/icons/close.svg';
+import './production-info-view.css';
 
 const PUB_LEVELS = [
   ['Zine', 'Zine'],
@@ -16,7 +20,7 @@ const STATUSES = [
   ['Not Started', 'Not Started'],
   ['Drafting', 'Drafting'],
   ['Awaiting Review', 'Awaiting Review'],
-  ['Can Be Shared', 'Can Be Shared'],
+  ['Can Be Shared', 'Can be Shared'],
   ['Archived', 'Archived'],
 ] as const;
 
@@ -70,6 +74,12 @@ const PublicationDetailsView: React.FC<Props> = ({
     [],
   );
 
+  const persist = async (body: Record<string, unknown>) => {
+    const updated = await apiClient.updateAnthology(anthologyId, body);
+    setValues((prev) => ({ ...prev, ...updated }));
+    onChange(updated);
+  };
+
   const save = async (
     field: string,
     body: Record<string, unknown>,
@@ -77,9 +87,7 @@ const PublicationDetailsView: React.FC<Props> = ({
     setSavingField(field);
     setSaveError(null);
     try {
-      const updated = await apiClient.updateAnthology(anthologyId, body);
-      setValues((prev) => ({ ...prev, ...updated }));
-      onChange(updated);
+      await persist(body);
       return true;
     } catch (error: unknown) {
       const data = (
@@ -227,9 +235,9 @@ const PublicationDetailsView: React.FC<Props> = ({
             />
           </label>
 
-          <label className="publication-details__field">
-            <span>Description</span>
+          <label className="publication-details__field publication-details__description">
             <textarea
+              aria-label="Description"
               placeholder="Add description."
               value={values.description ?? ''}
               disabled={!editable}
@@ -249,75 +257,95 @@ const PublicationDetailsView: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="publication-details__grid">
-        <label className="publication-details__field">
-          <span>Publication Level</span>
-          <select
-            value={values.pubLevel ?? values.pub_level ?? ''}
-            disabled={!editable}
-            onChange={(event) =>
-              saveImmediately('pub_level', event.target.value)
-            }
-          >
-            {PUB_LEVELS.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="publication-details__field">
-          <span>Publication Date</span>
-          <input
-            type="date"
-            value={dateValue}
-            disabled={!editable}
-            onChange={(event) =>
-              saveImmediately('publicationDate', event.target.value)
-            }
-          />
-        </label>
-
-        <MultiSelect
-          label="Genre(s)"
-          placeholder="Add field."
-          options={GENRES}
-          selected={values.genres ?? []}
-          disabled={!editable}
-          onChange={(value) => saveImmediately('genres', value)}
-        />
-        <MultiSelect
-          label="Theme(s)"
-          placeholder="Add themes."
-          options={THEMES}
-          selected={values.themes ?? []}
-          disabled={!editable}
-          onChange={(value) => saveImmediately('themes', value)}
-        />
-
-        <label className="publication-details__field">
-          <span>Grade</span>
-          <input
-            value={values.gradeLevel ?? ''}
-            disabled={!editable}
-            onChange={(event) => changeText('gradeLevel', event.target.value)}
-            onBlur={() => {
-              clearTimeout(timers.current.gradeLevel);
-              void save('gradeLevel', { gradeLevel: values.gradeLevel });
-            }}
-          />
-        </label>
-
-        <MultiSelect
-          label="Program(s)"
-          placeholder="Add programs."
-          options={PROGRAM_OPTIONS.map((option) => option.displayLabel)}
-          selected={programs}
-          disabled={!editable}
-          onChange={(value) => saveImmediately('programs', value)}
-        />
-      </div>
+      <table className="production-info-table publication-details__table">
+        <tbody>
+          <tr>
+            <th>Publication Level</th>
+            <td>
+              <select
+                className="publication-details__control"
+                aria-label="Publication Level"
+                value={values.pubLevel ?? values.pub_level ?? ''}
+                disabled={!editable}
+                onChange={(event) =>
+                  saveImmediately('pub_level', event.target.value)
+                }
+              >
+                {PUB_LEVELS.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th>Publication Date</th>
+            <td>
+              <input
+                className="publication-details__control"
+                aria-label="Publication Date"
+                type="date"
+                value={dateValue}
+                disabled={!editable}
+                onChange={(event) =>
+                  saveImmediately('publicationDate', event.target.value)
+                }
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>Genre(s)</th>
+            <td>
+              <MultiSelect
+                label="Genre(s)"
+                placeholder="Add genres."
+                options={GENRES}
+                selected={values.genres ?? []}
+                disabled={!editable}
+                onChange={(value) => saveImmediately('genres', value)}
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>Theme(s)</th>
+            <td>
+              <MultiSelect
+                label="Theme(s)"
+                placeholder="Add themes."
+                options={THEMES}
+                selected={values.themes ?? []}
+                disabled={!editable}
+                onChange={(value) => saveImmediately('themes', value)}
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>Grade</th>
+            <td>
+              <EditableCell
+                value={values.gradeLevel ?? null}
+                placeholder="Add grade."
+                disabled={!editable}
+                onSave={(value) => persist({ gradeLevel: value })}
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>Program(s)</th>
+            <td>
+              <MultiSelect
+                label="Program(s)"
+                placeholder="Add programs."
+                options={PROGRAM_OPTIONS.map((option) => option.displayLabel)}
+                selected={programs}
+                disabled={!editable}
+                onChange={(value) => saveImmediately('programs', value)}
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -362,14 +390,14 @@ const MultiSelect: React.FC<{
     );
 
   return (
-    <div className="publication-details__field publication-details__multi">
-      <span>{label}</span>
+    <div className="publication-details__multi">
       <div className="publication-details__multi-wrap" ref={wrapRef}>
         <div
           className={`publication-details__multi-control${
             open ? ' publication-details__multi-control--open' : ''
           }`}
           role="button"
+          aria-label={label}
           tabIndex={disabled ? -1 : 0}
           aria-disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
@@ -391,7 +419,7 @@ const MultiSelect: React.FC<{
                     toggle(item);
                   }}
                 >
-                  ×
+                  <img src={CloseIcon} alt="" width={16} height={16} />
                 </button>
               )}
             </span>
@@ -405,19 +433,13 @@ const MultiSelect: React.FC<{
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              >
-                <circle cx="11" cy="11" r="6.5" />
-                <path d="m16 16 4 4" />
-              </svg>
+              <img
+                className="publication-details__multi-search-icon"
+                src={SearchSelectIcon}
+                alt=""
+                width={20}
+                height={20}
+              />
             </>
           ) : (
             !selected.length && (
