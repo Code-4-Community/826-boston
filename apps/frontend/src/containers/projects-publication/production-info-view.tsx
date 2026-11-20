@@ -165,7 +165,7 @@ const ProductionInfoView: React.FC<Props> = ({
       onSave: (value) => saveProductionInfoField('dimensions', value),
     },
     {
-      label: '# of Copies Printed',
+      label: '# of copies printed',
       placeholder: 'Add # of copies.',
       value: productionInfo?.print_run ?? null,
       type: 'number',
@@ -173,7 +173,7 @@ const ProductionInfoView: React.FC<Props> = ({
       onSave: (value) => saveProductionInfoField('print_run', value),
     },
     {
-      label: 'Total Printing Cost',
+      label: 'Total printing cost',
       placeholder: 'Add printing cost.',
       value: productionInfo?.printing_cost ?? null,
       type: 'number',
@@ -190,7 +190,7 @@ const ProductionInfoView: React.FC<Props> = ({
   ];
 
   return (
-    <div>
+    <div className="production-info">
       <table className="production-info-table">
         <tbody>
           {rows.map((row) => (

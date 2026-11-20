@@ -67,3 +67,45 @@
   align-items: center;
   gap: 8px;
 }
+
+/* Production & Distribution tab (Figma): 200px labels, 16px gap to values,
+   28px rows 16px apart. Scoped so Publication Details, which reuses
+   .production-info-table, keeps its own rules. */
+.production-info .production-info-table {
+  width: auto;
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+
+.production-info .production-info-table th,
+.production-info .production-info-table td {
+  padding: 0 0 16px;
+  vertical-align: middle;
+  line-height: 28px;
+}
+
+.production-info .production-info-table tr:last-child th,
+.production-info .production-info-table tr:last-child td {
+  padding-bottom: 0;
+}
+
+.production-info .production-info-table th {
+  width: 216px;
+  box-sizing: border-box;
+  padding-right: 16px;
+  color: var(--neutral-500);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.production-info .production-info-table td {
+  min-width: 166px;
+  color: var(--neutral-600);
+  font-weight: 400;
+}
+
+/* Figma "Muted Gray" for empty-field prompts like "Add URL." */
+.production-info .production-info-placeholder {
+  color: #858585;
+}
