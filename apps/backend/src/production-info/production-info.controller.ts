@@ -6,7 +6,9 @@ import {
   Param,
   Put,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { ProductionInfoService } from './production-info.service';
 import { CreateProductionInfoDto } from './dtos/create-production-info.dto';
 import { UpdateProductionInfoDto } from './dtos/update-production-info.dto';
@@ -21,11 +23,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from 'src/auth/roles.decorator';
+import { OmchaiAction } from 'src/auth/omchai-permissions';
+import { OmchaiActor, OmchaiService } from 'src/omchai/omchai.service';
 
 @ApiTags('Production Info')
 @Controller('production-info')
 export class ProductionInfoController {
-  constructor(private readonly productionInfoService: ProductionInfoService) {}
+  constructor(
+    private readonly productionInfoService: ProductionInfoService,
+    private readonly omchaiService: OmchaiService,
+  ) {}
 
   @ApiBearerAuth()
   @ApiOperation({
@@ -61,9 +68,15 @@ export class ProductionInfoController {
     },
   })
   @Post()
-  create(
+  async create(
     @Body() createProductionInfoDto: CreateProductionInfoDto,
+    @Req() req: Request & { user?: OmchaiActor },
   ): Promise<ProductionInfo> {
+    await this.omchaiService.assertCan(
+      req.user,
+      createProductionInfoDto.anthology_id,
+      [OmchaiAction.EDIT_PRODUCTION],
+    );
     return this.productionInfoService.create(createProductionInfoDto);
   }
 
@@ -179,10 +192,26 @@ export class ProductionInfoController {
     },
   })
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductionInfoDto: UpdateProductionInfoDto,
+    @Req() req: Request & { user?: OmchaiActor },
   ): Promise<ProductionInfo> {
+    // :id is a production-info id, not an anthology id, so check the role
+    // on the anthology that owns this record.
+    const anthologyId = await this.omchaiService.anthologyIdForProductionInfo(
+      id,
+    );
+    await this.omchaiService.assertCan(req.user, anthologyId, [
+      OmchaiAction.EDIT_PRODUCTION,
+    ]);
+    // Moving the record to another anthology also needs rights there.
+    const target = updateProductionInfoDto.anthology_id;
+    if (target !== undefined && target !== anthologyId) {
+      await this.omchaiService.assertCan(req.user, target, [
+        OmchaiAction.EDIT_PRODUCTION,
+      ]);
+    }
     return this.productionInfoService.update(id, updateProductionInfoDto);
   }
 }

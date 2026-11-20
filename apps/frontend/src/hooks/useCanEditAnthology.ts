@@ -22,8 +22,9 @@ export function useCanEditAnthology(
     apiClient
       .getOmchaiByAnthology(anthologyId)
       .then((entries) => {
+        // The endpoint loads the assignment's user rather than a userId
         const assignment = entries.find(
-          (entry) => entry.userId === currentUser?.id,
+          (entry) => entry.user?.id === currentUser?.id,
         );
         setCanEdit(
           assignment?.role === OmchaiRole.OWNER ||

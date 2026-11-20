@@ -47,6 +47,10 @@ interface DocumentsTableProps {
   onRowClick?: (row: StoryDocumentRow, reload: () => void) => void;
   // Modal opened by the + button. Defaults to NewStoryDraftModal.
   renderAddModal?: (onClose: () => void, onSaved: () => void) => ReactNode;
+  // Whether to show the + button. Off unless the caller says otherwise.
+  canAdd?: boolean;
+  // Whether rows can be deleted and their consent toggled.
+  canEdit?: boolean;
 }
 
 const DocumentsTable: React.FC<DocumentsTableProps> = ({
@@ -55,6 +59,8 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   showFilters = true,
   onRowClick,
   renderAddModal,
+  canAdd = false,
+  canEdit = false,
 }) => {
   const [documents, setDocuments] = useState<StoryDocumentRow[]>([]);
   const [page, setPage] = useState(1);
@@ -112,7 +118,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
   }, [loadDocuments]);
 
   const handleConsentToggle = async (row: StoryDocumentRow) => {
-    if (row.storyDraftId === null) return;
+    if (!canEdit || row.storyDraftId === null) return;
     const consent = !row.consent;
     const setConsent = (value: boolean) =>
       setDocuments((prev) =>
@@ -206,14 +212,16 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
           <tr>
             <th>
               <div className="documents-consent-head">
-                <button
-                  type="button"
-                  className="documents-add-btn"
-                  aria-label="Add story draft"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  +
-                </button>
+                {canAdd && (
+                  <button
+                    type="button"
+                    className="documents-add-btn"
+                    aria-label="Add story draft"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    +
+                  </button>
+                )}
                 Consent
               </div>
             </th>
@@ -239,36 +247,38 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
               >
                 <td>
                   <div className="documents-consent-cell">
-                    <button
-                      type="button"
-                      className="documents-delete-btn"
-                      aria-label={`Delete document for ${row.firstName} ${row.lastName}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(row);
-                      }}
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
+                    {canEdit && (
+                      <button
+                        type="button"
+                        className="documents-delete-btn"
+                        aria-label={`Delete document for ${row.firstName} ${row.lastName}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(row);
+                        }}
                       >
-                        <path d="M3 6h18" />
-                        <path d="M8 6V4h8v2" />
-                        <path d="M19 6l-1 14H6L5 6" />
-                        <path d="M10 11v6M14 11v6" />
-                      </svg>
-                    </button>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M3 6h18" />
+                          <path d="M8 6V4h8v2" />
+                          <path d="M19 6l-1 14H6L5 6" />
+                          <path d="M10 11v6M14 11v6" />
+                        </svg>
+                      </button>
+                    )}
                     <input
                       type="checkbox"
                       checked={row.consent}
-                      disabled={row.storyDraftId === null}
+                      disabled={!canEdit || row.storyDraftId === null}
                       aria-label={`Consent for ${row.firstName} ${row.lastName}`}
                       onClick={(e) => e.stopPropagation()}
                       onChange={() => handleConsentToggle(row)}
@@ -334,7 +344,8 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         </nav>
       )}
 
-      {isModalOpen &&
+      {canAdd &&
+        isModalOpen &&
         (renderAddModal ? (
           renderAddModal(
             () => setIsModalOpen(false),
@@ -356,7 +367,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         />
       )}
 
-      {deleteRow && (
+      {canEdit && deleteRow && (
         <div className="documents-modal-overlay">
           <div
             className="documents-delete-modal"

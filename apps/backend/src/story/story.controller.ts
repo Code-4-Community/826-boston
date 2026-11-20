@@ -13,6 +13,7 @@ import {
   BadRequestException,
   Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { StoryService } from './story.service';
 import { Story } from './story.entity';
 import {
@@ -33,7 +34,9 @@ import {
   PaginatedStoryDocuments,
   StoryDocumentsFilters,
 } from './dtos/story-document-row.dto';
-import { Public } from 'src/auth/roles.decorator';
+import { OmchaiRoles, Public } from 'src/auth/roles.decorator';
+import { ACTION_ROLES, OmchaiAction } from 'src/auth/omchai-permissions';
+import { OmchaiActor, OmchaiService } from 'src/omchai/omchai.service';
 import { isLibraryRequest } from '../anthology/library-eligibility';
 
 // On @Public() routes the JWT guard still sets `user` when a valid token is sent
@@ -85,6 +88,7 @@ export class StoryController {
     private storyService: StoryService,
     private anthologyService: AnthologyService,
     private authorService: AuthorService,
+    private omchaiService: OmchaiService,
   ) {}
 
   @Public()
@@ -140,7 +144,8 @@ export class StoryController {
     return this.storyService.getStoriesByAnthology(anthologyId, libraryOnly);
   }
 
-  @Public()
+  @ApiBearerAuth()
+  @OmchaiRoles(...ACTION_ROLES[OmchaiAction.VIEW])
   @ApiOperation({
     summary: 'Get story documents table for an anthology',
     description:
@@ -322,7 +327,14 @@ export class StoryController {
   @Delete('/:storyId')
   async removeStory(
     @Param('storyId', ParseIntPipe) storyId: number,
+    @Req() req: Request & { user?: OmchaiActor },
   ): Promise<Story> {
+    // Deleting a story from the Documents tab deletes its draft too, so it
+    // needs the same rights as editing the draft.
+    const anthologyId = await this.omchaiService.anthologyIdForStory(storyId);
+    await this.omchaiService.assertCan(req.user, anthologyId, [
+      OmchaiAction.EDIT_DRAFTS,
+    ]);
     return this.storyService.remove(storyId);
   }
 
@@ -368,6 +380,7 @@ export class StoryController {
       },
     },
   })
+  @OmchaiRoles(...ACTION_ROLES[OmchaiAction.EDIT_DRAFTS])
   @Post('/anthology/:anthologyId')
   /**
    * Create a new story in a specific anthology.
@@ -392,7 +405,8 @@ export class StoryController {
     );
   }
 
-  @Public()
+  @ApiBearerAuth()
+  @OmchaiRoles(...ACTION_ROLES[OmchaiAction.VIEW])
   @ApiOperation({
     summary: 'Get story drafts for an anthology',
     description:

@@ -13,6 +13,7 @@ import {
   StoryDraft,
   SubmissionRound,
   Task,
+  AnthologyStatus,
 } from '../types';
 import User from './dtos/user.dto';
 import Role from './dtos/role';
@@ -25,6 +26,9 @@ export interface FilterSortAnthologyBody {
   pubLevels?: string[];
   programs?: string[];
   genres?: string[];
+  search?: string;
+  /** Requires a logged-in user; the backend returns 401 otherwise. */
+  staffIds?: number[];
   sortBy?: string;
   /** Only Library-eligible publications, even for logged-in staff. */
   library?: boolean;
@@ -37,6 +41,10 @@ export interface LibraryOptions {
 
 const libraryQuery = ({ library }: LibraryOptions = {}) =>
   library ? '?library=true' : '';
+
+export interface TrackerAnthologyBody {
+  status?: AnthologyStatus;
+}
 
 export interface StoryDocumentRow {
   storyId: number;
@@ -206,6 +214,13 @@ export class ApiClient {
     return normalizeAnthologies(data);
   }
 
+  public async getTrackerAnthologies(
+    body: TrackerAnthologyBody,
+  ): Promise<Anthology[]> {
+    const data = await this.post('/api/anthologies/tracker', body);
+    return normalizeAnthologies(data);
+  }
+
   public async getAuthors(): Promise<Author[]> {
     return this.get('/api/author') as Promise<Author[]>;
   }
@@ -286,8 +301,13 @@ export class ApiClient {
       /** null clears the stored grade. */
       grade?: number | null;
     },
+    /** Draft the edit is made from; the API checks edit rights on its publication. */
+    storyDraftId: number,
   ): Promise<Author> {
-    return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
+    return this.put(
+      `/api/author/${authorId}?storyDraftId=${storyDraftId}`,
+      body,
+    ) as Promise<Author>;
   }
 
   public async updateStoryDraft(
