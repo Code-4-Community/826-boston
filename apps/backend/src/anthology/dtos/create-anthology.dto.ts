@@ -13,6 +13,11 @@ export class CreateAnthologyDto {
   @IsString()
   title: string;
 
+  @ApiPropertyOptional({ description: 'Byline of the anthology' })
+  @IsOptional()
+  @IsString()
+  byline?: string;
+
   @ApiProperty({ description: 'Description of the anthology' })
   @IsString()
   description: string;
@@ -60,6 +65,11 @@ export class CreateAnthologyDto {
   @ApiProperty({ description: 'ISBN of the anthology' })
   @IsString()
   isbn?: string;
+
+  @ApiPropertyOptional({ description: 'Grade level of the anthology' })
+  @IsOptional()
+  @IsString()
+  gradeLevel?: string;
 
   @ApiPropertyOptional({ description: 'Shopify URL for purchasing' })
   @IsOptional()
