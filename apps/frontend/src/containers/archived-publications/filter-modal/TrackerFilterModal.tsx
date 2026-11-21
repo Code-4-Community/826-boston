@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import apiClient from '../../../api/apiClient';
 import {
-  Anthology,
   TrackerFilterState,
   DEFAULT_TRACKER_FILTER_STATE,
 } from '../../../types';
+import usePrograms from '../../../hooks/usePrograms';
 import FilterModalHeader from './FilterModalHeader';
 import FilterModalFooter from './FilterModalFooter';
 import TabFilterRow from './TabFilterRow';
@@ -18,22 +18,6 @@ interface TrackerFilterModalProps {
   initialFilters: TrackerFilterState;
   onApply: (filters: TrackerFilterState) => void;
   onClose: () => void;
-}
-
-// every distinct program name across all publications, sorted A-Z
-function collectPrograms(anthologies: Anthology[]): string[] {
-  const programs = new Set<string>();
-  for (const anthology of anthologies) {
-    const values =
-      typeof anthology.programs === 'string'
-        ? anthology.programs.split(',')
-        : anthology.programs ?? [];
-    for (const value of values) {
-      const program = value.trim();
-      if (program) programs.add(program);
-    }
-  }
-  return [...programs].sort((a, b) => a.localeCompare(b));
 }
 
 export default function TrackerFilterModal({
@@ -59,13 +43,10 @@ export default function TrackerFilterModal({
     queryFn: () => apiClient.getAnthologies(),
   });
 
+  const programs = usePrograms(anthologiesQuery.data ?? []);
   const programOptions = useMemo(
-    () =>
-      collectPrograms(anthologiesQuery.data ?? []).map((program) => ({
-        value: program,
-        label: program,
-      })),
-    [anthologiesQuery.data],
+    () => programs.map((program) => ({ value: program, label: program })),
+    [programs],
   );
   const staffOptions = useMemo(
     () =>
