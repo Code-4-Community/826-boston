@@ -24,6 +24,7 @@ import FilterIcon from '../../assets/icons/filter.svg';
 import MenuDotsIcon from '../../assets/icons/menu-dots.svg';
 import BookmarkIcon from '../../assets/icons/bookmark.svg';
 import CreatePublicationModal from '@containers/create-publication-modal';
+import Toast from '@components/Toast';
 
 type PublicationsPageMode = 'archive' | 'tracker';
 type ArchiveTab = 'published' | 'archived';
@@ -182,6 +183,7 @@ export default function ArchivedPublications({
   );
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [createPubModalOpen, setCreatePubModalOpen] = useState(false);
+  const [showCreatedToast, setShowCreatedToast] = useState(false);
   const [, , currentUser] = useAuth();
 
   const navigate = useNavigate();
@@ -334,7 +336,7 @@ export default function ArchivedPublications({
                 )}
               </button>
 
-              {mode === 'tracker' && (
+              {mode === 'tracker' && currentUser?.role === Role.ADMIN && (
                 <button
                   type="button"
                   className="publication-create-btn"
@@ -468,9 +470,17 @@ export default function ArchivedPublications({
         <CreatePublicationModal
           onCreated={() => {
             setCreatePubModalOpen(false);
+            setShowCreatedToast(true);
             queryClient.invalidateQueries(['tracker']);
           }}
           onClose={() => setCreatePubModalOpen(false)}
+        />
+      )}
+      {showCreatedToast && (
+        <Toast
+          title="Success!"
+          message="New publication created."
+          onClose={() => setShowCreatedToast(false)}
         />
       )}
     </div>
