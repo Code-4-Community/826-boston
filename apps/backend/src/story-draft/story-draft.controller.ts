@@ -7,7 +7,9 @@ import {
   Body,
   Post,
   Patch,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -21,17 +23,27 @@ import { CreateStoryDraftDto } from './dto/create-story-draft.dto';
 import { UpdateStoryDraftDto } from './dto/update-story-draft.dto';
 import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
-import { Public } from 'src/auth/roles.decorator';
+import { UserStatus } from 'src/auth/roles.decorator';
+import { Role } from 'src/users/types';
+import { OmchaiActor, OmchaiService } from 'src/omchai/omchai.service';
+import { OmchaiAction, draftActionsFor } from 'src/auth/omchai-permissions';
+
+type ActorRequest = Request & { user?: OmchaiActor };
 
 @ApiTags('StoryDrafts')
 @Controller('story-drafts')
 export class StoryDraftController {
-  constructor(private readonly storyDraftService: StoryDraftService) {}
+  constructor(
+    private readonly storyDraftService: StoryDraftService,
+    private readonly omchaiService: OmchaiService,
+  ) {}
 
-  @Public()
+  @ApiBearerAuth()
+  @UserStatus(Role.ADMIN)
   @ApiOperation({
     summary: 'Get all story drafts',
-    description: 'Retrieves a list of all story drafts in the system.',
+    description:
+      'Retrieves a list of all story drafts in the system. Admin only.',
   })
   @ApiOkResponse({
     description: 'Story drafts retrieved successfully',
@@ -96,7 +108,18 @@ export class StoryDraftController {
   @Post()
   async createStoryDraft(
     @Body() createStoryDraftDto: CreateStoryDraftDto,
+    @Req() req: ActorRequest,
   ): Promise<{ message: string }> {
+    // Creating needs draft-edit rights, plus checkpoint or manuscript rights
+    // if the new draft arrives with those fields already set.
+    const anthologyId = await this.omchaiService.anthologyIdForStory(
+      createStoryDraftDto.storyId,
+    );
+    await this.omchaiService.assertCan(req.user, anthologyId, [
+      OmchaiAction.EDIT_DRAFTS,
+      ...draftActionsFor(createStoryDraftDto),
+    ]);
+
     await this.storyDraftService.create(
       createStoryDraftDto.docLink,
       createStoryDraftDto.submissionRound ?? SubmissionRound.ONE,
@@ -150,7 +173,22 @@ export class StoryDraftController {
   async editStoryDraft(
     @Param('storyDraftId', ParseIntPipe) storyDraftId: number,
     @Body() updateStoryDraftDto: UpdateStoryDraftDto,
+    @Req() req: ActorRequest,
   ): Promise<{ message: string }> {
+    // One route saves edits, checkpoints and manuscript changes, so the
+    // permission comes from which fields are present. The user needs every
+    // permission the body touches; a body they can only partly write is
+    // rejected whole. storyId is ignored by edit(), so it needs nothing.
+    const anthologyId = await this.omchaiService.anthologyIdForStoryDraft(
+      storyDraftId,
+    );
+    const actions = draftActionsFor(updateStoryDraftDto);
+    await this.omchaiService.assertCan(
+      req.user,
+      anthologyId,
+      actions.length > 0 ? actions : [OmchaiAction.EDIT_DRAFTS],
+    );
+
     await this.storyDraftService.edit(
       storyDraftId,
       updateStoryDraftDto.docLink,

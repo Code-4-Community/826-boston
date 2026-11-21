@@ -8,6 +8,7 @@ import { AuthorModule } from '../author/author.module';
 import { Author } from '../author/author.entity';
 import { StoryDraftService } from './story-draft.service';
 import { EditRound, SubmissionRound } from './types';
+import { OmchaiModule } from '../omchai/omchai.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { EditRound, SubmissionRound } from './types';
     AuthModule,
     UsersModule,
     AuthorModule,
+    OmchaiModule,
   ],
   controllers: [StoryDraftController],
   providers: [StoryDraftService],

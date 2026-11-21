@@ -1,10 +1,21 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { AnthologyService } from '../anthology/anthology.service';
 import { StoryController } from './story.controller';
 import { StoryService } from './story.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthorService } from '../author/author.service';
 import { StoriesSeed } from '../seeds/stories.seed';
+import { OmchaiService } from '../omchai/omchai.service';
+import { Omchai, OmchaiRole } from '../omchai/omchai.entity';
+import { Story } from './story.entity';
+import { Anthology } from '../anthology/anthology.entity';
+import { Role } from '../users/types';
+import { IS_PUBLIC_KEY, OMCHAI_ROLES } from '../auth/roles.decorator';
 
 describe('StoryController', () => {
   let controller: StoryController;
@@ -23,6 +34,8 @@ describe('StoryController', () => {
   };
 
   const mockAnthologyService = { findOne: jest.fn() };
+  const omchaiRepo = { findOne: jest.fn() };
+  const storyRepo = { findOne: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,6 +52,10 @@ describe('StoryController', () => {
             findOne: jest.fn(),
           },
         },
+        OmchaiService,
+        { provide: getRepositoryToken(Omchai), useValue: omchaiRepo },
+        { provide: getRepositoryToken(Story), useValue: storyRepo },
+        { provide: getRepositoryToken(Anthology), useValue: {} },
       ],
     }).compile();
 
@@ -213,5 +230,79 @@ describe('StoryController', () => {
     });
   });
 
-  // todo: other tests
+  describe('route protection', () => {
+    const proto = StoryController.prototype;
+    const ALL_ROLES = Object.values(OmchaiRole);
+
+    it.each([
+      ['getStoryDocumentsByAnthology', proto.getStoryDocumentsByAnthology],
+      ['getStoryDraftsByAnthology', proto.getStoryDraftsByAnthology],
+    ])('%s needs login and any role on the publication', (_, handler) => {
+      expect(Reflect.getMetadata(IS_PUBLIC_KEY, handler)).toBeUndefined();
+      expect(Reflect.getMetadata(OMCHAI_ROLES, handler)).toEqual(ALL_ROLES);
+    });
+
+    it('createStory needs draft-edit rights', () => {
+      expect(Reflect.getMetadata(OMCHAI_ROLES, proto.createStory)).toEqual([
+        OmchaiRole.OWNER,
+        OmchaiRole.MANAGER,
+        OmchaiRole.HELPER,
+      ]);
+    });
+
+    it.each([
+      ['getStoriesByAnthology', proto.getStoriesByAnthology],
+      ['getStory (library)', proto.getStory],
+    ])('%s stays public for the Library', (_, handler) => {
+      expect(Reflect.getMetadata(IS_PUBLIC_KEY, handler)).toBe(true);
+    });
+  });
+
+  describe('remove story', () => {
+    const req = { user: { id: 1, role: Role.STANDARD } } as never;
+
+    beforeEach(() => {
+      storyRepo.findOne.mockResolvedValue({ anthology: { id: 5 } });
+      mockService.remove.mockResolvedValue({ id: 3 });
+    });
+
+    it.each([
+      [OmchaiRole.OWNER, true],
+      [OmchaiRole.MANAGER, true],
+      [OmchaiRole.HELPER, true],
+      [OmchaiRole.APPROVER, false],
+      [OmchaiRole.CONSULTED, false],
+      [OmchaiRole.INFORMED, false],
+    ])('as %s → allowed %s', async (role, allowed) => {
+      omchaiRepo.findOne.mockResolvedValue({ role });
+      const call = controller.removeStory(3, req);
+
+      if (allowed) {
+        await expect(call).resolves.toEqual({ id: 3 });
+      } else {
+        await expect(call).rejects.toThrow(ForbiddenException);
+        expect(mockService.remove).not.toHaveBeenCalled();
+      }
+    });
+
+    it('checks the role on the story’s publication', async () => {
+      omchaiRepo.findOne.mockResolvedValue({ role: OmchaiRole.OWNER });
+
+      await controller.removeStory(3, req);
+
+      expect(omchaiRepo.findOne).toHaveBeenCalledWith({
+        where: { user: { id: 1 }, anthology: { id: 5 } },
+      });
+    });
+
+    it('lets an admin with no role delete', async () => {
+      omchaiRepo.findOne.mockResolvedValue(null);
+
+      await expect(
+        controller.removeStory(3, {
+          user: { id: 2, role: Role.ADMIN },
+        } as never),
+      ).resolves.toEqual({ id: 3 });
+    });
+  });
 });

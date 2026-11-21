@@ -12,6 +12,8 @@ import {
   Story,
   StoryDraft,
   SubmissionRound,
+  Task,
+  AnthologyStatus,
 } from '../types';
 import User from './dtos/user.dto';
 import Role from './dtos/role';
@@ -24,7 +26,14 @@ export interface FilterSortAnthologyBody {
   pubLevels?: string[];
   programs?: string[];
   genres?: string[];
+  search?: string;
+  /** Requires a logged-in user; the backend returns 401 otherwise. */
+  staffIds?: number[];
   sortBy?: string;
+}
+
+export interface TrackerAnthologyBody {
+  status?: AnthologyStatus;
 }
 
 export interface StoryDocumentRow {
@@ -143,6 +152,10 @@ export class ApiClient {
     );
   }
 
+  public async getTasks(anthologyId: string | number): Promise<Task[]> {
+    return this.get(`/api/anthologies/${anthologyId}/tasks`) as Promise<Task[]>;
+  }
+
   public async getStoriesByAnthology(
     anthologyId: string | number,
   ): Promise<Story[]> {
@@ -179,6 +192,13 @@ export class ApiClient {
     body: FilterSortAnthologyBody,
   ): Promise<Anthology[]> {
     const data = await this.post('/api/anthologies/filter-sort', body);
+    return normalizeAnthologies(data);
+  }
+
+  public async getTrackerAnthologies(
+    body: TrackerAnthologyBody,
+  ): Promise<Anthology[]> {
+    const data = await this.post('/api/anthologies/tracker', body);
     return normalizeAnthologies(data);
   }
 
@@ -262,8 +282,13 @@ export class ApiClient {
       /** null clears the stored grade. */
       grade?: number | null;
     },
+    /** Draft the edit is made from; the API checks edit rights on its publication. */
+    storyDraftId: number,
   ): Promise<Author> {
-    return this.put(`/api/author/${authorId}`, body) as Promise<Author>;
+    return this.put(
+      `/api/author/${authorId}?storyDraftId=${storyDraftId}`,
+      body,
+    ) as Promise<Author>;
   }
 
   public async updateStoryDraft(
@@ -294,6 +319,10 @@ export class ApiClient {
     return this.get(`/api/omchai/anthology/${anthologyId}`) as Promise<
       OmchaiEntry[]
     >;
+  }
+
+  public async getOmchaiByUser(userId: number): Promise<OmchaiEntry[]> {
+    return this.get(`/api/omchai/user/${userId}`) as Promise<OmchaiEntry[]>;
   }
 
   public async uploadAnthologyCoverImage(

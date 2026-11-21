@@ -36,6 +36,7 @@ interface AuthenticatedUserResponse {
   lastName: string;
   email: string;
   role: 'admin' | 'standard';
+  omchaiAssignmentCount: number;
 }
 
 type GetUserRequest = Request & {
@@ -45,6 +46,7 @@ type GetUserRequest = Request & {
     firstName: string;
     lastName: string;
     role: string;
+    omchaiAssignments?: unknown[];
   };
 };
 
@@ -93,12 +95,16 @@ export class AuthController {
       throw new NotFoundException('User not found');
     }
 
+    const users = await this.usersService.findWithOmchai(user.email);
+    const assignmentCount = users[0]?.omchaiAssignments?.length ?? 0;
+
     return {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       role: user.role === Role.ADMIN ? 'admin' : 'standard',
+      omchaiAssignmentCount: assignmentCount,
     };
   }
 

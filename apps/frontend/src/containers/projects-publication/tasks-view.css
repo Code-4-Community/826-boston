@@ -1,0 +1,146 @@
+.tasks-loading {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--neutral-400);
+  padding: 24px 0;
+}
+
+.tasks-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tasks-view-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.tasks-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.tasks-view-btn:disabled {
+  cursor: default;
+}
+
+.tasks-view-btn--active {
+  background-color: var(--neutral-200);
+}
+
+.tasks-task-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tasks-table th,
+.tasks-table td {
+  padding: 0 12px;
+}
+
+.tasks-table th {
+  height: 44px;
+}
+
+.tasks-table td {
+  height: 50px;
+}
+
+.tasks-table th.tasks-col-right,
+.tasks-table td.tasks-col-right {
+  text-align: right;
+}
+
+.tasks-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* The asset is drawn at an angle, so turn it upright */
+.tasks-paperclip {
+  flex-shrink: 0;
+  transform: rotate(-45deg);
+}
+
+.tasks-badge {
+  display: inline-block;
+  padding: 4px 16px 6px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 13px;
+  color: var(--neutral-500);
+  font-size: 12px;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.tasks-badge--programming {
+  border-color: #00996b;
+  color: #00996b;
+}
+
+.tasks-badge--checkpoint {
+  border-color: var(--error-red);
+  color: var(--error-red);
+}
+
+.tasks-badge--production {
+  border-color: #006fd7;
+  color: #006fd7;
+}
+
+.tasks-person {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #000;
+}
+
+.tasks-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--accent-500);
+  border-radius: 999px;
+  background-color: #ffcc7f;
+  color: #000;
+  font-size: 10px;
+}
+
+.tasks-table td.tasks-due--overdue {
+  color: var(--error-red);
+}
+
+/* Completed tasks are greyed out */
+.document-tracker-table .tasks-row--complete td {
+  background-color: #f9f9f9;
+  color: #858585;
+}
+
+.tasks-row--complete .tasks-badge {
+  border-color: #858585;
+  color: #858585;
+}
+
+.tasks-row--complete .tasks-person {
+  color: #858585;
+}
+
+.tasks-row--complete .tasks-avatar {
+  border-color: #858585;
+  background: none;
+  color: #858585;
+}
