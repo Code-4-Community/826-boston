@@ -20,6 +20,10 @@ interface Props {
   draft: StoryDraftDetail;
   onClose: () => void;
   onSaved: () => void;
+  // Author fields, consent and doc link (Owner, Manager, Helper)
+  canEditDrafts?: boolean;
+  // Checkpoint boxes (Owner, Manager, Approver)
+  canTickCheckpoints?: boolean;
 }
 
 type PanelTab = 'omchai' | 'approved-documents' | 'checkpoints';
@@ -73,6 +77,8 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
   draft,
   onClose,
   onSaved,
+  canEditDrafts = false,
+  canTickCheckpoints = false,
 }) => {
   const [form, setForm] = useState<FormState>(() => toForm(draft));
   const [activeTab, setActiveTab] = useState<PanelTab>('checkpoints');
@@ -96,7 +102,11 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
       checkpoints: { ...prev.checkpoints, [id]: !prev.checkpoints[id] },
     }));
 
-  /** Persists whatever has changed since the last successful save. */
+  /**
+   * Persists whatever has changed since the last successful save, limited to
+   * fields the user may change. This runs on close and on unmount too, so the
+   * permission check lives here as well as on the inputs.
+   */
   const save = useCallback(async (): Promise<boolean> => {
     const current = formRef.current;
     const base = savedRef.current;
@@ -108,19 +118,20 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
       grade?: number | null;
     } = {};
     if (
-      current.firstName !== base.firstName ||
-      current.lastName !== base.lastName
+      canEditDrafts &&
+      (current.firstName !== base.firstName ||
+        current.lastName !== base.lastName)
     ) {
       authorPatch.name =
         `${current.firstName.trim()} ${current.lastName.trim()}`.trim();
     }
-    if (current.nameInBook !== base.nameInBook) {
+    if (canEditDrafts && current.nameInBook !== base.nameInBook) {
       authorPatch.nameInBook = current.nameInBook.trim();
     }
-    if (current.bio !== base.bio) {
+    if (canEditDrafts && current.bio !== base.bio) {
       authorPatch.bio = current.bio.trim();
     }
-    if (current.grade !== base.grade) {
+    if (canEditDrafts && current.grade !== base.grade) {
       const parsed = Number.parseInt(current.grade, 10);
       authorPatch.grade = Number.isNaN(parsed) ? null : parsed;
     }
@@ -130,19 +141,24 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
       studentConsent?: boolean;
       checkpoints?: Record<string, boolean>;
     } = {};
-    if (current.docLink !== base.docLink) {
+    if (canEditDrafts && current.docLink !== base.docLink) {
       draftPatch.docLink = current.docLink.trim();
     }
-    if (current.studentConsent !== base.studentConsent) {
+    if (canEditDrafts && current.studentConsent !== base.studentConsent) {
       draftPatch.studentConsent = current.studentConsent;
     }
-    if (!sameCheckpoints(current.checkpoints, base.checkpoints)) {
+    if (
+      canTickCheckpoints &&
+      !sameCheckpoints(current.checkpoints, base.checkpoints)
+    ) {
       draftPatch.checkpoints = current.checkpoints;
     }
 
     const requests: Promise<unknown>[] = [];
     if (Object.keys(authorPatch).length > 0) {
-      requests.push(apiClient.updateAuthor(draft.authorId, authorPatch));
+      requests.push(
+        apiClient.updateAuthor(draft.authorId, authorPatch, draft.storyDraftId),
+      );
     }
     if (Object.keys(draftPatch).length > 0) {
       requests.push(apiClient.updateStoryDraft(draft.storyDraftId, draftPatch));
@@ -162,7 +178,13 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
     } finally {
       setSaving(false);
     }
-  }, [draft.authorId, draft.storyDraftId, onSaved]);
+  }, [
+    draft.authorId,
+    draft.storyDraftId,
+    onSaved,
+    canEditDrafts,
+    canTickCheckpoints,
+  ]);
 
   const handleClose = useCallback(async () => {
     if (await save()) onClose();
@@ -218,6 +240,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
           placeholder="Last Name"
           aria-label="Last name"
           size={nameSize(form.lastName, 'Last Name')}
+          readOnly={!canEditDrafts}
           onChange={(e) => update('lastName', e.target.value)}
         />
         <span className="sdp__name-sep">,</span>
@@ -227,6 +250,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
           placeholder="First Name"
           aria-label="First name"
           size={nameSize(form.firstName, 'First Name')}
+          readOnly={!canEditDrafts}
           onChange={(e) => update('firstName', e.target.value)}
         />
       </div>
@@ -238,6 +262,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
         placeholder="Author bio"
         aria-label="Author bio"
         rows={1}
+        readOnly={!canEditDrafts}
         onChange={(e) => update('bio', e.target.value)}
       />
 
@@ -245,7 +270,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
         <div className="sdp__field">
           <dt className="sdp__label">Grade</dt>
           <dd className="sdp__value">
-            {editingGrade || !form.grade ? (
+            {canEditDrafts && (editingGrade || !form.grade) ? (
               <input
                 className="sdp__input"
                 type="number"
@@ -262,9 +287,10 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
               <button
                 type="button"
                 className="sdp__value-button"
+                disabled={!canEditDrafts}
                 onClick={() => setEditingGrade(true)}
               >
-                {ordinal(form.grade)}
+                {form.grade ? ordinal(form.grade) : '—'}
               </button>
             )}
           </dd>
@@ -278,6 +304,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
               value={form.nameInBook}
               placeholder="Add name."
               aria-label="Name in book"
+              readOnly={!canEditDrafts}
               onChange={(e) => update('nameInBook', e.target.value)}
             />
           </dd>
@@ -291,6 +318,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
               type="checkbox"
               checked={form.studentConsent}
               aria-label="Consent on file"
+              disabled={!canEditDrafts}
               onChange={(e) => update('studentConsent', e.target.checked)}
             />
           </dd>
@@ -304,6 +332,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
               value={form.docLink}
               placeholder="Add document."
               aria-label="Document link"
+              readOnly={!canEditDrafts}
               onChange={(e) => update('docLink', e.target.value)}
             />
             {hasDocLink && (
@@ -360,6 +389,7 @@ const StoryDraftDetailPanel: React.FC<Props> = ({
                   className="sdp__checkbox"
                   type="checkbox"
                   checked={form.checkpoints[checkpoint.id] ?? false}
+                  disabled={!canTickCheckpoints}
                   onChange={() => toggleCheckpoint(checkpoint.id)}
                 />
               </li>

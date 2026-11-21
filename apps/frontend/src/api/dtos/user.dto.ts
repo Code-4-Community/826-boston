@@ -11,7 +11,11 @@ interface User {
 
   title: string;
 
+  pronouns?: string | null;
+
   role: Role;
+
+  omchaiAssignmentCount: number;
 }
 
 export default User;

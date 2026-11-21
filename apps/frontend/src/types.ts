@@ -113,6 +113,28 @@ export const DEFAULT_FILTER_STATE: FilterState = {
   inventoryMax: '',
 };
 
+/** Values match the backend's AnthologySortOption, so they're sent as-is. */
+export enum TrackerSortOption {
+  TITLE_ASC = 'title-asc',
+  TITLE_DESC = 'title-desc',
+  BYLINE_ASC = 'byline-asc',
+  BYLINE_DESC = 'byline-desc',
+  DATE_RECENT = 'date-recent',
+  DATE_OLDEST = 'date-oldest',
+}
+
+export interface TrackerFilterState {
+  sortBy: TrackerSortOption;
+  programs: string[];
+  staffIds: number[];
+}
+
+export const DEFAULT_TRACKER_FILTER_STATE: TrackerFilterState = {
+  sortBy: TrackerSortOption.TITLE_ASC,
+  programs: [],
+  staffIds: [],
+};
+
 export enum OmchaiRole {
   OWNER = 'OWNER',
   MANAGER = 'MANAGER',
@@ -136,6 +158,7 @@ export interface OmchaiEntry {
   role: OmchaiRole;
   datetimeAssigned: string;
   user: OmchaiUser;
+  anthology?: Anthology;
 }
 
 export interface Anthology {
@@ -162,6 +185,33 @@ export interface Anthology {
   sponsors?: string[];
   triggers?: string[];
   ageCategories?: string[];
+  stories?: Story[];
+}
+
+export enum AreaOfWork {
+  PLANNING = 'PLANNING',
+  PROGRAMMING = 'PROGRAMMING',
+  CHECKPOINT = 'CHECKPOINT',
+  PRODUCTION = 'PRODUCTION',
+}
+
+export enum TaskStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETE = 'COMPLETE',
+}
+
+/** A task, from GET /anthologies/:anthologyId/tasks. */
+export interface Task {
+  id: number;
+  name: string;
+  areaOfWork?: AreaOfWork | null;
+  status: TaskStatus;
+  /** Postgres date columns, returned as YYYY-MM-DD strings. */
+  timeFrame: string;
+  dueBy: string;
+  personInCharge: { id: number; firstName: string; lastName: string } | null;
+  attachments: { id: number; fileName: string; fileUrl: string }[];
 }
 
 /** Production metadata for an anthology, from GET /production-info/:anthologyId. */

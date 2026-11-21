@@ -48,7 +48,7 @@ const noAssignmentsUser: User = {
   id: 1,
   email: 'test@example.com',
   omchaiAssignments: [],
-  role: Role.ADMIN,
+  role: Role.STANDARD,
   firstName: '',
   lastName: '',
 };
@@ -72,7 +72,7 @@ const insufficientRoleUser: User = {
       user: new User(),
     },
   ],
-  role: Role.ADMIN,
+  role: Role.STANDARD,
   firstName: '',
   lastName: '',
 };
@@ -149,6 +149,23 @@ describe('OmchaiGuard', () => {
       .mockReturnValue([OmchaiRole.MANAGER]);
     const context = makeContext(standardUser, { anthologyId: '42' });
     expect(guard.canActivate(context)).toBe(true);
+  });
+
+  it('allows an admin with no assignment on the anthology', () => {
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([OmchaiRole.OWNER]);
+    const admin: User = { ...noAssignmentsUser, role: Role.ADMIN };
+    const context = makeContext(admin, { id: '7' });
+    expect(guard.canActivate(context)).toBe(true);
+  });
+
+  it('still denies a standard user with no assignment on the anthology', () => {
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([OmchaiRole.OWNER]);
+    const context = makeContext(noAssignmentsUser, { id: '7' });
+    expect(guard.canActivate(context)).toBe(false);
   });
 
   it('uses OMCHAI_ROLES when reading metadata', () => {
