@@ -4,6 +4,7 @@ interface FieldProps {
   children: React.ReactNode;
 }
 
+// TODO: similar Field components are used in a few places and should be shared
 export default function Field({
   label,
   required = false,

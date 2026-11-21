@@ -9,7 +9,7 @@ import {
 import FilterModalHeader from './FilterModalHeader';
 import FilterModalFooter from './FilterModalFooter';
 import TabFilterRow from './TabFilterRow';
-import SearchableFilterSelect from './SearchableFilterSelect';
+import SearchableMultiSelect from '@components/SearchableMultiSelect';
 import { TRACKER_SORT_OPTIONS } from './constants';
 import CloseIcon from '../../../assets/icons/close.svg';
 import './filter-modal.css';
@@ -107,33 +107,39 @@ export default function TrackerFilterModal({
 
           <section className="filter-modal-section">
             <h3 className="filter-modal-section-title">Filter By Attribute</h3>
-            <SearchableFilterSelect
-              label="Program(s)"
-              options={programOptions}
-              selected={draft.programs}
-              onChange={(values) => update('programs', values)}
-              placeholder="Search for a program..."
-              isLoading={anthologiesQuery.isLoading}
-              errorMessage={
-                anthologiesQuery.isError
-                  ? "Couldn't load programs. Try again."
-                  : undefined
-              }
-            />
-            <SearchableFilterSelect
-              label="Staff"
-              options={staffOptions}
-              selected={draft.staffIds}
-              onChange={(values) => update('staffIds', values)}
-              placeholder="Search for a staff member..."
-              showAvatar
-              isLoading={usersQuery.isLoading}
-              errorMessage={
-                usersQuery.isError
-                  ? "Couldn't load staff. Try again."
-                  : undefined
-              }
-            />
+            <div className="filter-select-row">
+              <span className="filter-select-label">Program(s)</span>
+              <SearchableMultiSelect
+                label="Program(s)"
+                options={programOptions}
+                selected={draft.programs}
+                onChange={(values) => update('programs', values)}
+                placeholder="Search for a program..."
+                isLoading={anthologiesQuery.isLoading}
+                errorMessage={
+                  anthologiesQuery.isError
+                    ? "Couldn't load programs. Try again."
+                    : undefined
+                }
+              />
+            </div>
+            <div className="filter-select-row">
+              <span className="filter-select-label">Staff</span>
+              <SearchableMultiSelect
+                label="Staff"
+                options={staffOptions}
+                selected={draft.staffIds}
+                onChange={(values) => update('staffIds', values)}
+                placeholder="Search for a staff member..."
+                showAvatar
+                isLoading={usersQuery.isLoading}
+                errorMessage={
+                  usersQuery.isError
+                    ? "Couldn't load staff. Try again."
+                    : undefined
+                }
+              />
+            </div>
           </section>
         </div>
 

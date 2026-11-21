@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
 import './styles.css';
-import User from '@api/dtos/user.dto';
 import apiClient from '@api/apiClient';
+import SearchableMultiSelect from '@components/SearchableMultiSelect';
 import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
 import { Anthology, AnthologyPubLevel, CreateAnthologyDto } from '../../types';
 import { PUBLICATION_LEVELS } from './constants';
 import Field from './Field';
+import CloseIcon from '../../assets/icons/close.svg';
 
 interface CreatePublicationModalProps {
   onClose: () => void;
@@ -30,139 +32,31 @@ const INITIAL_FORM: PublicationFormState = {
   owners: [],
 };
 
-// TODO: to delete
-interface OwnerOption {
-  id: number;
-  name: string;
-  email: string;
-}
-
-// TODO: to delete
-interface UserSearchableMultiSelectProps {
-  users: OwnerOption[];
-  selected: number[];
-  onChange: (val: number[]) => void;
-  placeholder: string;
-}
-
-// TODO: to delete
-function UserSearchableMultiSelect({
-  users,
-  selected,
-  onChange,
-  placeholder,
-}: UserSearchableMultiSelectProps) {
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-
-  const filteredUsers = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return users;
-
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(normalized) ||
-        user.email.toLowerCase().includes(normalized),
-    );
-  }, [users, query]);
-
-  const toggle = (value: number) => {
-    onChange(
-      selected.includes(value)
-        ? selected.filter((s) => s !== value)
-        : [...selected, value],
-    );
-  };
-
-  const selectedUsers = users.filter((user) => selected.includes(user.id));
-
-  return (
-    <div className="multiselect__wrapper">
-      {selectedUsers.length > 0 && (
-        <div className="multiselect__tags">
-          {selectedUsers.map((user) => {
-            const value = `${user.name} <${user.email}>`;
-
-            return (
-              <span
-                key={value}
-                className="multiselect__tag multiselect__tag--user"
-              >
-                {user.name}
-                <button
-                  type="button"
-                  className="multiselect__tag-remove"
-                  onClick={() => toggle(user.id)}
-                  aria-label={`Remove ${user.name}`}
-                >
-                  ×
-                </button>
-              </span>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="multiselect__search">
-        <input
-          className="input"
-          placeholder={placeholder}
-          value={query}
-          onFocus={() => setIsOpen(true)}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
-        />
-      </div>
-
-      {isOpen && (
-        <div className="multiselect__options-list">
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => {
-              const value = user.id;
-              const isSelected = selected.includes(user.id);
-
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  className={`multiselect__option-row ${
-                    isSelected ? 'multiselect__option--selected-user' : ''
-                  }`}
-                  onClick={() => toggle(value)}
-                >
-                  <div className="multiselect__user-meta">
-                    <span>{user.name}</span>
-                    <span className="multiselect__user-email">
-                      {user.email}
-                    </span>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    readOnly
-                    tabIndex={-1}
-                  />
-                </button>
-              );
-            })
-          ) : (
-            <div className="multiselect__empty">No results found</div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function CreatePublicationModal({
   onClose,
   onSave,
   onCreated,
 }: CreatePublicationModalProps) {
   const [form, setForm] = useState<PublicationFormState>(INITIAL_FORM);
-  const [users, setUsers] = useState<User[]>([]);
+
+  const usersQuery = useQuery({
+    queryKey: ['users'],
+    queryFn: () => apiClient.getUsers(),
+  });
+
+  const ownerOptions = useMemo(
+    () =>
+      (usersQuery.data ?? []).map((user) => ({
+        value: user.id,
+        label: `${user.firstName} ${user.lastName}`,
+      })),
+    [usersQuery.data],
+  );
+
+  const programOptions = PROGRAM_OPTIONS.map(({ value, displayLabel }) => ({
+    value,
+    label: displayLabel,
+  }));
 
   async function handleSaveForm() {
     onSave(form);
@@ -188,15 +82,6 @@ export default function CreatePublicationModal({
     }
   }
 
-  useEffect(() => {
-    apiClient
-      .getUsers()
-      .then((data) => setUsers(data as User[]))
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
   const set = <K extends keyof PublicationFormState>(
     key: K,
     value: PublicationFormState[K],
@@ -211,7 +96,7 @@ export default function CreatePublicationModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className="modal create-publication-modal">
         <div className="modal__header">
           <div className="modal__header-row">
             <h1 className="modal__title">Create new publication</h1>
@@ -221,7 +106,7 @@ export default function CreatePublicationModal({
               onClick={onClose}
               aria-label="Close modal"
             >
-              ×
+              <img src={CloseIcon} alt="" />
             </button>
           </div>
         </div>
@@ -237,26 +122,20 @@ export default function CreatePublicationModal({
           </Field>
 
           <Field label="Program">
-            <select
-              className="input input--select"
-              value={form.programs[0] ?? ''}
-              onChange={(e) => set('programs', [e.target.value])}
-            >
-              <option value="" disabled>
-                Select a program
-              </option>
-              {PROGRAM_OPTIONS.map(({ value, displayLabel }) => (
-                <option key={value} value={value}>
-                  {displayLabel}
-                </option>
-              ))}
-            </select>
+            <SearchableMultiSelect
+              label="Program"
+              options={programOptions}
+              selected={form.programs}
+              onChange={(values) => set('programs', values)}
+              placeholder="Select a program"
+            />
           </Field>
 
           <div className="field-row">
             <Field label="Publication Level" required>
               <select
                 className="input input--select"
+                required
                 value={form.publicationLevel}
                 onChange={(e) => set('publicationLevel', e.target.value)}
               >
@@ -273,7 +152,9 @@ export default function CreatePublicationModal({
 
             <Field label="Publication Date">
               <input
-                className="input"
+                className={`input input--date${
+                  form.publicationDate ? '' : ' input--empty'
+                }`}
                 type="date"
                 value={form.publicationDate}
                 onChange={(e) => set('publicationDate', e.target.value)}
@@ -282,15 +163,19 @@ export default function CreatePublicationModal({
           </div>
 
           <Field label="Owner" required>
-            <UserSearchableMultiSelect
-              users={users.map((u) => ({
-                name: u.firstName + ' ' + u.lastName,
-                email: u.email,
-                id: u.id,
-              }))}
+            <SearchableMultiSelect
+              label="Owner"
+              options={ownerOptions}
               selected={form.owners}
-              onChange={(value) => set('owners', value)}
+              onChange={(values) => set('owners', values)}
               placeholder="Select a user"
+              showAvatar
+              isLoading={usersQuery.isLoading}
+              errorMessage={
+                usersQuery.isError
+                  ? "Couldn't load users. Try again."
+                  : undefined
+              }
             />
           </Field>
         </div>
