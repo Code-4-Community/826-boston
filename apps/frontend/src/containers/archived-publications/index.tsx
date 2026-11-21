@@ -471,7 +471,6 @@ export default function ArchivedPublications({
           onSave={() => {
             setCreatePubModalOpen(false);
           }}
-          teamMembers={[]}
         />
       )}
     </div>

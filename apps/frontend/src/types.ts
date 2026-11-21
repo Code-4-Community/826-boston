@@ -1,5 +1,3 @@
-//import { PUB_LEVEL_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
-
 export enum AnthologyStatus {
   NOT_STARTED = 'Not Started',
   DRAFTING = 'Drafting',
@@ -246,15 +244,9 @@ export interface AnthologyInventory {
 export interface CreateAnthologyDto {
   title: string;
   pub_level: AnthologyPubLevel;
-  themes: string[];
-  genres: string[];
-  publicationDate: string;
-  description: string;
-  programs: string[];
-  photoUrl?: string;
-  isbn: string;
-  shopifyUrl?: string;
-  inventory?: number;
+  owner_ids: number[];
+  programs?: string[];
+  publicationDate?: string;
 }
 
 export interface CreateBatchOmchaiAssignmentsDto {

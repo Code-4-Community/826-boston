@@ -1,194 +1,51 @@
 import { useEffect, useMemo, useState } from 'react';
 import './styles.css';
-import { THEMES, OMCHAI_ROLES, OmchaiRole } from './constants';
 import User from '@api/dtos/user.dto';
 import apiClient from '@api/apiClient';
 import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
-import {
-  Anthology,
-  AnthologyPubLevel,
-  CreateAnthologyDto,
-  CreateBatchOmchaiAssignmentsDto,
-} from '../../types';
+import { Anthology, AnthologyPubLevel, CreateAnthologyDto } from '../../types';
+import { PUBLICATION_LEVELS } from './constants';
+import Field from './Field';
+
+interface CreatePublicationModalProps {
+  onClose: () => void;
+  onSave: (form: PublicationFormState) => void;
+  /** Called after the publication and its OMCHAI assignments are saved. */
+  onCreated?: (anthology: Anthology) => void;
+}
 
 export interface PublicationFormState {
   title: string;
-  publicationType: string;
   programs: string[];
-  themes: string[];
-  genres: string[];
+  publicationLevel: string;
   publicationDate: string;
-  description: string;
-  owner: number[];
-  manager: number[];
-  consulted: number[];
-  helper: number[];
-  approver: number[];
-  informed: number[];
+  owners: number[];
 }
 
-interface TeamMemberOption {
+const INITIAL_FORM: PublicationFormState = {
+  title: '',
+  programs: [],
+  publicationLevel: '',
+  publicationDate: '',
+  owners: [],
+};
+
+// TODO: to delete
+interface OwnerOption {
   id: number;
   name: string;
   email: string;
 }
 
-interface CreatePublicationModalProps {
-  onClose: () => void;
-  onSave: (form: PublicationFormState) => void;
-  teamMembers?: TeamMemberOption[];
-  /** Called after the publication and its OMCHAI assignments are saved. */
-  onCreated?: (anthology: Anthology) => void;
-}
-
-const PUBLICATION_TYPES = [
-  { value: 'Zine', label: 'Level 0 (Zines)' },
-  { value: 'Chapbook', label: 'Level 1 (Chapbooks)' },
-  { value: 'PerfectBound', label: 'Level 2 (Perfect Bound)' },
-  { value: 'Signature', label: 'Level 3 (Signature Publications)' },
-];
-
-const GENRES = [
-  'Poetry',
-  'Fiction',
-  'Nonfiction',
-  'Memoir',
-  'Essay',
-  'Short Story',
-  'Personal Narrative',
-  'Graphic Narrative',
-  'Play',
-  'Interview',
-  'Letters',
-  'Mixed Genre',
-  'Civic Engagement',
-  'Multicultural',
-];
-
-const INITIAL_FORM: PublicationFormState = {
-  title: '',
-  publicationType: '',
-  programs: [],
-  themes: [],
-  genres: [],
-  publicationDate: '',
-  description: '',
-  owner: [],
-  manager: [],
-  consulted: [],
-  helper: [],
-  approver: [],
-  informed: [],
-};
-
-interface SearchableMultiSelectProps {
-  options: string[];
-  selected: string[];
-  onChange: (val: string[]) => void;
-  placeholder: string;
-  tagClass: string;
-  selectedOptionClass: string;
-}
-
-function SearchableMultiSelect({
-  options,
-  selected,
-  onChange,
-  placeholder,
-  tagClass,
-  selectedOptionClass,
-}: SearchableMultiSelectProps) {
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-
-  const filteredOptions = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return options;
-    return options.filter((opt) => opt.toLowerCase().includes(normalized));
-  }, [options, query]);
-
-  const toggle = (opt: string) => {
-    onChange(
-      selected.includes(opt)
-        ? selected.filter((s) => s !== opt)
-        : [...selected, opt],
-    );
-  };
-
-  return (
-    <div className="multiselect__wrapper">
-      {selected.length > 0 && (
-        <div className="multiselect__tags">
-          {selected.map((s) => (
-            <span key={s} className={`multiselect__tag ${tagClass}`}>
-              {s}
-              <button
-                type="button"
-                className="multiselect__tag-remove"
-                onClick={() => toggle(s)}
-                aria-label={`Remove ${s}`}
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="multiselect__search">
-        <input
-          className="input"
-          placeholder={placeholder}
-          value={query}
-          onFocus={() => setIsOpen(true)}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
-        />
-      </div>
-
-      {isOpen && (
-        <div className="multiselect__options-list">
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((opt) => {
-              const isSelected = selected.includes(opt);
-
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  className={`multiselect__option-row ${
-                    isSelected ? selectedOptionClass : ''
-                  }`}
-                  onClick={() => toggle(opt)}
-                >
-                  <span>{opt}</span>
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    readOnly
-                    tabIndex={-1}
-                  />
-                </button>
-              );
-            })
-          ) : (
-            <div className="multiselect__empty">No results found</div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
+// TODO: to delete
 interface UserSearchableMultiSelectProps {
-  users: TeamMemberOption[];
+  users: OwnerOption[];
   selected: number[];
   onChange: (val: number[]) => void;
   placeholder: string;
 }
 
+// TODO: to delete
 function UserSearchableMultiSelect({
   users,
   selected,
@@ -299,29 +156,11 @@ function UserSearchableMultiSelect({
   );
 }
 
-interface FieldProps {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}
-
-function Field({ label, required = false, children }: FieldProps) {
-  return (
-    <div className="field">
-      <label className="field__label">
-        {label} {required && <span className="field__required">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
 export default function CreatePublicationModal({
   onClose,
   onSave,
   onCreated,
 }: CreatePublicationModalProps) {
-  const [tab, setTab] = useState<0 | 1>(0);
   const [form, setForm] = useState<PublicationFormState>(INITIAL_FORM);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -329,35 +168,19 @@ export default function CreatePublicationModal({
     onSave(form);
 
     try {
-      // create body for anthology and omchai api calls
       const createAnthologyBody: CreateAnthologyDto = {
         title: form.title,
-        pub_level: form.publicationType as AnthologyPubLevel,
-        themes: form.themes,
-        genres: form.genres,
-        description: form.description,
-        programs: form.programs,
-        publicationDate: form.publicationDate,
-        isbn: '',
+        pub_level: form.publicationLevel as AnthologyPubLevel,
+        owner_ids: form.owners,
       };
+      // optional fields
+      if (form.programs.length > 0)
+        createAnthologyBody.programs = form.programs;
+      if (form.publicationDate) {
+        createAnthologyBody.publicationDate = form.publicationDate;
+      }
 
       const anthology = await apiClient.createAnthology(createAnthologyBody);
-
-      const createBatchOmchaiAssignmentsBody: CreateBatchOmchaiAssignmentsDto =
-        {
-          anthology_id: anthology.id,
-          datetime_assigned: new Date().toISOString(),
-          owners: form.owner,
-          managers: form.manager,
-          consulted: form.consulted,
-          helpers: form.helper,
-          approvers: form.approver,
-          informers: form.informed,
-        };
-
-      await apiClient.createBatchOmchaiAssignments(
-        createBatchOmchaiAssignmentsBody,
-      );
 
       onCreated?.(anthology);
     } catch (err) {
@@ -381,28 +204,17 @@ export default function CreatePublicationModal({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const tab1Valid =
+  const isValid =
     form.title.trim().length > 0 &&
-    form.publicationType.length > 0 &&
-    form.publicationDate.length > 0;
-
-  const DescriptionField = (
-    <Field label="Description">
-      <textarea
-        className="input input--textarea"
-        placeholder="Include # students published, # editorial board members, consult your manager to ensure that they align with WR team goals"
-        value={form.description}
-        onChange={(e) => set('description', e.target.value)}
-      />
-    </Field>
-  );
+    form.publicationLevel.length > 0 &&
+    form.owners.length > 0;
 
   return (
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal__header">
           <div className="modal__header-row">
-            <h1 className="modal__title">New Publication</h1>
+            <h1 className="modal__title">Create new publication</h1>
             <button
               type="button"
               className="modal__close"
@@ -415,117 +227,83 @@ export default function CreatePublicationModal({
         </div>
 
         <div className="modal__body">
-          {tab === 0 ? (
-            <>
-              <Field label="Title" required>
-                <input
-                  className="input"
-                  placeholder="Enter publication title"
-                  value={form.title}
-                  onChange={(e) => set('title', e.target.value)}
-                />
-              </Field>
+          <Field label="Title" required>
+            <input
+              className="input"
+              placeholder="Enter title"
+              value={form.title}
+              onChange={(e) => set('title', e.target.value)}
+            />
+          </Field>
 
-              <Field label="Publication Type" required>
-                <select
-                  className="input input--select"
-                  value={form.publicationType}
-                  onChange={(e) => set('publicationType', e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select a publication type
-                  </option>
-                  {PUBLICATION_TYPES.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Theme(s)">
-                <SearchableMultiSelect
-                  options={THEMES}
-                  selected={form.themes}
-                  onChange={(value) => set('themes', value)}
-                  placeholder="Search for a theme..."
-                  tagClass="multiselect__tag--theme"
-                  selectedOptionClass="multiselect__option--selected-theme"
-                />
-              </Field>
-              <Field label="Program(s)">
-                <SearchableMultiSelect
-                  options={PROGRAM_OPTIONS.map((o) => o.displayLabel)}
-                  selected={form.programs}
-                  onChange={(value) => set('programs', value)}
-                  placeholder="Search for a program..."
-                  tagClass="multiselect__tag--theme"
-                  selectedOptionClass="multiselect__option--selected-theme"
-                />
-              </Field>
-
-              <Field label="Genre(s)">
-                <SearchableMultiSelect
-                  options={GENRES}
-                  selected={form.genres}
-                  onChange={(value) => set('genres', value)}
-                  placeholder="Search for a genre..."
-                  tagClass="multiselect__tag--theme"
-                  selectedOptionClass="multiselect__option--selected-theme"
-                />
-              </Field>
-
-              <div className="field-row">
-                <Field label="Publication Date" required>
-                  <input
-                    className="input"
-                    type="date"
-                    value={form.publicationDate}
-                    onChange={(e) => set('publicationDate', e.target.value)}
-                  />
-                </Field>
-              </div>
-
-              {DescriptionField}
-            </>
-          ) : (
-            <>
-              {OMCHAI_ROLES.map(({ key, label }: OmchaiRole) => (
-                <Field key={key} label={label}>
-                  <UserSearchableMultiSelect
-                    users={users.map((u) => ({
-                      name: u.firstName + ' ' + u.lastName,
-                      email: u.email,
-                      id: u.id,
-                    }))}
-                    selected={form[key]}
-                    onChange={(value) => set(key, value)}
-                    placeholder="Search by name or email..."
-                  />
-                </Field>
+          <Field label="Program">
+            <select
+              className="input input--select"
+              value={form.programs[0] ?? ''}
+              onChange={(e) => set('programs', [e.target.value])}
+            >
+              <option value="" disabled>
+                Select a program
+              </option>
+              {PROGRAM_OPTIONS.map(({ value, displayLabel }) => (
+                <option key={value} value={value}>
+                  {displayLabel}
+                </option>
               ))}
-            </>
-          )}
+            </select>
+          </Field>
+
+          <div className="field-row">
+            <Field label="Publication Level" required>
+              <select
+                className="input input--select"
+                value={form.publicationLevel}
+                onChange={(e) => set('publicationLevel', e.target.value)}
+              >
+                <option value="" disabled>
+                  Select a level...
+                </option>
+                {PUBLICATION_LEVELS.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field label="Publication Date">
+              <input
+                className="input"
+                type="date"
+                value={form.publicationDate}
+                onChange={(e) => set('publicationDate', e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <Field label="Owner" required>
+            <UserSearchableMultiSelect
+              users={users.map((u) => ({
+                name: u.firstName + ' ' + u.lastName,
+                email: u.email,
+                id: u.id,
+              }))}
+              selected={form.owners}
+              onChange={(value) => set('owners', value)}
+              placeholder="Select a user"
+            />
+          </Field>
         </div>
 
         <div className="modal__footer">
-          {tab === 1 && (
-            <button
-              type="button"
-              className="btn btn--secondary modal__back"
-              onClick={() => setTab(0)}
-            >
-              Back
-            </button>
-          )}
-
           <div className="modal__footer-right">
             <button
               type="button"
               className="btn btn--primary"
-              onClick={tab === 0 ? () => setTab(1) : () => handleSaveForm()}
-              disabled={!tab1Valid}
+              onClick={handleSaveForm}
+              disabled={!isValid}
             >
-              {tab === 0 ? 'Next' : 'Save as Draft'}
+              Create
             </button>
           </div>
         </div>
