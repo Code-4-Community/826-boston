@@ -11,9 +11,7 @@ import CloseIcon from '../../assets/icons/close.svg';
 
 interface CreatePublicationModalProps {
   onClose: () => void;
-  onSave: (form: PublicationFormState) => void;
-  /** Called after the publication and its OMCHAI assignments are saved. */
-  onCreated?: (anthology: Anthology) => void;
+  onCreated: (anthology: Anthology) => void;
 }
 
 export interface PublicationFormState {
@@ -34,10 +32,11 @@ const INITIAL_FORM: PublicationFormState = {
 
 export default function CreatePublicationModal({
   onClose,
-  onSave,
   onCreated,
 }: CreatePublicationModalProps) {
   const [form, setForm] = useState<PublicationFormState>(INITIAL_FORM);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const usersQuery = useQuery({
     queryKey: ['users'],
@@ -59,7 +58,8 @@ export default function CreatePublicationModal({
   }));
 
   async function handleSaveForm() {
-    onSave(form);
+    setSaving(true);
+    setError(null);
 
     try {
       const createAnthologyBody: CreateAnthologyDto = {
@@ -76,9 +76,11 @@ export default function CreatePublicationModal({
 
       const anthology = await apiClient.createAnthology(createAnthologyBody);
 
-      onCreated?.(anthology);
-    } catch (err) {
-      console.log(err);
+      onCreated(anthology);
+    } catch {
+      setError("Couldn't create the publication. Please try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -178,6 +180,12 @@ export default function CreatePublicationModal({
               }
             />
           </Field>
+
+          {error && (
+            <p className="modal__error" role="alert">
+              {error}
+            </p>
+          )}
         </div>
 
         <div className="modal__footer">
@@ -186,9 +194,9 @@ export default function CreatePublicationModal({
               type="button"
               className="btn btn--primary"
               onClick={handleSaveForm}
-              disabled={!isValid}
+              disabled={!isValid || saving}
             >
-              Create
+              {saving ? 'Creating...' : 'Create'}
             </button>
           </div>
         </div>

@@ -466,11 +466,11 @@ export default function ArchivedPublications({
       )}
       {createPubModalOpen && (
         <CreatePublicationModal
-          onCreated={() => queryClient.invalidateQueries(['tracker'])}
-          onClose={() => setCreatePubModalOpen(false)}
-          onSave={() => {
+          onCreated={() => {
             setCreatePubModalOpen(false);
+            queryClient.invalidateQueries(['tracker']);
           }}
+          onClose={() => setCreatePubModalOpen(false)}
         />
       )}
     </div>

@@ -467,6 +467,13 @@
   cursor: pointer;
 }
 
+.create-publication-modal .modal__error {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--error-red);
+}
+
 .create-publication-modal .modal__footer {
   padding: 24px 32px 36px;
 }
