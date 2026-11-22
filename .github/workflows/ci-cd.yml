@@ -51,8 +51,8 @@ jobs:
       - name: Nx Affected Lint
         run: npx nx affected -t lint
 
-      - name: Nx Affected Test
-        run: npx nx affected -t test
+      - name: Nx Test
+        run: npx nx run-many -t test
 
       - name: Nx Affected Build
         run: npx nx affected -t build
