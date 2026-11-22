@@ -407,6 +407,17 @@
   position: relative;
 }
 
+/* Library date picker in a 28px row: the box is ~38px tall with 16px of inset,
+   so pull it out to line the date text up with the other values */
+.publication-details__date {
+  display: inline-block;
+  margin: -5px 0 -5px -16px;
+}
+
+.publication-details__date .filter-date-input {
+  color: var(--neutral-600);
+}
+
 .publication-details__control {
   width: 100%;
   max-width: 280px;

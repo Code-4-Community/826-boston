@@ -4,6 +4,7 @@ import Role from '../../api/dtos/role';
 import { Anthology, OmchaiRole } from '../../types';
 import { GENRES, THEMES } from '../create-publication-modal/constants';
 import { PROGRAM_OPTIONS } from '../archived-publications/filter-modal/constants';
+import DatePickerField from '../archived-publications/filter-modal/DatePickerField';
 import EditableCell from './editable-cell';
 import SearchSelectIcon from '../../assets/icons/search-select.svg';
 import CloseIcon from '../../assets/icons/close-tag.svg';
@@ -294,15 +295,12 @@ const PublicationDetailsView: React.FC<Props> = ({
           <tr>
             <th>Publication Date</th>
             <td>
-              <input
-                className="publication-details__control"
-                aria-label="Publication Date"
-                type="date"
+              <DatePickerField
+                className="publication-details__date"
+                ariaLabel="Publication Date"
                 value={dateValue}
                 disabled={!editable}
-                onChange={(event) =>
-                  saveImmediately('publicationDate', event.target.value)
-                }
+                onChange={(iso) => saveImmediately('publicationDate', iso)}
               />
             </td>
           </tr>
