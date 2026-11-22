@@ -2,38 +2,23 @@ import { useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import apiClient from '../../../api/apiClient';
 import {
-  Anthology,
   TrackerFilterState,
   DEFAULT_TRACKER_FILTER_STATE,
 } from '../../../types';
 import FilterModalHeader from './FilterModalHeader';
 import FilterModalFooter from './FilterModalFooter';
 import TabFilterRow from './TabFilterRow';
-import SearchableMultiSelect from '@components/SearchableMultiSelect';
+import SearchableFilterSelect from './SearchableFilterSelect';
 import { TRACKER_SORT_OPTIONS } from './constants';
+import { collectDistinctValues } from './filterOptions';
 import CloseIcon from '../../../assets/icons/close.svg';
+import SearchFilterIcon from '../../../assets/icons/search-filter.svg';
 import './filter-modal.css';
 
 interface TrackerFilterModalProps {
   initialFilters: TrackerFilterState;
   onApply: (filters: TrackerFilterState) => void;
   onClose: () => void;
-}
-
-// every distinct program name across all publications, sorted A-Z
-function collectPrograms(anthologies: Anthology[]): string[] {
-  const programs = new Set<string>();
-  for (const anthology of anthologies) {
-    const values =
-      typeof anthology.programs === 'string'
-        ? anthology.programs.split(',')
-        : anthology.programs ?? [];
-    for (const value of values) {
-      const program = value.trim();
-      if (program) programs.add(program);
-    }
-  }
-  return [...programs].sort((a, b) => a.localeCompare(b));
 }
 
 export default function TrackerFilterModal({
@@ -61,10 +46,12 @@ export default function TrackerFilterModal({
 
   const programOptions = useMemo(
     () =>
-      collectPrograms(anthologiesQuery.data ?? []).map((program) => ({
-        value: program,
-        label: program,
-      })),
+      collectDistinctValues(anthologiesQuery.data ?? [], 'programs').map(
+        (program) => ({
+          value: program,
+          label: program,
+        }),
+      ),
     [anthologiesQuery.data],
   );
   const staffOptions = useMemo(
@@ -85,7 +72,7 @@ export default function TrackerFilterModal({
       aria-label="Sort and Filter Results"
     >
       <div
-        className="filter-modal filter-modal--tracker"
+        className="filter-modal filter-modal--results"
         onClick={(e) => e.stopPropagation()}
       >
         <FilterModalHeader
@@ -97,49 +84,46 @@ export default function TrackerFilterModal({
         <div className="filter-modal-body">
           <section className="filter-modal-section">
             <h3 className="filter-modal-section-title">Sort</h3>
+            {/* At most one sort at a time; clicking the chosen one again clears it. */}
             <TabFilterRow
               options={TRACKER_SORT_OPTIONS}
               selected={draft.sortBy}
-              onChange={(value) => value && update('sortBy', value)}
-              allowDeselect={false}
+              onChange={(value) => update('sortBy', value)}
+              allowDeselect={true}
             />
           </section>
 
           <section className="filter-modal-section">
             <h3 className="filter-modal-section-title">Filter By Attribute</h3>
-            <div className="filter-select-row">
-              <span className="filter-select-label">Program(s)</span>
-              <SearchableMultiSelect
-                label="Program(s)"
-                options={programOptions}
-                selected={draft.programs}
-                onChange={(values) => update('programs', values)}
-                placeholder="Search for a program..."
-                isLoading={anthologiesQuery.isLoading}
-                errorMessage={
-                  anthologiesQuery.isError
-                    ? "Couldn't load programs. Try again."
-                    : undefined
-                }
-              />
-            </div>
-            <div className="filter-select-row">
-              <span className="filter-select-label">Staff</span>
-              <SearchableMultiSelect
-                label="Staff"
-                options={staffOptions}
-                selected={draft.staffIds}
-                onChange={(values) => update('staffIds', values)}
-                placeholder="Search for a staff member..."
-                showAvatar
-                isLoading={usersQuery.isLoading}
-                errorMessage={
-                  usersQuery.isError
-                    ? "Couldn't load staff. Try again."
-                    : undefined
-                }
-              />
-            </div>
+            <SearchableFilterSelect
+              label="Program(s)"
+              options={programOptions}
+              selected={draft.programs}
+              onChange={(values) => update('programs', values)}
+              placeholder="Search for a program..."
+              searchIconSrc={SearchFilterIcon}
+              isLoading={anthologiesQuery.isLoading}
+              errorMessage={
+                anthologiesQuery.isError
+                  ? "Couldn't load programs. Try again."
+                  : undefined
+              }
+            />
+            <SearchableFilterSelect
+              label="Staff"
+              options={staffOptions}
+              selected={draft.staffIds}
+              onChange={(values) => update('staffIds', values)}
+              placeholder="Search for a staff member..."
+              searchIconSrc={SearchFilterIcon}
+              showAvatar
+              isLoading={usersQuery.isLoading}
+              errorMessage={
+                usersQuery.isError
+                  ? "Couldn't load staff. Try again."
+                  : undefined
+              }
+            />
           </section>
         </div>
 

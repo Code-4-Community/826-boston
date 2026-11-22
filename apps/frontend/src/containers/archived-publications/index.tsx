@@ -3,7 +3,6 @@ import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from 'react-query';
 import './styles.css';
 import apiClient from '../../api/apiClient';
-import { type FilterSortAnthologyBody } from '../../api/apiClient';
 import useDebouncedValue from '../../hooks/useDebouncedValue';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
@@ -12,10 +11,14 @@ import {
   AnthologyStatus,
   FilterState,
   DEFAULT_FILTER_STATE,
-  SortOption,
   TrackerFilterState,
   DEFAULT_TRACKER_FILTER_STATE,
 } from '../../types';
+import {
+  buildFilterSortBody,
+  buildTrackerBody,
+  countActiveTrackerFilters,
+} from './filterRequest';
 import FilterModal from './filter-modal/FilterModal';
 import TrackerFilterModal from './filter-modal/TrackerFilterModal';
 
@@ -69,102 +72,11 @@ interface PublicationsPageProps {
   mode?: PublicationsPageMode;
 }
 
-const SORT_OPTION_TO_BACKEND: Partial<Record<SortOption, string>> = {
-  [SortOption.TITLE_ASC]: 'title-asc',
-  [SortOption.AUTHOR_ASC]: 'byline-asc',
-  [SortOption.DATE_NEWEST]: 'date-recent',
-  [SortOption.DATE_OLDEST]: 'date-oldest',
-};
+function applyLocalSearch(pubs: Anthology[], search: string): Anthology[] {
+  if (!search) return pubs;
 
-function buildFilterSortBody(filters: FilterState): FilterSortAnthologyBody {
-  const body: FilterSortAnthologyBody = {};
-
-  const backendSort = SORT_OPTION_TO_BACKEND[filters.sortBy];
-  if (backendSort) {
-    body.sortBy = backendSort;
-  }
-
-  if (filters.pubDateStart || filters.pubDateEnd) {
-    body.pubDateRange = {
-      start: filters.pubDateStart
-        ? `${filters.pubDateStart}-01-01`
-        : '1900-01-01',
-      end: filters.pubDateEnd ? `${filters.pubDateEnd}-12-31` : '2100-12-31',
-    };
-  }
-
-  if (filters.pubLevels.length > 0) {
-    body.pubLevels = [...filters.pubLevels];
-  }
-
-  if (filters.programs.length > 0) {
-    body.programs = [...filters.programs];
-  }
-
-  if (filters.genres.length > 0) {
-    body.genres = [...filters.genres];
-  }
-
-  return body;
-}
-
-function buildTrackerBody(
-  search: string,
-  filters: TrackerFilterState,
-): FilterSortAnthologyBody {
-  const body: FilterSortAnthologyBody = { sortBy: filters.sortBy };
-
-  if (search) {
-    body.search = search;
-  }
-
-  if (filters.programs.length > 0) {
-    body.programs = [...filters.programs];
-  }
-
-  if (filters.staffIds.length > 0) {
-    body.staffIds = [...filters.staffIds];
-  }
-
-  return body;
-}
-
-// each picked program and staff member counts, plus one for a non-default sort
-function countActiveTrackerFilters(filters: TrackerFilterState): number {
-  return (
-    filters.programs.length +
-    filters.staffIds.length +
-    (filters.sortBy !== DEFAULT_TRACKER_FILTER_STATE.sortBy ? 1 : 0)
-  );
-}
-
-function applyLocalFilters(
-  pubs: Anthology[],
-  search: string,
-  filters: FilterState,
-): Anthology[] {
-  let result = [...pubs];
-
-  if (search) {
-    const q = search.toLowerCase();
-    result = result.filter((p) => p.title.toLowerCase().includes(q));
-  }
-
-  if (filters.inventoryMin) {
-    const min = parseInt(filters.inventoryMin, 10);
-    if (!Number.isNaN(min)) {
-      result = result.filter((p) => (p.inventory ?? 0) >= min);
-    }
-  }
-
-  if (filters.inventoryMax) {
-    const max = parseInt(filters.inventoryMax, 10);
-    if (!Number.isNaN(max)) {
-      result = result.filter((p) => (p.inventory ?? Infinity) <= max);
-    }
-  }
-
-  return result;
+  const q = search.toLowerCase();
+  return pubs.filter((p) => p.title.toLowerCase().includes(q));
 }
 
 function isArchiveTab(value: string | undefined): value is ArchiveTab {
@@ -236,12 +148,11 @@ export default function ArchivedPublications({
           (pub) =>
             !activeTrackerTab?.status || pub.status === activeTrackerTab.status,
         )
-      : applyLocalFilters(
+      : applyLocalSearch(
           publications.filter(
             (pub) => pub.status === ARCHIVE_TAB_STATUS[activeArchiveTab],
           ),
           searchQuery,
-          appliedFilters,
         );
 
   const activeTrackerFilterCount = countActiveTrackerFilters(trackerFilters);
