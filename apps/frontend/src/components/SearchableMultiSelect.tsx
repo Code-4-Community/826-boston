@@ -10,7 +10,6 @@ export interface MultiSelectOption<T extends string | number> {
 }
 
 interface SearchableMultiSelectProps<T extends string | number> {
-  /** Names the search box for screen readers; the surrounding layout shows the visible label. */
   label: string;
   options: MultiSelectOption<T>[];
   selected: T[];

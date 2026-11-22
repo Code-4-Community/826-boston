@@ -43,15 +43,7 @@ import { AwsS3Service } from '../aws/aws-s3.service';
 import { InventoryHoldingService } from '../inventory-holding/inventory-holding.service';
 import { AnthologyInventoryDto } from '../inventory-holding/dto/anthology-inventory.dto';
 import { TrackerAnthologyDto } from './dtos/tracker-anthology.dto';
-
-interface UploadedFileType {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  buffer: Buffer;
-  size: number;
-}
+import { UploadedFileType } from 'src/shared/types';
 
 @ApiTags('Anthologies')
 @Controller('anthologies')
