@@ -1,0 +1,152 @@
+.tasks-timeline-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 24px 0 20px;
+}
+
+.tasks-timeline-month {
+  margin: 0;
+  min-width: 160px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 500;
+  color: #000;
+}
+
+.tasks-timeline-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.tasks-timeline-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.tasks-timeline-arrow-icon {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.tasks-timeline-arrow-icon--prev {
+  border-right: 8px solid var(--neutral-500);
+}
+
+.tasks-timeline-arrow-icon--next {
+  border-left: 8px solid var(--neutral-500);
+}
+
+/* Scrolls sideways, and up and down when there are many tasks */
+.tasks-timeline-scroll {
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid var(--neutral-300);
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.tasks-timeline-canvas {
+  position: relative;
+}
+
+.tasks-timeline-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  height: 44px;
+  background-color: var(--neutral-100);
+  border-bottom: 1px solid var(--neutral-300);
+}
+
+.tasks-timeline-day {
+  flex: 0 0 var(--day-width);
+  box-sizing: border-box;
+  padding: 0 0 0 8px;
+  line-height: 44px;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--neutral-600);
+  white-space: nowrap;
+}
+
+/* One gridline per day */
+.tasks-timeline-body {
+  position: relative;
+  background-image: linear-gradient(
+    to right,
+    var(--neutral-300) 1px,
+    transparent 1px
+  );
+  background-size: var(--day-width) 100%;
+}
+
+.tasks-timeline-today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 2px;
+  margin-left: -1px;
+  background-color: var(--accent-600);
+  pointer-events: none;
+}
+
+.tasks-timeline-today::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -5px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 9px solid var(--accent-600);
+}
+
+.tasks-bar {
+  position: absolute;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 9px;
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  /* Planning is grey; the other areas override the color below */
+  background-color: var(--neutral-500);
+}
+
+.tasks-bar--programming {
+  background-color: #00996b;
+}
+
+.tasks-bar--production {
+  background-color: #006fd7;
+}
+
+.tasks-bar--checkpoint {
+  background-color: var(--error-red);
+}
+
+/* Offset so the outline still shows on the red Checkpoint bars */
+.tasks-bar--overdue {
+  outline: 2px solid var(--error-red);
+  outline-offset: 2px;
+}
