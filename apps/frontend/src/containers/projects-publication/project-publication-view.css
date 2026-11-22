@@ -195,7 +195,8 @@
   align-items: center;
   min-height: 32px;
   position: absolute;
-  top: 0;
+  /* Nudged above the form's top edge so the pill and its dropdown clear the description */
+  top: -12px;
   right: 0;
 }
 
