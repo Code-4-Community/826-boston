@@ -127,13 +127,14 @@ export enum TrackerSortOption {
 }
 
 export interface TrackerFilterState {
-  sortBy: TrackerSortOption;
+  /** null means no sort is chosen. */
+  sortBy: TrackerSortOption | null;
   programs: string[];
   staffIds: number[];
 }
 
 export const DEFAULT_TRACKER_FILTER_STATE: TrackerFilterState = {
-  sortBy: TrackerSortOption.TITLE_ASC,
+  sortBy: null,
   programs: [],
   staffIds: [],
 };

@@ -5,7 +5,7 @@
 const MAX_HEIGHT = 220;
 // space left between the list and the edge of the screen
 const EDGE_MARGIN = 12;
-// the gap between the search box and the list (4px in the Tracker, 6px in the Library)
+// the gap between the search box and the list (see .filter-select-dropdown in the css)
 const GAP = 6;
 // three 42px options; with less room than this below, opening upward is preferred
 const COMFORTABLE_HEIGHT = 126;
