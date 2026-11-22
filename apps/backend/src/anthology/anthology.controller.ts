@@ -397,11 +397,11 @@ export class AnthologyController {
   }
 
   @ApiBearerAuth()
-  @UserStatus(Role.ADMIN)
+  @OmchaiRoles(OmchaiRole.OWNER, OmchaiRole.MANAGER)
   @ApiOperation({
     summary: 'Upload anthology cover image',
     description:
-      'Uploads a cover image for an anthology. Accepts JPEG, PNG, GIF, or WebP images up to 5MB. Admin-only endpoint.',
+      'Uploads a cover image for an anthology. Accepts JPEG, PNG, GIF, or WebP images up to 5MB. Requires OWNER or MANAGER role (admins are always allowed).',
   })
   @ApiOkResponse({
     description: 'Cover image uploaded successfully',

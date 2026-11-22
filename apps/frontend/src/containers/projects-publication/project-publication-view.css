@@ -4,22 +4,26 @@
   height: 100%;
   overflow-y: auto;
   background-color: var(--neutral-100);
-  padding: 24px 100px 104px;
+  padding: 70px 100px 104px;
   box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .ppv-breadcrumb {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--neutral-400);
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  color: var(--neutral-600);
   margin-bottom: 24px;
 }
 
 .ppv-breadcrumb-link {
-  color: var(--neutral-400);
+  color: var(--neutral-600);
   text-decoration: none;
 }
 
@@ -35,94 +39,6 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-
-.ppv-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-}
-
-.ppv-cover-image {
-  width: 160px;
-  height: 160px;
-  flex: 0 0 160px;
-  border-radius: 10px;
-  overflow: visible;
-  position: relative;
-}
-
-.ppv-cover-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: 50% 50%;
-  border-radius: 10px;
-}
-
-.ppv-cover-upload-input {
-  display: none;
-}
-
-.ppv-cover-upload-btn {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.65);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 5px 12px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  white-space: nowrap;
-}
-
-.ppv-cover-image:hover .ppv-cover-upload-btn {
-  opacity: 1;
-}
-
-.ppv-cover-upload-btn:disabled {
-  cursor: not-allowed;
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.ppv-cover-upload-error {
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #d32f2f;
-  font-family: var(--font-body);
-  font-size: 11px;
-  margin: 0;
-}
-
-.ppv-title {
-  font-family: var(--font-heading);
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--neutral-600);
-  margin: 0;
-  align-self: center;
-}
-
-.ppv-status-pill {
-  margin-left: auto;
-  padding: 4px 16px;
-  border-radius: 13px;
-  background-color: var(--neutral-200);
-  color: var(--neutral-500);
-  font-size: 12px;
-  line-height: 16px;
-  white-space: nowrap;
 }
 
 .publication-tabs button.publication-tab {
@@ -189,4 +105,557 @@
   font-family: var(--font-body);
   font-size: 14px;
   box-sizing: border-box;
+}
+
+.publication-tabs {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  border-bottom: 1px solid var(--neutral-300);
+  overflow-x: auto;
+}
+
+/* A real margin (not a transform) so the tab content keeps Figma's 36px gap below the bar */
+.ppv-content > .publication-tabs {
+  margin-top: 20px;
+}
+
+/* Figma tabs: Roboto 16px regular, 8px padding, 12px apart */
+.publication-tabs button.publication-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px;
+  background: none;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  text-decoration: none;
+  color: var(--black);
+  white-space: nowrap;
+  border: none;
+  border-bottom: 2px solid transparent;
+}
+
+/* Figma Accents/600 */
+.publication-tabs button.publication-tab--active {
+  color: #aa5e00;
+  border-bottom-color: #aa5e00;
+}
+
+.publication-details,
+.publication-details input,
+.publication-details textarea,
+.publication-details select,
+.publication-details button {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.publication-details__status-row button,
+.publication-details__field input,
+.publication-details__field textarea,
+.publication-details__field select,
+.publication-details__field > span {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.publication-details__main {
+  display: grid;
+  grid-template-columns: 185px minmax(0, 1fr);
+  gap: 40px;
+}
+
+.publication-details__cover {
+  position: relative;
+}
+
+.publication-details__cover img,
+.publication-details__cover-placeholder {
+  width: 185px;
+  height: 186px;
+  border-radius: 12px;
+}
+
+.publication-details__cover img {
+  object-fit: cover;
+}
+
+.publication-details__cover-placeholder {
+  background: var(--neutral-200);
+  color: var(--neutral-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.publication-details__status-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 32px;
+  position: absolute;
+  /* Nudged above the form's top edge so the pill and its dropdown clear the description */
+  top: -12px;
+  right: 0;
+}
+
+.publication-details__form {
+  position: relative;
+}
+
+/* Figma: title (H2) and byline 2px apart, then 20px to the description */
+.publication-details__form > .publication-details__field:nth-of-type(1) {
+  padding-right: 180px;
+  margin-bottom: 2px;
+}
+
+.publication-details__form > .publication-details__field:nth-of-type(1) > span {
+  display: none;
+}
+
+.publication-details__form > .publication-details__field:nth-of-type(1) input {
+  padding: 0;
+  color: var(--black);
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.publication-details__form > .publication-details__field:nth-of-type(2) > span {
+  display: none;
+}
+
+.publication-details__form > .publication-details__field:nth-of-type(2) {
+  padding-right: 180px;
+  margin-bottom: 20px;
+}
+
+.publication-details__form > .publication-details__field:nth-of-type(2) input {
+  padding: 0;
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+/* Outranks .publication-details__field textarea so it lines up with title/byline */
+.publication-details__field.publication-details__description textarea {
+  max-width: 650px;
+  padding: 0;
+  color: var(--neutral-500);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.publication-details__description textarea::placeholder {
+  color: var(--neutral-400);
+}
+
+.publication-details__status-wrap {
+  position: relative;
+}
+
+.publication-status-pill {
+  display: flex;
+  padding: 4px 16px 6px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--neutral-200);
+  color: var(--neutral-500);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+/* Figma: right-aligned stack of small badges under the status pill */
+.publication-status-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.publication-status-menu button {
+  display: flex;
+  height: 24px;
+  min-width: 78px;
+  padding: 4px 16px 6px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 13px;
+  background: var(--neutral-200);
+  color: var(--neutral-500);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.publication-status-menu button:hover,
+.publication-status-menu button:focus-visible {
+  background: var(--neutral-300);
+}
+
+.publication-details__multi-menu {
+  position: absolute;
+  z-index: 10;
+  min-width: 180px;
+  padding: 8px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Beside the pill rather than after it, so the pill itself stays flush right */
+.publication-details__save-state {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--neutral-400);
+  white-space: nowrap;
+}
+
+.publication-details__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.publication-details__field > span {
+  font-weight: 600;
+}
+
+.publication-details__field input,
+.publication-details__field textarea,
+.publication-details__field select {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 8px 10px;
+  background: transparent;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.publication-details__field textarea {
+  min-height: 90px;
+  resize: none;
+}
+
+.publication-details__field input:not(:disabled):hover,
+.publication-details__field textarea:not(:disabled):hover,
+.publication-details__field select:not(:disabled):hover {
+  border-color: var(--neutral-300);
+}
+
+/* Rows reuse .production-info-table from the Production & Distribution tab */
+/* Figma: 36px below the header row; 28px rows, 16px apart, as on the Production & Distribution tab */
+.production-info-table.publication-details__table {
+  margin-top: 36px;
+  font-size: 16px;
+}
+
+/* Labels sit flush with the cover's left edge; values share one column */
+.production-info-table.publication-details__table th,
+.production-info-table.publication-details__table td {
+  height: 28px;
+  padding: 0 0 16px;
+  vertical-align: top;
+  line-height: 28px;
+}
+
+.production-info-table.publication-details__table tr:last-child th,
+.production-info-table.publication-details__table tr:last-child td {
+  padding-bottom: 0;
+}
+
+.production-info-table.publication-details__table th {
+  width: 216px;
+  box-sizing: border-box;
+  padding-right: 16px;
+  color: var(--neutral-500);
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+.production-info-table.publication-details__table td {
+  color: var(--neutral-600);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.production-info-table.publication-details__table td {
+  position: relative;
+}
+
+/* Library date picker in a 28px row: the box is ~38px tall with 16px of inset,
+   so pull it out to line the date text up with the other values */
+.publication-details__date {
+  display: inline-block;
+  /* top-aligned so the box doesn't add baseline space under the 28px line */
+  vertical-align: top;
+  margin: -5px 0 -5px -16px;
+}
+
+.publication-details__date .filter-date-input {
+  color: var(--neutral-600);
+}
+
+/* Figma shows the date as plain text like the other rows; the box and calendar
+   button only appear on hover or focus (read-only stays plain via --disabled) */
+.publication-details__date .filter-date-box {
+  border-color: transparent;
+  background: transparent;
+}
+
+.publication-details__date .filter-date-toggle {
+  visibility: hidden;
+}
+
+.publication-details__date .filter-date-box:hover {
+  border-color: var(--neutral-300);
+}
+
+.publication-details__date .filter-date-box:focus-within {
+  border-color: var(--neutral-600);
+}
+
+.publication-details__date .filter-date-box:hover .filter-date-toggle,
+.publication-details__date .filter-date-box:focus-within .filter-date-toggle {
+  visibility: visible;
+}
+
+.publication-details__control {
+  width: 100%;
+  max-width: 280px;
+  margin: -5px 0 -5px -9px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Match the plain-text look of the other rows (no dropdown arrow) */
+select.publication-details__control {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.publication-details__control:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.publication-details__control:not(:disabled):hover,
+.publication-details__control:focus {
+  border-color: var(--neutral-300);
+  outline: none;
+}
+
+.production-info-cell:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
+/* Centre the tags on the label's 28px line (they're only 20px tall) */
+.publication-details__multi {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+}
+
+/* Shrinks to the box and carries its 5px outset, so the menu (left: 0;
+   width: 100%) lines up exactly with the search box */
+.publication-details__multi-wrap {
+  position: relative;
+  display: inline-block;
+  min-width: 0;
+  max-width: 400px;
+  margin-left: -5px;
+}
+
+.publication-details__multi-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: 400px;
+  /* Tags stay on the value column; the outline sits 4px outside them */
+  margin: -5px 0;
+  box-sizing: border-box;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--neutral-400);
+  /* The row's 28px line-height would make the box taller than the tags */
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.publication-details__multi-control[aria-disabled='true'] {
+  cursor: default;
+}
+
+.publication-details__multi-control:not([aria-disabled='true']):hover,
+.publication-details__multi-control--open {
+  border-color: var(--neutral-300);
+}
+
+/* Figma "Search Select": outlined box, tags then a search icon */
+.publication-details__multi-control--open {
+  min-width: 212px;
+  width: fit-content;
+}
+
+.publication-details__multi-search-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: 6px;
+}
+
+/* Figma tag: 20px tall, Accents/400 fill, Accents/500 border, 12px text */
+.publication-details__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--accent-500);
+  border-radius: 12px;
+  background: #ffcc7f;
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.publication-details__chip button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.publication-details__chip button img {
+  width: 14px;
+  height: 14px;
+}
+
+.publication-details__multi input.publication-details__multi-search {
+  flex: 1;
+  /* No intrinsic width, so the box hugs its tags like Figma's instead of stretching */
+  width: 0;
+  min-width: 80px;
+  padding: 2px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--neutral-600);
+}
+
+/* Figma search box placeholder: Open Sans italic 14px, Neutral/400 */
+.publication-details__multi
+  input.publication-details__multi-search::placeholder {
+  color: var(--neutral-400);
+  font-style: italic;
+}
+
+/* Figma "Dropdown Options": 8px corners, no shadow, a touch wider than the search box */
+.publication-details__multi-menu {
+  /* The box overhangs the wrapper by 5px (negative margin), so +13px = 8px below the box */
+  top: calc(100% + 13px);
+  left: 0;
+  width: 100%;
+  min-width: 234px;
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: none;
+  /* Show about six options at a time and scroll the rest, so long lists like
+     Genre don't take over the page; scrolling stops at the list's ends */
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.publication-details__multi-menu label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  /* The row's 28px line-height would make each option taller than Figma's 39px */
+  line-height: normal;
+  cursor: pointer;
+}
+
+.publication-details__multi-menu label:hover {
+  background: var(--neutral-200);
+}
+
+/* Figma checkbox: 10px box, 1px Neutral/600 stroke (same look as the library filter's) */
+.publication-details__multi-menu input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--neutral-600);
+  border-radius: 1px;
+  background: transparent center / 10px 10px no-repeat;
+  background-origin: border-box;
+}
+
+.publication-details__multi-menu input:checked {
+  background-image: url('../../assets/icons/check.svg');
+}
+
+.publication-details__multi-empty {
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--neutral-400);
+}
+
+.publication-details__error {
+  color: #b42318;
+  font-size: 13px;
 }

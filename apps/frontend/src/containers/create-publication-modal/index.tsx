@@ -4,6 +4,7 @@ import './styles.css';
 import apiClient from '@api/apiClient';
 import SearchableMultiSelect from '@components/SearchableMultiSelect';
 import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
+import DatePickerField from '@containers/archived-publications/filter-modal/DatePickerField';
 import { Anthology, AnthologyPubLevel } from '../../types';
 import { PUBLICATION_LEVELS } from './constants';
 import Field from './Field';
@@ -147,13 +148,10 @@ export default function CreatePublicationModal({
             </Field>
 
             <Field label="Publication Date">
-              <input
-                className={`input input--date${
-                  form.publicationDate ? '' : ' input--empty'
-                }`}
-                type="date"
+              <DatePickerField
+                ariaLabel="Publication Date"
                 value={form.publicationDate}
-                onChange={(e) => set('publicationDate', e.target.value)}
+                onChange={(iso) => set('publicationDate', iso)}
               />
             </Field>
           </div>

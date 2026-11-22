@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
@@ -184,9 +188,44 @@ export class AnthologyService {
     if (photo_url !== undefined) attrs.photoUrl = photo_url;
     if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
     if (pub_level !== undefined) attrs.pubLevel = pub_level;
-    if (publicationDate) attrs.publishedDate = new Date(publicationDate);
+    // An empty value clears the date (the column is nullable)
+    if (publicationDate !== undefined)
+      attrs.publishedDate = publicationDate
+        ? new Date(publicationDate)
+        : (null as unknown as undefined);
 
-    Object.assign(anthology, attrs);
+    const updated = Object.assign(anthology, attrs);
+
+    if (
+      attrs.status !== undefined &&
+      attrs.status !== AnthologyStatus.NOT_STARTED
+    ) {
+      const missingFields: string[] = [];
+      if (!updated.title?.trim()) missingFields.push('title');
+      if (!updated.description?.trim()) missingFields.push('description');
+      if (!updated.genres?.length) missingFields.push('genres');
+      if (!updated.programs?.length) missingFields.push('programs');
+      if (!updated.pubLevel) missingFields.push('publication level');
+
+      if (missingFields.length) {
+        throw new BadRequestException({
+          message: 'Required publication fields are missing',
+          missingFields,
+        });
+      }
+    }
+
+    if (
+      updated.status === AnthologyStatus.CAN_BE_SHARED &&
+      (updated.pubLevel === AnthologyPubLevel.PERFECT_BOUND ||
+        updated.pubLevel === AnthologyPubLevel.SIGNATURE) &&
+      !updated.isbn?.trim()
+    ) {
+      throw new BadRequestException({
+        message: 'An ISBN is required for this publication level',
+        missingFields: ['ISBN'],
+      });
+    }
 
     return this.repo.save(anthology);
   }

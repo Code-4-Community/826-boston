@@ -451,6 +451,10 @@
   color: var(--neutral-400);
 }
 
+.create-publication-modal .filter-date-input {
+  flex: 1;
+}
+
 .create-publication-modal .input--date {
   padding: 8px 16px;
 }

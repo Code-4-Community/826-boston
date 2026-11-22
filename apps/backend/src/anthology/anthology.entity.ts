@@ -36,10 +36,10 @@ export class Anthology {
   @Column({ type: 'text', array: true, default: [] })
   genres: string[];
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column({ type: 'simple-array', default: '' })
   themes: string[];
 
-  @Column({ type: 'simple-array', default: [] })
+  @Column({ type: 'simple-array', default: '' })
   triggers: string[];
 
   // NOTE: PluralNamingStrategy ignores @Column `name`, so the physical column
@@ -85,6 +85,9 @@ export class Anthology {
 
   @Column({ nullable: true })
   isbn?: string;
+
+  @Column({ nullable: true })
+  gradeLevel?: string;
 
   @Column({
     name: 'shopify_url',

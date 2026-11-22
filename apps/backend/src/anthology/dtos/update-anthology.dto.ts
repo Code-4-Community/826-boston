@@ -16,6 +16,11 @@ export class UpdateAnthologyDto {
   @IsString()
   title?: string;
 
+  @ApiPropertyOptional({ description: 'Byline of the anthology' })
+  @IsOptional()
+  @IsString()
+  byline?: string;
+
   @ApiPropertyOptional({ description: 'Description of the anthology' })
   @IsOptional()
   @IsString()
@@ -25,6 +30,7 @@ export class UpdateAnthologyDto {
     description: 'Projected publication date of the anthology',
   })
   @IsOptional()
+  @ValidateIf((_, value) => value !== '')
   @IsDateString()
   publicationDate?: string;
 

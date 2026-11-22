@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import CalendarIcon from '../../../assets/icons/calendar.svg';
 import PrevMonthIcon from '../../../assets/icons/date-picker-prev.svg';
 import NextMonthIcon from '../../../assets/icons/date-picker-next.svg';
+import './DatePickerField.css';
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
@@ -84,6 +85,10 @@ interface DatePickerFieldProps {
   ariaLabel: string;
   /** Outlines the box in red, e.g. when the date doesn't fit with the other end of a range. */
   hasError?: boolean;
+  /** Read-only: shows the date as plain text with no calendar button. */
+  disabled?: boolean;
+  /** Extra class on the outer wrapper, for placement in the parent layout. */
+  className?: string;
 }
 
 export default function DatePickerField({
@@ -91,6 +96,8 @@ export default function DatePickerField({
   onChange,
   ariaLabel,
   hasError = false,
+  disabled = false,
+  className = '',
 }: DatePickerFieldProps) {
   const [text, setText] = useState(isoToDisplay(value));
   const [isOpen, setIsOpen] = useState(false);
@@ -101,6 +108,11 @@ export default function DatePickerField({
   useEffect(() => {
     setText(isoToDisplay(value));
   }, [value]);
+
+  // close the calendar if the field becomes read-only while it's open
+  useEffect(() => {
+    if (disabled) setIsOpen(false);
+  }, [disabled]);
 
   // close the calendar on a click outside it or on Escape
   useEffect(() => {
@@ -165,11 +177,14 @@ export default function DatePickerField({
   });
 
   return (
-    <div className="filter-date-field" ref={wrapperRef}>
+    <div
+      className={`filter-date-field${className ? ` ${className}` : ''}`}
+      ref={wrapperRef}
+    >
       <div
         className={`filter-date-box${
           hasError ? ' filter-date-box--error' : ''
-        }`}
+        }${disabled ? ' filter-date-box--disabled' : ''}`}
       >
         <input
           className="filter-date-input"
@@ -179,22 +194,25 @@ export default function DatePickerField({
           aria-label={ariaLabel}
           aria-invalid={hasError}
           value={text}
+          disabled={disabled}
           onChange={(e) => handleTyping(e.target.value)}
           // drop a half-typed date so the box always shows what is applied
           onBlur={() => setText(isoToDisplay(value))}
         />
-        <button
-          type="button"
-          className="filter-date-toggle"
-          onClick={toggleCalendar}
-          aria-label={`Open calendar for ${ariaLabel}`}
-          aria-expanded={isOpen}
-        >
-          <img src={CalendarIcon} alt="" />
-        </button>
+        {!disabled && (
+          <button
+            type="button"
+            className="filter-date-toggle"
+            onClick={toggleCalendar}
+            aria-label={`Open calendar for ${ariaLabel}`}
+            aria-expanded={isOpen}
+          >
+            <img src={CalendarIcon} alt="" />
+          </button>
+        )}
       </div>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div
           className="filter-date-popover"
           role="dialog"
