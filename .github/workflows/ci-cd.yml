@@ -51,8 +51,8 @@ jobs:
       - name: Nx Affected Lint
         run: npx nx affected -t lint
 
-      # - name: Nx Affected Test
-      #   run: npx nx affected -t test
+      - name: Nx Test
+        run: npx nx run-many -t test
 
       - name: Nx Affected Build
         run: npx nx affected -t build
@@ -63,51 +63,51 @@ jobs:
           echo "The following projects have been affected: [$(npx nx print-affected -t build --select=tasks.target.project)]";
           echo "affected=$(npx nx print-affected -t build --select=tasks.target.project)" >> "$GITHUB_OUTPUT"
 
-  deploy-debug:
-    needs: pre-deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug logs
-        run: |
-          echo "Manual Deploy: ${{github.event.inputs.manual-deploy}}";
-          echo "Affected Names: ${{needs.pre-deploy.outputs.affected}}";
-          echo "Event: ${{github.event_name}}";
-          echo "Ref: ${{github.ref}}";
-          echo "Will deploy?: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'}}";
+  # deploy-debug:
+  #   needs: pre-deploy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Debug logs
+  #       run: |
+  #         echo "Manual Deploy: ${{github.event.inputs.manual-deploy}}";
+  #         echo "Affected Names: ${{needs.pre-deploy.outputs.affected}}";
+  #         echo "Event: ${{github.event_name}}";
+  #         echo "Ref: ${{github.ref}}";
+  #         echo "Will deploy?: ${{(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'}}";
 
-  deploy-frontend:
-    needs: pre-deploy
-    if: (contains(github.event.inputs.manual-deploy, 'c4c-ops-frontend') || contains(needs.pre-deploy.outputs.affected, 'scaffolding-frontend')) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    # For "simplicity", deployment settings are configured in the AWS Amplify Console
-    # This just posts to a webhook telling Amplify to redeploy the main branch
-    steps:
-      - name: Tell Amplify to rebuild
-        run: curl -X POST -d {} ${C4C_OPS_WEBHOOK_DEPLOY}  -H "Content-Type:application/json"
-        env:
-          C4C_OPS_WEBHOOK_DEPLOY: ${{ secrets.C4C_OPS_WEBHOOK_DEPLOY }}
+  # deploy-frontend:
+  #   needs: pre-deploy
+  #   if: (contains(github.event.inputs.manual-deploy, 'c4c-ops-frontend') || contains(needs.pre-deploy.outputs.affected, 'scaffolding-frontend')) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   # For "simplicity", deployment settings are configured in the AWS Amplify Console
+  #   # This just posts to a webhook telling Amplify to redeploy the main branch
+  #   steps:
+  #     - name: Tell Amplify to rebuild
+  #       run: curl -X POST -d {} ${C4C_OPS_WEBHOOK_DEPLOY}  -H "Content-Type:application/json"
+  #       env:
+  #         C4C_OPS_WEBHOOK_DEPLOY: ${{ secrets.C4C_OPS_WEBHOOK_DEPLOY }}
 
-  deploy-backend:
-    needs: pre-deploy
-    if: (contains(github.event.inputs.manual-deploy, 'c4c-ops-backend') || contains(needs.pre-deploy.outputs.affected, 'scaffolding-backend')) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: 'yarn'
+  # deploy-backend:
+  #   needs: pre-deploy
+  #   if: (contains(github.event.inputs.manual-deploy, 'c4c-ops-backend') || contains(needs.pre-deploy.outputs.affected, 'scaffolding-backend')) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Use Node.js 16
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 16.x
+  #         cache: 'yarn'
 
-      - name: Install Dependencies
-        run: yarn install
+  #     - name: Install Dependencies
+  #       run: yarn install
 
-      - run: npx nx build c4c-ops-backend --configuration production
-      - name: default deploy
-        uses: appleboy/lambda-action@master
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          function_name: c4c-ops-monolith-lambda
-          source: dist/apps/c4c-ops/c4c-ops-backend/main.js
+  #     - run: npx nx build c4c-ops-backend --configuration production
+  #     - name: default deploy
+  #       uses: appleboy/lambda-action@master
+  #       with:
+  #         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws_region: ${{ secrets.AWS_REGION }}
+  #         function_name: c4c-ops-monolith-lambda
+  #         source: dist/apps/c4c-ops/c4c-ops-backend/main.js
