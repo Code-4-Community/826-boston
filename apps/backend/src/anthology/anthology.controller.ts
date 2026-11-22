@@ -59,8 +59,8 @@ export class AnthologyController {
   @ApiOperation({
     summary: 'Filter and sort anthologies',
     description:
-      'Retrieves anthologies with optional filtering by publication date range, publication levels, programs, and genres. ' +
-      'Results can be sorted by a specified field.',
+      'Retrieves anthologies with optional filtering by publication date range, publication levels, programs, genres, themes, and inventory locations. ' +
+      'Results can be sorted by a specified field; without one they come back oldest first.',
   })
   @ApiOkResponse({
     description: 'Anthologies retrieved successfully',
