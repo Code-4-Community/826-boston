@@ -12,6 +12,7 @@ import { AreaOfWork, TaskStatus } from './types';
 import { TaskResponseDto } from './dtos/task-response.dto';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { User } from 'src/users/user.entity';
+import { Omchai } from 'src/omchai/omchai.entity';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { AwsS3Service } from 'src/aws/aws-s3.service';
 import { TaskAttachment } from './task-attachment.entity';
@@ -28,6 +29,8 @@ export class TaskService {
     private anthologyRepository: Repository<Anthology>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Omchai)
+    private omchaiRepository: Repository<Omchai>,
     private readonly s3Service: AwsS3Service,
   ) {}
 
@@ -74,16 +77,10 @@ export class TaskService {
 
     let personInCharge: User | undefined;
     if (createTaskDto.personInChargeId) {
-      const user = await this.userRepository.findOne({
-        where: { id: createTaskDto.personInChargeId },
-      });
-
-      if (!user) {
-        throw new BadRequestException(
-          `User with ID ${createTaskDto.personInChargeId} not found`,
-        );
-      }
-      personInCharge = user;
+      personInCharge = await this.findPersonInCharge(
+        anthologyId,
+        createTaskDto.personInChargeId,
+      );
     }
 
     const task = this.taskRepository.create({
@@ -112,17 +109,16 @@ export class TaskService {
     const { personInChargeId, ...fields } = updateTaskDto;
     if (personInChargeId === null) {
       task.personInCharge = null;
-    } else if (personInChargeId) {
-      const user = await this.userRepository.findOne({
-        where: { id: personInChargeId },
-      });
-
-      if (!user) {
-        throw new BadRequestException(
-          `User with ID ${personInChargeId} not found`,
-        );
-      }
-      task.personInCharge = user;
+    } else if (
+      personInChargeId &&
+      personInChargeId !== task.personInCharge?.id
+    ) {
+      // Only checked when it changes, so a task keeps someone who has since
+      // left the OMCHAI until a staff member reassigns it.
+      task.personInCharge = await this.findPersonInCharge(
+        anthologyId,
+        personInChargeId,
+      );
     }
 
     this.validateDates(
@@ -200,6 +196,27 @@ export class TaskService {
     }
 
     await this.taskAttachmentRepository.remove(taskAttachment);
+  }
+
+  /** The user must exist and hold an OMCHAI role on this anthology. */
+  private async findPersonInCharge(
+    anthologyId: number,
+    userId: number,
+  ): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException(`User with ID ${userId} not found`);
+    }
+
+    const assignment = await this.omchaiRepository.findOne({
+      where: { user: { id: userId }, anthology: { id: anthologyId } },
+    });
+    if (!assignment) {
+      throw new BadRequestException(
+        `User with ID ${userId} is not on the OMCHAI for this anthology`,
+      );
+    }
+    return user;
   }
 
   private validateDates(timeFrame: Date, dueBy: Date): void {

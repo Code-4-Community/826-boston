@@ -14,6 +14,7 @@ import {
   StoryDraft,
   SubmissionRound,
   Task,
+  TaskBody,
   AnthologyStatus,
 } from '../types';
 import User from './dtos/user.dto';
@@ -163,6 +164,44 @@ export class ApiClient {
 
   public async getTasks(anthologyId: string | number): Promise<Task[]> {
     return this.get(`/api/anthologies/${anthologyId}/tasks`) as Promise<Task[]>;
+  }
+
+  public async createTask(
+    anthologyId: number,
+    body: TaskBody & Required<Pick<TaskBody, 'name' | 'timeFrame' | 'dueBy'>>,
+  ): Promise<Task> {
+    return this.post(
+      `/api/anthologies/${anthologyId}/tasks`,
+      body,
+    ) as Promise<Task>;
+  }
+
+  public async updateTask(
+    anthologyId: number,
+    taskId: number,
+    body: TaskBody,
+  ): Promise<Task> {
+    return this.patch(
+      `/api/anthologies/${anthologyId}/tasks/${taskId}`,
+      body,
+    ) as Promise<Task>;
+  }
+
+  public async deleteTask(anthologyId: number, taskId: number): Promise<void> {
+    await this.delete(`/api/anthologies/${anthologyId}/tasks/${taskId}`);
+  }
+
+  /** Resolves to the task with the new file added to its attachments. */
+  public async uploadTaskAttachment(
+    anthologyId: number,
+    taskId: number,
+    file: File,
+  ): Promise<Task> {
+    return this.uploadFile(
+      'post',
+      `/api/anthologies/${anthologyId}/tasks/${taskId}/attachments`,
+      file,
+    ) as Promise<Task>;
   }
 
   public async getStoriesByAnthology(
@@ -338,17 +377,13 @@ export class ApiClient {
     anthologyId: number,
     file: File,
   ): Promise<Anthology> {
-    const formData = new FormData();
-    formData.append('file', file);
-    const headers = await this.getAuthHeaders();
-    return this.axiosInstance
-      .patch(`/api/anthologies/${anthologyId}/cover-image`, formData, {
-        headers: {
-          ...headers,
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((response) => normalizeAnthology(response.data));
+    return normalizeAnthology(
+      await this.uploadFile(
+        'patch',
+        `/api/anthologies/${anthologyId}/cover-image`,
+        file,
+      ),
+    );
   }
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
@@ -360,6 +395,19 @@ export class ApiClient {
     } catch {
       return {};
     }
+  }
+
+  private async uploadFile(
+    method: 'post' | 'patch',
+    path: string,
+    file: File,
+  ): Promise<unknown> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const headers = await this.getAuthHeaders();
+    return this.axiosInstance[method](path, formData, {
+      headers: { ...headers, 'Content-Type': 'multipart/form-data' },
+    }).then((response) => response.data);
   }
 
   private async get(path: string): Promise<unknown> {

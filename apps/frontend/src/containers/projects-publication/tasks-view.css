@@ -130,6 +130,17 @@
   color: #858585;
 }
 
+/* The cell background above would otherwise hide the row's hover colour */
+.document-tracker-table .tasks-row--complete:hover td {
+  background-color: var(--neutral-200);
+}
+
+.tasks-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--error-red);
+}
+
 .tasks-row--complete .tasks-badge {
   border-color: #858585;
   color: #858585;
