@@ -63,6 +63,7 @@ export default function TabFilterRow<T extends string>(
             className={`filter-tab-option${
               isActive(opt.value) ? ' filter-tab-option--active' : ''
             }`}
+            aria-pressed={isActive(opt.value)}
             onClick={() => handleClick(opt.value)}
           >
             {opt.displayLabel}

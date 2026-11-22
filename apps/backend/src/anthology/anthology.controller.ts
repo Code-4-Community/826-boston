@@ -27,11 +27,9 @@ import {
   ApiBearerAuth,
   ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiConflictResponse,
   ApiCreatedResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -46,16 +44,8 @@ import { AwsS3Service } from '../aws/aws-s3.service';
 import { InventoryHoldingService } from '../inventory-holding/inventory-holding.service';
 import { AnthologyInventoryDto } from '../inventory-holding/dto/anthology-inventory.dto';
 import { TrackerAnthologyDto } from './dtos/tracker-anthology.dto';
-
-interface UploadedFileType {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  buffer: Buffer;
-  size: number;
-}
 import { AnthologyPubLevel } from './types';
+import { UploadedFileType } from 'src/shared/types';
 import { isLibraryRequest } from './library-eligibility';
 
 // On @Public() routes the JWT guard still sets `user` when a valid token is sent
@@ -74,8 +64,8 @@ export class AnthologyController {
   @ApiOperation({
     summary: 'Filter and sort anthologies',
     description:
-      'Retrieves anthologies with optional filtering by publication date range, publication levels, programs, and genres. ' +
-      'Results can be sorted by a specified field.',
+      'Retrieves anthologies with optional filtering by publication date range, publication levels, programs, genres, themes, and inventory locations. ' +
+      'Results can be sorted by a specified field; without one they come back oldest first.',
   })
   @ApiOkResponse({
     description: 'Anthologies retrieved successfully',

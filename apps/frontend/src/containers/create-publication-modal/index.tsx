@@ -4,6 +4,7 @@ import { GENRES, THEMES, OMCHAI_ROLES, OmchaiRole } from './constants';
 import User from '@api/dtos/user.dto';
 import apiClient from '@api/apiClient';
 import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
+import DatePickerField from '@containers/archived-publications/filter-modal/DatePickerField';
 import {
   Anthology,
   AnthologyPubLevel,
@@ -459,11 +460,10 @@ export default function CreatePublicationModal({
 
               <div className="field-row">
                 <Field label="Publication Date" required>
-                  <input
-                    className="input"
-                    type="date"
+                  <DatePickerField
+                    ariaLabel="Publication Date"
                     value={form.publicationDate}
-                    onChange={(e) => set('publicationDate', e.target.value)}
+                    onChange={(iso) => set('publicationDate', iso)}
                   />
                 </Field>
               </div>

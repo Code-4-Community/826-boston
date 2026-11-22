@@ -7,6 +7,7 @@ import {
   CreateAnthologyDto,
   CreateBatchOmchaiAssignmentsDto,
   EditRound,
+  Inventory,
   OmchaiEntry,
   ProductionInfo,
   Story,
@@ -26,9 +27,12 @@ export interface FilterSortAnthologyBody {
   pubLevels?: string[];
   programs?: string[];
   genres?: string[];
+  themes?: string[];
   search?: string;
   /** Requires a logged-in user; the backend returns 401 otherwise. */
   staffIds?: number[];
+  /** Publications with at least one copy at any of these inventory locations. */
+  locationIds?: number[];
   sortBy?: string;
   /** Only Library-eligible publications, even for logged-in staff. */
   library?: boolean;
@@ -135,6 +139,11 @@ export class ApiClient {
   ): Promise<Anthology[]> {
     const data = await this.get(`/api/anthologies${libraryQuery(options)}`);
     return normalizeAnthologies(data);
+  }
+
+  /** Every inventory location, regardless of what it holds. */
+  public async getInventories(): Promise<Inventory[]> {
+    return this.get('/api/inventory') as Promise<Inventory[]>;
   }
 
   public async getAnthology(

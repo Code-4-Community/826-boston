@@ -53,6 +53,12 @@ export class FilterAnthologyDto {
   @IsString({ each: true })
   genres?: string[];
 
+  // publications tagged with any of these themes
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  themes?: string[];
+
   // case-insensitive match anywhere in the title
   @IsOptional()
   @IsString()
@@ -70,6 +76,13 @@ export class FilterAnthologyDto {
   @IsOptional()
   @IsBoolean()
   library?: boolean;
+
+  // publications with at least one copy at any of these inventory locations
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(200)
+  @IsInt({ each: true })
+  locationIds?: number[];
 }
 
 export class SortAnthologyDto {

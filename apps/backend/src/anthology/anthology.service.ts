@@ -29,8 +29,14 @@ function escapeLike(value: string): string {
 // has no joins combined with skip/take; revisit this if pagination is added
 function applySort(
   qb: SelectQueryBuilder<Anthology>,
-  sortBy: AnthologySortOption = AnthologySortOption.TITLE_ASC,
+  sortBy?: AnthologySortOption,
 ): void {
+  // no sort chosen: don't impose a field, keep the natural order (oldest first)
+  if (!sortBy) {
+    qb.orderBy('a.id', 'ASC');
+    return;
+  }
+
   switch (sortBy) {
     case AnthologySortOption.TITLE_DESC:
       qb.orderBy('LOWER(a.title)', 'DESC');
@@ -228,9 +234,12 @@ export class AnthologyService {
     }
 
     if (dto.pubDateRange) {
+      // The dates go in as the strings they are. As Date objects, '2026-02-03' is UTC
+      // midnight, which is still the 2nd on a server west of UTC, so the range would
+      // shift a day: the day before the start in, the end day out.
       qb.andWhere('a.publishedDate BETWEEN :start AND :end', {
-        start: new Date(dto.pubDateRange.start),
-        end: new Date(dto.pubDateRange.end),
+        start: dto.pubDateRange.start,
+        end: dto.pubDateRange.end,
       });
     }
     if (dto.pubLevels?.length) {
@@ -244,6 +253,13 @@ export class AnthologyService {
     if (dto.programs?.length) {
       qb.andWhere('a.programs && :programs', { programs: dto.programs });
     }
+    // unlike genres and programs, themes is still a comma-separated text column, and
+    // older rows can hold the literal '[]' for "no themes"
+    if (dto.themes?.length) {
+      qb.andWhere("string_to_array(NULLIF(a.themes, '[]'), ',') && :themes", {
+        themes: dto.themes,
+      });
+    }
 
     const search = dto.search?.trim();
     if (search) {
@@ -256,6 +272,13 @@ export class AnthologyService {
       qb.andWhere(
         'EXISTS (SELECT 1 FROM omchais o WHERE o.anthology = a.id AND o."user" IN (:...staffIds))',
         { staffIds: dto.staffIds },
+      );
+    }
+    // a holding row with zero copies means the location is out of stock, so it doesn't count
+    if (dto.locationIds?.length) {
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM inventoryholdings h WHERE h.anthology = a.id AND h.inventory IN (:...locationIds) AND h."numCopies" > 0)',
+        { locationIds: dto.locationIds },
       );
     }
 
