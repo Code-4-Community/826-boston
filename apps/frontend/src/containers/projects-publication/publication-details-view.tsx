@@ -309,7 +309,7 @@ const PublicationDetailsView: React.FC<Props> = ({
             <td>
               <MultiSelect
                 label="Genre(s)"
-                placeholder="Add genres."
+                placeholder="Add field."
                 options={GENRES}
                 selected={genres}
                 disabled={!editable}
@@ -371,6 +371,8 @@ const MultiSelect: React.FC<{
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const wrapRef = useRef<HTMLDivElement>(null);
+  // "Genre(s)" -> "genre", for the "Search for a genre..." placeholder
+  const noun = label.replace('(s)', '').toLowerCase();
   // Stored values outside the standard list (e.g. seeded program codes) stay listed
   const allOptions = [
     ...options,
@@ -420,7 +422,7 @@ const MultiSelect: React.FC<{
           {selected.map((item) => (
             <span key={item} className="publication-details__chip">
               {item}
-              {!disabled && (
+              {!disabled && open && (
                 <button
                   type="button"
                   aria-label={`Remove ${item}`}
@@ -439,7 +441,7 @@ const MultiSelect: React.FC<{
               <input
                 autoFocus
                 className="publication-details__multi-search"
-                placeholder={selected.length ? '' : 'Search...'}
+                placeholder={selected.length ? '' : `Search for a ${noun}...`}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
