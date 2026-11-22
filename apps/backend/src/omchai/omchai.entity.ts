@@ -7,6 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Relation,
+  Unique,
 } from 'typeorm';
 
 export enum OmchaiRole {
@@ -18,7 +19,9 @@ export enum OmchaiRole {
   INFORMED = 'INFORMED',
 }
 
+// A person holds at most one role per publication
 @Entity()
+@Unique('UQ_omchais_user_anthology', ['user', 'anthology'])
 export class Omchai {
   @PrimaryGeneratedColumn()
   id: number;

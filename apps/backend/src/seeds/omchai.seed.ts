@@ -161,7 +161,7 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     datetimeAssigned: new Date('2025-03-01'),
   },
 
-  // Anthology 5 (I Am Bravery Itself) — partial
+  // Anthology 5 (I Am Bravery Itself) — every role, several with more than one person
   {
     anthology_id: 5,
     user_id: 2,
@@ -170,8 +170,50 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
   },
   {
     anthology_id: 5,
+    user_id: 1,
+    role: OmchaiRole.OWNER,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
     user_id: 3,
     role: OmchaiRole.MANAGER,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
+    user_id: 6,
+    role: OmchaiRole.MANAGER,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
+    user_id: 4,
+    role: OmchaiRole.CONSULTED,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
+    user_id: 5,
+    role: OmchaiRole.CONSULTED,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
+    user_id: 7,
+    role: OmchaiRole.HELPER,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
+    user_id: 9,
+    role: OmchaiRole.HELPER,
+    datetimeAssigned: new Date('2024-10-01'),
+  },
+  {
+    anthology_id: 5,
+    user_id: 10,
+    role: OmchaiRole.APPROVER,
     datetimeAssigned: new Date('2024-10-01'),
   },
   {
@@ -531,67 +573,5 @@ export const OmchaiSeed: OmchaiSeedItem[] = [
     user_id: 3,
     role: OmchaiRole.MANAGER,
     datetimeAssigned: new Date('2025-07-15'),
-  },
-
-  // Anthology 5 (I Am Bravery Itself) — full set of roles with multi-user entries
-  {
-    anthology_id: 5,
-    user_id: 1,
-    role: OmchaiRole.OWNER,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 3,
-    role: OmchaiRole.MANAGER,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 6,
-    role: OmchaiRole.MANAGER,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 4,
-    role: OmchaiRole.CONSULTED,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 5,
-    role: OmchaiRole.CONSULTED,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 7,
-    role: OmchaiRole.HELPER,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 6,
-    role: OmchaiRole.HELPER,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 2,
-    role: OmchaiRole.APPROVER,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 5,
-    role: OmchaiRole.INFORMED,
-    datetimeAssigned: new Date(),
-  },
-  {
-    anthology_id: 5,
-    user_id: 1,
-    role: OmchaiRole.INFORMED,
-    datetimeAssigned: new Date(),
   },
 ];

@@ -14,6 +14,10 @@ export enum OmchaiAction {
   TICK_CHECKPOINTS = 'TICK_CHECKPOINTS',
   MANAGE_MANUSCRIPT = 'MANAGE_MANUSCRIPT',
   EDIT_PRODUCTION = 'EDIT_PRODUCTION',
+  /** Add or remove Consulted, Helper, Approver and Informed. */
+  MANAGE_TEAM = 'MANAGE_TEAM',
+  /** Add or remove Owners and Managers. */
+  MANAGE_LEADS = 'MANAGE_LEADS',
 }
 
 export const ACTION_ROLES: Record<OmchaiAction, OmchaiRole[]> = {
@@ -34,6 +38,10 @@ export const ACTION_ROLES: Record<OmchaiAction, OmchaiRole[]> = {
     OmchaiRole.APPROVER,
   ],
   [OmchaiAction.EDIT_PRODUCTION]: [OmchaiRole.OWNER, OmchaiRole.MANAGER],
+  [OmchaiAction.MANAGE_TEAM]: [OmchaiRole.OWNER, OmchaiRole.MANAGER],
+  // Admins only, so a Manager can't make themselves Owner and an Owner can't
+  // remove the Manager who holds them accountable
+  [OmchaiAction.MANAGE_LEADS]: [],
 };
 
 export function roleCan(

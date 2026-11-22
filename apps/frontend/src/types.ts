@@ -165,6 +165,13 @@ export interface OmchaiEntry {
   anthology?: Anthology;
 }
 
+export interface CreateOmchaiDto {
+  anthologyId: number;
+  userId: number;
+  role: OmchaiRole;
+  datetimeAssigned: string;
+}
+
 export interface Anthology {
   id: number;
   title: string;

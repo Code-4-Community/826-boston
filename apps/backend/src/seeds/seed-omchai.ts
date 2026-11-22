@@ -35,11 +35,11 @@ export async function seedOmchais(dataSource: DataSource) {
       continue;
     }
 
+    // One role per person per publication (UQ_omchais_user_anthology)
     const exists = await omchaiRepo.findOne({
       where: {
         user: { id: omchai.user_id },
         anthology: { id: anthology.id },
-        role: omchai.role,
       },
     });
 
@@ -56,7 +56,7 @@ export async function seedOmchais(dataSource: DataSource) {
       );
     } else {
       console.log(
-        `  - Omchai already exists: userId=${omchai.user_id}, anthology="${anthology.title}", role=${omchai.role}`,
+        `  - User already has a role: userId=${omchai.user_id}, anthology="${anthology.title}", role=${exists.role}`,
       );
     }
   }

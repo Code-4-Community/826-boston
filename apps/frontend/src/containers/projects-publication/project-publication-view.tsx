@@ -220,7 +220,11 @@ const ProjectPublicationView: React.FC = () => {
 
         {activeTab === 'omchai' && (
           <div className="ppv-tab-content">
-            <OmchaiView anthologyId={anthology.id} />
+            <OmchaiView
+              anthologyId={anthology.id}
+              canManageTeam={permissions.canManageTeam}
+              canManageLeads={permissions.canManageLeads}
+            />
           </div>
         )}
 
