@@ -211,7 +211,10 @@
   height: 24px;
 }
 
+/* a flex column, so the 32px gap separates Sort from Filter By Attribute */
 .filter-modal--results .filter-modal-body {
+  display: flex;
+  flex-direction: column;
   padding: 24px 32px;
   gap: 32px;
   overflow: visible;
@@ -250,8 +253,8 @@
 .filter-modal--results .filter-tab-option--active,
 .filter-modal--results .filter-tab-option--active:hover {
   font-weight: 400;
-  background: var(--accent-300);
-  color: var(--neutral-600);
+  background: var(--accent-400);
+  color: var(--black);
   box-shadow: inset 0 0 0 1px var(--accent-500);
 }
 
@@ -307,6 +310,8 @@
   min-width: 0;
 }
 
+/* 7px + 1px border = the 8px padding Figma draws inside the stroke, which makes the
+   search box 40px tall */
 .filter-select-box {
   display: flex;
   align-items: center;
@@ -314,7 +319,7 @@
   gap: 8px;
   border: 1px solid var(--neutral-300);
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 7px 15px;
   background: white;
 }
 
@@ -376,7 +381,7 @@
   background: transparent;
   font-family: var(--font-body);
   font-size: 16px;
-  color: var(--neutral-600);
+  color: var(--black);
 }
 
 .filter-select-input::placeholder {
@@ -390,9 +395,10 @@
   color: var(--neutral-600);
 }
 
+/* Figma opens the list 6px from the search box */
 .filter-select-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
   z-index: 10;
@@ -461,7 +467,7 @@
 /* flipped above the search box when there is no room below (see dropdownPlacement.ts) */
 .filter-select-dropdown--up {
   top: auto;
-  bottom: calc(100% + 4px);
+  bottom: calc(100% + 6px);
 }
 
 /* ── Selected values as pills under the search box ───────── */
@@ -703,40 +709,10 @@
 
 /* ── Library variant (Figma "Filter/Sort Modal - FINAL") ─── */
 
-/* a flex column so the body's 32px gap separates Sort from Filter By Attribute;
-   it never shrinks, so on a short screen the modal scrolls instead of squeezing the
-   rows into the footer */
+/* the body never shrinks, so on a short screen the modal scrolls instead of squeezing
+   the rows into the footer */
 .filter-modal--library .filter-modal-body {
-  display: flex;
-  flex-direction: column;
   flex-shrink: 0;
-}
-
-/* the chosen sort pill is the stronger orange here */
-.filter-modal--library .filter-tab-option--active,
-.filter-modal--library .filter-tab-option--active:hover {
-  background: var(--accent-400);
-  color: var(--black);
-}
-
-/* 7px + 1px border = the 8px padding Figma draws inside the stroke, which makes the
-   search box 40px tall */
-.filter-modal--library .filter-select-box {
-  padding: 7px 15px;
-}
-
-.filter-modal--library .filter-select-input {
-  color: var(--black);
-}
-
-/* Figma opens the list 6px below the search box */
-.filter-modal--library .filter-select-dropdown {
-  top: calc(100% + 6px);
-}
-
-.filter-modal--library .filter-select-dropdown--up {
-  top: auto;
-  bottom: calc(100% + 6px);
 }
 
 /* one 9px gap between rows, whether a row is a search box or the date range */

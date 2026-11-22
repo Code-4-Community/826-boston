@@ -12,6 +12,7 @@ import SearchableFilterSelect from './SearchableFilterSelect';
 import { TRACKER_SORT_OPTIONS } from './constants';
 import { collectDistinctValues } from './filterOptions';
 import CloseIcon from '../../../assets/icons/close.svg';
+import SearchFilterIcon from '../../../assets/icons/search-filter.svg';
 import './filter-modal.css';
 
 interface TrackerFilterModalProps {
@@ -83,11 +84,12 @@ export default function TrackerFilterModal({
         <div className="filter-modal-body">
           <section className="filter-modal-section">
             <h3 className="filter-modal-section-title">Sort</h3>
+            {/* At most one sort at a time; clicking the chosen one again clears it. */}
             <TabFilterRow
               options={TRACKER_SORT_OPTIONS}
               selected={draft.sortBy}
-              onChange={(value) => value && update('sortBy', value)}
-              allowDeselect={false}
+              onChange={(value) => update('sortBy', value)}
+              allowDeselect={true}
             />
           </section>
 
@@ -99,6 +101,7 @@ export default function TrackerFilterModal({
               selected={draft.programs}
               onChange={(values) => update('programs', values)}
               placeholder="Search for a program..."
+              searchIconSrc={SearchFilterIcon}
               isLoading={anthologiesQuery.isLoading}
               errorMessage={
                 anthologiesQuery.isError
@@ -112,6 +115,7 @@ export default function TrackerFilterModal({
               selected={draft.staffIds}
               onChange={(values) => update('staffIds', values)}
               placeholder="Search for a staff member..."
+              searchIconSrc={SearchFilterIcon}
               showAvatar
               isLoading={usersQuery.isLoading}
               errorMessage={

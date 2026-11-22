@@ -1,5 +1,10 @@
 import { type FilterSortAnthologyBody } from '../../api/apiClient';
-import { FilterState, SortOption } from '../../types';
+import {
+  DEFAULT_TRACKER_FILTER_STATE,
+  FilterState,
+  SortOption,
+  TrackerFilterState,
+} from '../../types';
 
 const SORT_OPTION_TO_BACKEND: Record<SortOption, string> = {
   [SortOption.TITLE_ASC]: 'title-asc',
@@ -47,4 +52,41 @@ export function buildFilterSortBody(
   }
 
   return body;
+}
+
+// turns the search box and the Tracker's Sort and Filter choices into the filter-sort
+// request body; anything left unset is left out of the body
+export function buildTrackerBody(
+  search: string,
+  filters: TrackerFilterState,
+): FilterSortAnthologyBody {
+  const body: FilterSortAnthologyBody = {};
+
+  // no sort chosen: leave sortBy out so the server doesn't sort by any field
+  if (filters.sortBy) {
+    body.sortBy = filters.sortBy;
+  }
+
+  if (search) {
+    body.search = search;
+  }
+
+  if (filters.programs.length > 0) {
+    body.programs = [...filters.programs];
+  }
+
+  if (filters.staffIds.length > 0) {
+    body.staffIds = [...filters.staffIds];
+  }
+
+  return body;
+}
+
+// each picked program and staff member counts, plus one for a chosen sort
+export function countActiveTrackerFilters(filters: TrackerFilterState): number {
+  return (
+    filters.programs.length +
+    filters.staffIds.length +
+    (filters.sortBy !== DEFAULT_TRACKER_FILTER_STATE.sortBy ? 1 : 0)
+  );
 }

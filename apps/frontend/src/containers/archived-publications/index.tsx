@@ -3,7 +3,6 @@ import { Navigate, NavLink, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from 'react-query';
 import './styles.css';
 import apiClient from '../../api/apiClient';
-import { type FilterSortAnthologyBody } from '../../api/apiClient';
 import useDebouncedValue from '../../hooks/useDebouncedValue';
 import useAuth from '../../hooks/useAuth';
 import Role from '../../api/dtos/role';
@@ -15,7 +14,11 @@ import {
   TrackerFilterState,
   DEFAULT_TRACKER_FILTER_STATE,
 } from '../../types';
-import { buildFilterSortBody } from './filterRequest';
+import {
+  buildFilterSortBody,
+  buildTrackerBody,
+  countActiveTrackerFilters,
+} from './filterRequest';
 import FilterModal from './filter-modal/FilterModal';
 import TrackerFilterModal from './filter-modal/TrackerFilterModal';
 
@@ -66,36 +69,6 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 interface PublicationsPageProps {
   mode?: PublicationsPageMode;
-}
-
-function buildTrackerBody(
-  search: string,
-  filters: TrackerFilterState,
-): FilterSortAnthologyBody {
-  const body: FilterSortAnthologyBody = { sortBy: filters.sortBy };
-
-  if (search) {
-    body.search = search;
-  }
-
-  if (filters.programs.length > 0) {
-    body.programs = [...filters.programs];
-  }
-
-  if (filters.staffIds.length > 0) {
-    body.staffIds = [...filters.staffIds];
-  }
-
-  return body;
-}
-
-// each picked program and staff member counts, plus one for a non-default sort
-function countActiveTrackerFilters(filters: TrackerFilterState): number {
-  return (
-    filters.programs.length +
-    filters.staffIds.length +
-    (filters.sortBy !== DEFAULT_TRACKER_FILTER_STATE.sortBy ? 1 : 0)
-  );
 }
 
 function applyLocalSearch(pubs: Anthology[], search: string): Anthology[] {
