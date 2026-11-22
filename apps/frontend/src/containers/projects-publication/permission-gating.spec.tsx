@@ -256,12 +256,13 @@ describe('Production & Distribution tab', () => {
     'lets %s edit every field',
     async (role) => {
       await renderAs(role);
-      expect(screen.getAllByRole('button')).toHaveLength(7);
+      // 7 production fields + the release forms link
+      expect(screen.getAllByRole('button')).toHaveLength(8);
     },
   );
 
   it('lets an admin with no role edit', async () => {
     await renderAs(undefined, true);
-    expect(screen.getAllByRole('button')).toHaveLength(7);
+    expect(screen.getAllByRole('button')).toHaveLength(8);
   });
 });

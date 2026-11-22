@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import Role from '../../api/dtos/role';
-import { Anthology, OmchaiRole } from '../../types';
+import { Anthology } from '../../types';
+import { useCanEditAnthology } from '../../hooks/useCanEditAnthology';
 import { GENRES, THEMES } from '../create-publication-modal/constants';
 import { PROGRAM_OPTIONS } from '../archived-publications/filter-modal/constants';
 import DatePickerField from '../archived-publications/filter-modal/DatePickerField';
 import EditableCell from './editable-cell';
 import SearchSelectIcon from '../../assets/icons/search-select.svg';
 import CloseIcon from '../../assets/icons/close-tag.svg';
+import InfoCircleIcon from '../../assets/icons/info-circle.svg';
+import TooltipArrowIcon from '../../assets/icons/tooltip-arrow.svg';
 import './production-info-view.css';
 
 const PUB_LEVELS = [
@@ -52,35 +55,33 @@ const PublicationDetailsView: React.FC<Props> = ({
   onChange,
 }) => {
   const [values, setValues] = useState(anthology);
-  const [editable, setEditable] = useState(false);
+  const editable = useCanEditAnthology(anthologyId, currentUser);
   const [savingField, setSavingField] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [statusOpen, setStatusOpen] = useState(false);
+  // True while the menu plays its fade-out, before it unmounts
+  const [statusClosing, setStatusClosing] = useState(false);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const openStatusMenu = () => {
+    clearTimeout(timers.current.statusMenu);
+    setStatusClosing(false);
+    setStatusOpen(true);
+  };
+
+  // Matches the 150ms fade-out in project-publication-view.css
+  const closeStatusMenu = () => {
+    setStatusClosing(true);
+    clearTimeout(timers.current.statusMenu);
+    timers.current.statusMenu = setTimeout(() => {
+      setStatusOpen(false);
+      setStatusClosing(false);
+    }, 150);
+  };
 
   useEffect(() => {
     setValues(anthology);
   }, [anthology]);
-
-  useEffect(() => {
-    const isAdmin = String(currentUser?.role ?? '').toLowerCase() === 'admin';
-    setEditable(isAdmin);
-    if (isAdmin) return;
-    // The endpoint 404s when a publication has no assignments yet
-    apiClient
-      .getOmchaiByAnthology(anthologyId)
-      .then((entries) => {
-        // The endpoint loads the assignment's user rather than a userId
-        const assignment = entries.find(
-          (entry) => entry.user?.id === currentUser?.id,
-        );
-        setEditable(
-          assignment?.role === OmchaiRole.OWNER ||
-            assignment?.role === OmchaiRole.MANAGER,
-        );
-      })
-      .catch(() => setEditable(false));
-  }, [anthologyId, currentUser]);
 
   useEffect(
     () => () => {
@@ -196,24 +197,80 @@ const PublicationDetailsView: React.FC<Props> = ({
                 type="button"
                 className="publication-status-pill"
                 disabled={!editable}
-                onClick={() => setStatusOpen((open) => !open)}
+                onClick={() =>
+                  statusOpen ? closeStatusMenu() : openStatusMenu()
+                }
               >
-                {currentStatus}
+                {/* Keyed so the new label fades in after a status is picked */}
+                <span
+                  key={currentStatus}
+                  className="publication-status-pill__label"
+                >
+                  {currentStatus}
+                </span>
               </button>
               {statusOpen && (
-                <div className="publication-status-menu">
-                  {STATUSES.map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => {
-                        saveImmediately('status', value);
-                        setStatusOpen(false);
-                      }}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                <div
+                  className={`publication-status-menu${
+                    statusClosing ? ' publication-status-menu--closing' : ''
+                  }`}
+                >
+                  {STATUSES.map(([value, label]) => {
+                    // The API enforces this too; the UI just explains it
+                    const blocked =
+                      value === 'Can Be Shared' && !values.releaseFormsOnFile;
+                    if (blocked) {
+                      // Not a <button>: disabled buttons don't reliably fire
+                      // hover events, and the tooltip hangs off the info icon
+                      return (
+                        <div
+                          key={value}
+                          className="publication-status-menu__blocked"
+                          aria-disabled="true"
+                        >
+                          <span
+                            className="publication-status-menu__info"
+                            tabIndex={0}
+                            aria-describedby="status-blocked-tooltip"
+                          >
+                            <img
+                              src={InfoCircleIcon}
+                              alt="Why is this unavailable?"
+                              width={14}
+                              height={14}
+                            />
+                            <span
+                              id="status-blocked-tooltip"
+                              role="tooltip"
+                              className="publication-status-tooltip"
+                            >
+                              Release forms must be provided in order to share.
+                              <img
+                                className="publication-status-tooltip__arrow"
+                                src={TooltipArrowIcon}
+                                alt=""
+                                width={12}
+                                height={8}
+                              />
+                            </span>
+                          </span>
+                          {label}
+                        </div>
+                      );
+                    }
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => {
+                          saveImmediately('status', value);
+                          closeStatusMenu();
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

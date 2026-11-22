@@ -150,7 +150,9 @@ export default function ArchivedPublications({
   useEffect(() => {
     if (mode !== 'archive') return;
 
-    const body = buildFilterSortBody(appliedFilters);
+    // The Library shows only eligible publications, even to logged-in staff;
+    // the Tracker (trackerQuery above) shows everything
+    const body = { ...buildFilterSortBody(appliedFilters), library: true };
     apiClient
       .filterSortAnthologies(body)
       .then((data) => {

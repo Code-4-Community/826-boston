@@ -37,6 +37,10 @@ import {
 import { OmchaiRoles, Public } from 'src/auth/roles.decorator';
 import { ACTION_ROLES, OmchaiAction } from 'src/auth/omchai-permissions';
 import { OmchaiActor, OmchaiService } from 'src/omchai/omchai.service';
+import { isLibraryRequest } from '../anthology/library-eligibility';
+
+// On @Public() routes the JWT guard still sets `user` when a valid token is sent
+type MaybeAuthedRequest = { user?: unknown };
 
 const MAX_DOCUMENTS_PAGE_SIZE = 100;
 const DOCUMENT_CHECKPOINTS: DocumentCheckpoint[] = [
@@ -124,10 +128,20 @@ export class StoryController {
   @Get('/anthology/:anthologyId')
   async getStoriesByAnthology(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
   ): Promise<Story[]> {
-    const stories = await this.storyService.getStoriesByAnthology(anthologyId);
+    const libraryOnly = isLibraryRequest(req?.user, library);
 
-    return stories;
+    // A hidden publication should 404, not return an empty list
+    if (
+      libraryOnly &&
+      !(await this.anthologyService.findOne(anthologyId, true))
+    ) {
+      throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
+    }
+
+    return this.storyService.getStoriesByAnthology(anthologyId, libraryOnly);
   }
 
   @ApiBearerAuth()
@@ -268,8 +282,14 @@ export class StoryController {
   async getStory(
     @Param('anthologyId', ParseIntPipe) anthologyId: number,
     @Param('storyId', ParseIntPipe) storyId: number,
+    @Query('library') library?: string,
+    @Req() req?: MaybeAuthedRequest,
   ): Promise<Story> {
-    return this.storyService.findByAnthologyAndId(anthologyId, storyId);
+    return this.storyService.findByAnthologyAndId(
+      anthologyId,
+      storyId,
+      isLibraryRequest(req?.user, library),
+    );
   }
 
   @ApiBearerAuth()
