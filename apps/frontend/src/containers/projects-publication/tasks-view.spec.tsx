@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import TasksView from './tasks-view';
 import apiClient from '../../api/apiClient';
@@ -99,5 +99,49 @@ describe('TasksView', () => {
   it('shows an empty state when there are no tasks', async () => {
     await setup([]);
     expect(screen.getByText('No tasks yet.')).toBeTruthy();
+  });
+
+  it('switches between the list and the timeline', async () => {
+    await setup([
+      makeTask({
+        name: 'Draft review',
+        timeFrame: '2026-10-05',
+        dueBy: '2026-10-10',
+      }),
+    ]);
+    const timelineButton = screen.getByLabelText('Timeline view');
+    const listButton = screen.getByLabelText('List view');
+    expect(listButton.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('table')).toBeTruthy();
+
+    fireEvent.click(timelineButton);
+    expect(timelineButton.getAttribute('aria-pressed')).toBe('true');
+    expect(listButton.getAttribute('aria-pressed')).toBe('false');
+    expect(screen.queryByRole('table')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Draft review' })).toBeTruthy();
+
+    fireEvent.click(listButton);
+    expect(screen.getByRole('table')).toBeTruthy();
+  });
+
+  it('shows the same tasks on the timeline', async () => {
+    await setup([
+      makeTask({
+        id: 1,
+        name: 'First',
+        timeFrame: '2026-10-05',
+        dueBy: '2026-10-10',
+      }),
+      makeTask({
+        id: 2,
+        name: 'Second',
+        timeFrame: '2026-10-06',
+        dueBy: '2026-10-12',
+      }),
+    ]);
+
+    fireEvent.click(screen.getByLabelText('Timeline view'));
+    expect(screen.getByRole('button', { name: 'First' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Second' })).toBeTruthy();
   });
 });
