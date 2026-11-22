@@ -11,6 +11,8 @@ const TABLE: [OmchaiAction, OmchaiRole[]][] = [
   [OmchaiAction.TICK_CHECKPOINTS, [OWNER, MANAGER, APPROVER]],
   [OmchaiAction.MANAGE_MANUSCRIPT, [OWNER, MANAGER, APPROVER]],
   [OmchaiAction.EDIT_PRODUCTION, [OWNER, MANAGER]],
+  [OmchaiAction.MANAGE_TEAM, [OWNER, MANAGER]],
+  [OmchaiAction.MANAGE_LEADS, []],
 ];
 
 describe('roleCan', () => {

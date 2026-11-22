@@ -10,6 +10,10 @@ export interface OmchaiPermissions {
   canTickCheckpoints: boolean;
   canManageManuscript: boolean;
   canEditProduction: boolean;
+  /** Add or remove Consulted, Helper, Approver and Informed. */
+  canManageTeam: boolean;
+  /** Add or remove Owners and Managers. */
+  canManageLeads: boolean;
 }
 
 const { OWNER, MANAGER, HELPER, APPROVER } = OmchaiRole;
@@ -19,6 +23,9 @@ const ROLES: Record<keyof OmchaiPermissions, OmchaiRole[]> = {
   canTickCheckpoints: [OWNER, MANAGER, APPROVER],
   canManageManuscript: [OWNER, MANAGER, APPROVER],
   canEditProduction: [OWNER, MANAGER],
+  canManageTeam: [OWNER, MANAGER],
+  // Admins only
+  canManageLeads: [],
 };
 
 export const NO_PERMISSIONS: OmchaiPermissions = {
@@ -26,6 +33,8 @@ export const NO_PERMISSIONS: OmchaiPermissions = {
   canTickCheckpoints: false,
   canManageManuscript: false,
   canEditProduction: false,
+  canManageTeam: false,
+  canManageLeads: false,
 };
 
 export function permissionsFor(
@@ -39,5 +48,7 @@ export function permissionsFor(
     canTickCheckpoints: allowed('canTickCheckpoints'),
     canManageManuscript: allowed('canManageManuscript'),
     canEditProduction: allowed('canEditProduction'),
+    canManageTeam: allowed('canManageTeam'),
+    canManageLeads: allowed('canManageLeads'),
   };
 }

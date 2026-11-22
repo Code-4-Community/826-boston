@@ -6,6 +6,7 @@ import {
   Author,
   CreateAnthologyDto,
   CreateBatchOmchaiAssignmentsDto,
+  CreateOmchaiDto,
   EditRound,
   Inventory,
   OmchaiEntry,
@@ -332,6 +333,16 @@ export class ApiClient {
 
   public async getOmchaiByUser(userId: number): Promise<OmchaiEntry[]> {
     return this.get(`/api/omchai/user/${userId}`) as Promise<OmchaiEntry[]>;
+  }
+
+  public async createOmchaiAssignment(
+    body: CreateOmchaiDto,
+  ): Promise<OmchaiEntry> {
+    return this.post('/api/omchai', body) as Promise<OmchaiEntry>;
+  }
+
+  public async deleteOmchaiAssignment(id: number): Promise<OmchaiEntry> {
+    return this.delete(`/api/omchai/${id}`) as Promise<OmchaiEntry>;
   }
 
   public async uploadAnthologyCoverImage(

@@ -4,18 +4,21 @@ import { permissionsFor } from './permissions';
 
 describe('permissionsFor', () => {
   it.each([
-    [OmchaiRole.OWNER, [true, true, true, true]],
-    [OmchaiRole.MANAGER, [true, true, true, true]],
-    [OmchaiRole.HELPER, [true, false, false, false]],
-    [OmchaiRole.APPROVER, [false, true, true, false]],
-    [OmchaiRole.CONSULTED, [false, false, false, false]],
-    [OmchaiRole.INFORMED, [false, false, false, false]],
-  ])('%s', (role, [drafts, checkpoints, manuscript, production]) => {
+    [OmchaiRole.OWNER, [true, true, true, true, true]],
+    [OmchaiRole.MANAGER, [true, true, true, true, true]],
+    [OmchaiRole.HELPER, [true, false, false, false, false]],
+    [OmchaiRole.APPROVER, [false, true, true, false, false]],
+    [OmchaiRole.CONSULTED, [false, false, false, false, false]],
+    [OmchaiRole.INFORMED, [false, false, false, false, false]],
+  ])('%s', (role, [drafts, checkpoints, manuscript, production, team]) => {
     expect(permissionsFor(role, false)).toEqual({
       canEditDrafts: drafts,
       canTickCheckpoints: checkpoints,
       canManageManuscript: manuscript,
       canEditProduction: production,
+      canManageTeam: team,
+      // Only admins change who the Owner and Manager are
+      canManageLeads: false,
     });
   });
 
@@ -25,11 +28,15 @@ describe('permissionsFor', () => {
       false,
       false,
       false,
+      false,
+      false,
     ]);
   });
 
   it('gives an admin every permission without a role', () => {
     expect(Object.values(permissionsFor(undefined, true))).toEqual([
+      true,
+      true,
       true,
       true,
       true,
