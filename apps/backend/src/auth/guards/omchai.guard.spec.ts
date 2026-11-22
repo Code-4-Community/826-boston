@@ -53,6 +53,11 @@ const noAssignmentsUser: User = {
   lastName: '',
 };
 
+const adminWithoutAssignmentsUser: User = {
+  ...noAssignmentsUser,
+  role: Role.ADMIN,
+};
+
 const insufficientRoleUser: User = {
   id: 1,
   email: 'test@example.com',
@@ -104,6 +109,14 @@ describe('OmchaiGuard', () => {
       .mockReturnValue([OmchaiRole.MANAGER]);
     const context = makeContext(noAssignmentsUser, { id: '42' });
     expect(guard.canActivate(context)).toBe(false);
+  });
+
+  it('allows an admin without OMCHAI assignments', () => {
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([OmchaiRole.MANAGER]);
+    const context = makeContext(adminWithoutAssignmentsUser, { id: '42' });
+    expect(guard.canActivate(context)).toBe(true);
   });
 
   it('denies access and logs a warning when anthology ID is missing from params', () => {
