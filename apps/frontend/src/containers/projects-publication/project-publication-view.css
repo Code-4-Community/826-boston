@@ -553,6 +553,11 @@ select.publication-details__control {
   box-sizing: border-box;
   padding: 4px 0;
   border-radius: 6px;
+  /* Show about six options at a time and scroll the rest, so long lists like
+     Genre don't take over the page; scrolling stops at the list's ends */
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .publication-details__multi-menu label {
