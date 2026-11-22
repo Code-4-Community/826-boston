@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Omchai } from './omchai.entity';
 import { CreateOmchaiDto } from './dtos/create-omchai.dto';
 import { EditOmchaiDto } from './dtos/edit-omchai.dto';
@@ -129,16 +129,23 @@ export class OmchaiService {
     return this.repo.save(omchai);
   }
 
-  async createMany(createOmchaiDtos: CreateOmchaiDto[]) {
-    const omchais = await this.repo
-      .createQueryBuilder()
-      .insert()
-      .into(Omchai)
-      .values(createOmchaiDtos)
-      .orIgnore()
-      .execute();
+  async createMany(
+    createOmchaiDtos: CreateOmchaiDto[],
+    transactionManager?: EntityManager,
+  ) {
+    const targetRepo = transactionManager
+      ? transactionManager.getRepository(Omchai)
+      : this.repo;
 
-    return omchais;
+    const omchais = createOmchaiDtos.map((dto) =>
+      targetRepo.create({
+        anthology: { id: dto.anthologyId },
+        user: { id: dto.userId },
+        role: dto.role,
+        datetimeAssigned: dto.datetimeAssigned,
+      }),
+    );
+    return targetRepo.save(omchais);
   }
 
   findAll() {

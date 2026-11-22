@@ -1,3 +1,11 @@
+// TODO: publication levels should be standardized across the whole repo
+export const PUBLICATION_LEVELS = [
+  { value: 'Zine', label: 'Zine' },
+  { value: 'Chapbook', label: 'Chapbook' },
+  { value: 'PerfectBound', label: 'Perfect Bound' },
+  { value: 'Signature', label: 'Signature' },
+];
+
 export const GENRES: string[] = [
   'Poetry',
   'Fiction',
@@ -87,18 +95,4 @@ export const THEMES: string[] = [
   'immigration',
   'tradition',
   'goals',
-];
-
-export interface OmchaiRole {
-  key: 'owner' | 'manager' | 'consulted' | 'helper' | 'approver' | 'informed';
-  label: string;
-}
-
-export const OMCHAI_ROLES: OmchaiRole[] = [
-  { key: 'owner', label: 'Owner' },
-  { key: 'manager', label: 'Manager' },
-  { key: 'consulted', label: 'Consulted' },
-  { key: 'helper', label: 'Helper' },
-  { key: 'approver', label: 'Approver' },
-  { key: 'informed', label: 'Informed' },
 ];

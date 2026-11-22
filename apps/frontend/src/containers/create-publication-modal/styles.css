@@ -389,3 +389,103 @@
   color: #dc2626;
   font-weight: 600;
 }
+
+.create-publication-modal {
+  max-width: 593px;
+  overflow: visible;
+}
+
+.create-publication-modal .modal__header {
+  padding: 36px 32px 0;
+}
+
+.create-publication-modal .modal__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.create-publication-modal .modal__close {
+  display: flex;
+  padding: 0;
+}
+
+.create-publication-modal .modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-height: none;
+  overflow: visible;
+  padding: 24px 32px 0;
+}
+
+.create-publication-modal .field {
+  margin-bottom: 0;
+}
+
+.create-publication-modal .field-row {
+  gap: 24px;
+}
+
+.create-publication-modal .input {
+  padding: 8px 12px;
+  background-color: white;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--neutral-600);
+}
+
+.create-publication-modal .input::placeholder {
+  color: var(--neutral-400);
+}
+
+.create-publication-modal .input--select {
+  appearance: none;
+  padding: 8px 48px 8px 16px;
+  background: white url('../../assets/icons/chevron-down.svg') no-repeat right
+    16px center / 24px 24px;
+  cursor: pointer;
+}
+
+.create-publication-modal .input--select:invalid {
+  color: var(--neutral-400);
+}
+
+.create-publication-modal .filter-date-input {
+  flex: 1;
+}
+
+.create-publication-modal .input--date {
+  padding: 8px 16px;
+}
+
+.create-publication-modal .input--empty {
+  color: var(--neutral-400);
+}
+
+.create-publication-modal .input--date::-webkit-calendar-picker-indicator {
+  width: 22px;
+  height: 22px;
+  background: url('../../assets/icons/calendar.svg') no-repeat center / 22px
+    22px;
+  cursor: pointer;
+}
+
+.create-publication-modal .modal__error {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--error-red);
+}
+
+.create-publication-modal .modal__footer {
+  padding: 24px 32px 36px;
+}
+
+.create-publication-modal .btn--primary {
+  height: 36px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
