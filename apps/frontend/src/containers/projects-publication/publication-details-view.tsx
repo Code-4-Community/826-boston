@@ -9,6 +9,8 @@ import DatePickerField from '../archived-publications/filter-modal/DatePickerFie
 import EditableCell from './editable-cell';
 import SearchSelectIcon from '../../assets/icons/search-select.svg';
 import CloseIcon from '../../assets/icons/close-tag.svg';
+import InfoCircleIcon from '../../assets/icons/info-circle.svg';
+import TooltipArrowIcon from '../../assets/icons/tooltip-arrow.svg';
 import './production-info-view.css';
 
 const PUB_LEVELS = [
@@ -57,7 +59,25 @@ const PublicationDetailsView: React.FC<Props> = ({
   const [savingField, setSavingField] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [statusOpen, setStatusOpen] = useState(false);
+  // True while the menu plays its fade-out, before it unmounts
+  const [statusClosing, setStatusClosing] = useState(false);
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+
+  const openStatusMenu = () => {
+    clearTimeout(timers.current.statusMenu);
+    setStatusClosing(false);
+    setStatusOpen(true);
+  };
+
+  // Matches the 150ms fade-out in project-publication-view.css
+  const closeStatusMenu = () => {
+    setStatusClosing(true);
+    clearTimeout(timers.current.statusMenu);
+    timers.current.statusMenu = setTimeout(() => {
+      setStatusOpen(false);
+      setStatusClosing(false);
+    }, 150);
+  };
 
   useEffect(() => {
     setValues(anthology);
@@ -177,33 +197,77 @@ const PublicationDetailsView: React.FC<Props> = ({
                 type="button"
                 className="publication-status-pill"
                 disabled={!editable}
-                onClick={() => setStatusOpen((open) => !open)}
+                onClick={() =>
+                  statusOpen ? closeStatusMenu() : openStatusMenu()
+                }
               >
-                {currentStatus}
+                {/* Keyed so the new label fades in after a status is picked */}
+                <span
+                  key={currentStatus}
+                  className="publication-status-pill__label"
+                >
+                  {currentStatus}
+                </span>
               </button>
               {statusOpen && (
-                <div className="publication-status-menu">
+                <div
+                  className={`publication-status-menu${
+                    statusClosing ? ' publication-status-menu--closing' : ''
+                  }`}
+                >
                   {STATUSES.map(([value, label]) => {
                     // The API enforces this too; the UI just explains it
                     const blocked =
                       value === 'Can Be Shared' && !values.releaseFormsOnFile;
+                    if (blocked) {
+                      // Not a <button>: disabled buttons don't reliably fire
+                      // hover events, and the tooltip hangs off the info icon
+                      return (
+                        <div
+                          key={value}
+                          className="publication-status-menu__blocked"
+                          aria-disabled="true"
+                        >
+                          <span
+                            className="publication-status-menu__info"
+                            tabIndex={0}
+                            aria-describedby="status-blocked-tooltip"
+                          >
+                            <img
+                              src={InfoCircleIcon}
+                              alt="Why is this unavailable?"
+                              width={14}
+                              height={14}
+                            />
+                            <span
+                              id="status-blocked-tooltip"
+                              role="tooltip"
+                              className="publication-status-tooltip"
+                            >
+                              Release forms must be provided in order to share.
+                              <img
+                                className="publication-status-tooltip__arrow"
+                                src={TooltipArrowIcon}
+                                alt=""
+                                width={12}
+                                height={8}
+                              />
+                            </span>
+                          </span>
+                          {label}
+                        </div>
+                      );
+                    }
                     return (
                       <button
                         key={value}
                         type="button"
-                        disabled={blocked}
                         onClick={() => {
                           saveImmediately('status', value);
-                          setStatusOpen(false);
+                          closeStatusMenu();
                         }}
                       >
                         {label}
-                        {blocked && (
-                          <span className="publication-status-menu__reason">
-                            Mark release forms on file in Production &amp;
-                            Distribution first.
-                          </span>
-                        )}
                       </button>
                     );
                   })}
