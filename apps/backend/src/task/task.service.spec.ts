@@ -9,6 +9,7 @@ import { Task } from './task.entity';
 import { TaskAttachment } from './task-attachment.entity';
 import { AreaOfWork, TaskStatus } from './types';
 import { User } from 'src/users/user.entity';
+import { Omchai } from 'src/omchai/omchai.entity';
 import { Anthology } from 'src/anthology/anthology.entity';
 import { SortOrder, UploadedFileType } from 'src/shared/types';
 import { AwsS3Service } from 'src/aws/aws-s3.service';
@@ -30,6 +31,10 @@ describe('TaskService', () => {
   };
 
   const mockUserRepository = {
+    findOne: jest.fn(),
+  };
+
+  const mockOmchaiRepository = {
     findOne: jest.fn(),
   };
 
@@ -59,6 +64,10 @@ describe('TaskService', () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(Omchai),
+          useValue: mockOmchaiRepository,
         },
         {
           provide: getRepositoryToken(TaskAttachment),
@@ -199,6 +208,20 @@ describe('TaskService', () => {
       );
     });
 
+    it('should throw BadRequestException if person in charge is not on the OMCHAI for this anthology', async () => {
+      mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockOmchaiRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.create(1, createTaskDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(mockOmchaiRepository.findOne).toHaveBeenCalledWith({
+        where: { user: { id: 2 }, anthology: { id: 1 } },
+      });
+      expect(mockTaskRepository.save).not.toHaveBeenCalled();
+    });
+
     it('should throw BadRequestException if due date is before time frame', async () => {
       mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -211,6 +234,7 @@ describe('TaskService', () => {
     it('should successfully create a task', async () => {
       mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
       mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockOmchaiRepository.findOne.mockResolvedValue({ id: 1 } as Omchai);
       mockTaskRepository.create.mockReturnValue(savedTask);
       mockTaskRepository.save.mockResolvedValue(savedTask);
 
@@ -252,6 +276,7 @@ describe('TaskService', () => {
         anthology: mockAnthology,
         personInCharge: undefined,
       });
+      expect(mockOmchaiRepository.findOne).not.toHaveBeenCalled();
       expect(result).toEqual({
         id: 1,
         name: 'Draft Check-Point',
@@ -312,6 +337,39 @@ describe('TaskService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should throw BadRequestException if person in charge is not on the OMCHAI for this anthology', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+      mockUserRepository.findOne.mockResolvedValue({ id: 3 } as User);
+      mockOmchaiRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.update(1, 1, { personInChargeId: 3 }),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockOmchaiRepository.findOne).toHaveBeenCalledWith({
+        where: { user: { id: 3 }, anthology: { id: 1 } },
+      });
+      expect(mockTaskRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('should keep a person in charge who has left the OMCHAI while other fields change', async () => {
+      mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
+      mockOmchaiRepository.findOne.mockResolvedValue(null);
+      mockTaskRepository.save.mockImplementation(async (task) => task);
+
+      const result = await service.update(1, 1, {
+        status: TaskStatus.IN_PROGRESS,
+        personInChargeId: 2,
+      });
+
+      expect(mockOmchaiRepository.findOne).not.toHaveBeenCalled();
+      expect(result.status).toBe(TaskStatus.IN_PROGRESS);
+      expect(result.personInCharge).toEqual({
+        id: 2,
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+    });
+
     it('should throw BadRequestException if due date is before time frame', async () => {
       mockTaskRepository.findOne.mockResolvedValue({ ...existingTask });
 
@@ -346,6 +404,7 @@ describe('TaskService', () => {
         firstName: 'Jane',
         lastName: 'Smith',
       } as User);
+      mockOmchaiRepository.findOne.mockResolvedValue({ id: 1 } as Omchai);
       mockTaskRepository.save.mockImplementation(async (task) => task);
 
       const result = await service.update(1, 1, {

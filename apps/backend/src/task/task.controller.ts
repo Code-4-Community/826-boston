@@ -155,7 +155,8 @@ export class TaskController {
     },
   })
   @ApiBadRequestResponse({
-    description: 'Invalid payload or unknown personInChargeId',
+    description:
+      "Invalid payload, a due date before the time frame, or a personInChargeId that is unknown or not on this anthology's OMCHAI",
     schema: {
       example: {
         statusCode: 400,
@@ -215,7 +216,7 @@ export class TaskController {
   })
   @ApiBadRequestResponse({
     description:
-      'Invalid payload, null name or status, or unknown personInChargeId',
+      "Invalid payload, null name, status or dates, a due date before the time frame, or a personInChargeId that is unknown or not on this anthology's OMCHAI (an unchanged person is not rechecked)",
     schema: {
       example: {
         statusCode: 400,

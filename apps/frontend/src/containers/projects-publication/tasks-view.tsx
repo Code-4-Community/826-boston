@@ -1,33 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import apiClient from '../../api/apiClient';
-import { AreaOfWork, Task, TaskStatus } from '../../types';
+import { Task, TaskStatus } from '../../types';
 import PaperclipIcon from '../../assets/icons/paperclip.svg';
 import ListViewIcon from '../../assets/icons/view-list.svg';
 import BoardViewIcon from '../../assets/icons/view-board.svg';
 import TimelineViewIcon from '../../assets/icons/view-timeline.svg';
+import TaskSidePanel from './task-side-panel';
+import { AreaOfWorkBadge, PersonChip } from './task-chips';
+import { formatDueBy, formatTimeFrame } from './tasks-format';
 import './tasks-view.css';
 
 interface Props {
   anthologyId: number;
-}
-
-const AREA_OF_WORK_LABELS: Record<AreaOfWork, string> = {
-  [AreaOfWork.PLANNING]: 'Planning',
-  [AreaOfWork.PROGRAMMING]: 'Programming',
-  [AreaOfWork.CHECKPOINT]: 'Checkpoint',
-  [AreaOfWork.PRODUCTION]: 'Production',
-};
-
-// timeFrame and dueBy are YYYY-MM-DD strings. new Date() would read them as
-// UTC midnight and show the previous day in Boston, so format their parts.
-function formatTimeFrame(date: string): string {
-  const [, month, day] = date.split('-');
-  return `Week of ${month}/${day}`;
-}
-
-function formatDueBy(date: string): string {
-  const [year, month, day] = date.split('-').map(Number);
-  return `${month}/${day}/${year}`;
+  // Owner, Manager and admins; everyone else can open tasks but not change them
+  canEdit?: boolean;
 }
 
 // Today as YYYY-MM-DD, so it compares directly with dueBy
@@ -38,9 +24,23 @@ function getToday(): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-const TasksView: React.FC<Props> = ({ anthologyId }) => {
+const TasksView: React.FC<Props> = ({ anthologyId, canEdit = false }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  // The task open in the side panel, or a new one being filled in. Each new
+  // one gets its own number, so one that is still being created when its panel
+  // is closed can't take over a later one.
+  const [panel, setPanel] = useState<
+    { taskId: number } | { draft: number } | null
+  >(null);
+  const drafts = useRef(0);
+  // A save that failed after its panel was already closed
+  const [error, setError] = useState<string | null>(null);
+
+  const open = (next: { taskId: number } | { draft: number }) => {
+    setError(null);
+    setPanel(next);
+  };
 
   useEffect(() => {
     apiClient
@@ -55,6 +55,13 @@ const TasksView: React.FC<Props> = ({ anthologyId }) => {
   if (loading) return <div className="tasks-loading">Loading...</div>;
 
   const today = getToday();
+  const draft = panel && 'draft' in panel ? panel.draft : null;
+  const creating = draft !== null;
+  // undefined when the open task is no longer in the list
+  const openTask =
+    panel && 'taskId' in panel
+      ? tasks.find((t) => t.id === panel.taskId)
+      : null;
   // Open tasks first, soonest due date first, then completed tasks
   const sortedTasks = [...tasks].sort(
     (a, b) =>
@@ -110,18 +117,27 @@ const TasksView: React.FC<Props> = ({ anthologyId }) => {
         </div>
       </div>
 
+      {error && (
+        <p className="tasks-error" role="alert">
+          {error}
+        </p>
+      )}
+
       <table className="document-tracker-table tasks-table">
         <thead>
           <tr>
             <th>
               <div className="tasks-task-head">
-                <button
-                  type="button"
-                  className="documents-add-btn"
-                  aria-label="Add task"
-                >
-                  +
-                </button>
+                {canEdit && (
+                  <button
+                    type="button"
+                    className="documents-add-btn"
+                    aria-label="Add task"
+                    onClick={() => open({ draft: ++drafts.current })}
+                  >
+                    +
+                  </button>
+                )}
                 Task
               </div>
             </th>
@@ -132,7 +148,12 @@ const TasksView: React.FC<Props> = ({ anthologyId }) => {
           </tr>
         </thead>
         <tbody>
-          {sortedTasks.length === 0 ? (
+          {creating && (
+            <tr>
+              <td colSpan={5}>New Task</td>
+            </tr>
+          )}
+          {sortedTasks.length === 0 && !creating ? (
             <tr>
               <td colSpan={5} className="documents-empty">
                 No tasks yet.
@@ -146,7 +167,10 @@ const TasksView: React.FC<Props> = ({ anthologyId }) => {
               return (
                 <tr
                   key={task.id}
-                  className={complete ? 'tasks-row--complete' : undefined}
+                  className={`documents-row${
+                    complete ? ' tasks-row--complete' : ''
+                  }`}
+                  onClick={() => open({ taskId: task.id })}
                 >
                   <td>
                     <div className="tasks-name">
@@ -162,22 +186,12 @@ const TasksView: React.FC<Props> = ({ anthologyId }) => {
                   </td>
                   <td>
                     {task.areaOfWork && (
-                      <span
-                        className={`tasks-badge tasks-badge--${task.areaOfWork.toLowerCase()}`}
-                      >
-                        {AREA_OF_WORK_LABELS[task.areaOfWork]}
-                      </span>
+                      <AreaOfWorkBadge areaOfWork={task.areaOfWork} />
                     )}
                   </td>
                   <td>
                     {task.personInCharge && (
-                      <div className="tasks-person">
-                        <span className="tasks-avatar">
-                          {task.personInCharge.firstName.charAt(0)}
-                        </span>
-                        {task.personInCharge.firstName}{' '}
-                        {task.personInCharge.lastName}
-                      </div>
+                      <PersonChip person={task.personInCharge} />
                     )}
                   </td>
                   <td className="tasks-col-right">
@@ -196,6 +210,35 @@ const TasksView: React.FC<Props> = ({ anthologyId }) => {
           )}
         </tbody>
       </table>
+
+      {panel && openTask !== undefined && (
+        <TaskSidePanel
+          key={openTask ? openTask.id : `new-${draft}`}
+          anthologyId={anthologyId}
+          task={openTask}
+          canEdit={canEdit}
+          onClose={() => setPanel(null)}
+          // Replace only: a response that lands late can't bring back a
+          // task that has since been deleted
+          onSaved={(saved) =>
+            setTasks((prev) => prev.map((t) => (t.id === saved.id ? saved : t)))
+          }
+          onCreated={(created) => {
+            setTasks((prev) => [...prev, created]);
+            // Open it, unless this draft's panel is no longer the open one
+            setPanel((prev) =>
+              prev && 'draft' in prev && prev.draft === draft
+                ? { taskId: created.id }
+                : prev,
+            );
+          }}
+          onDeleted={(taskId) => {
+            setTasks((prev) => prev.filter((t) => t.id !== taskId));
+            setPanel(null);
+          }}
+          onError={setError}
+        />
+      )}
     </>
   );
 };

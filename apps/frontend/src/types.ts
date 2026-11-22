@@ -204,10 +204,18 @@ export enum TaskStatus {
   COMPLETE = 'COMPLETE',
 }
 
+/** A task as the panel lists it under another: as a parent or a sub-task. */
+export interface TaskReference {
+  id: number;
+  name: string;
+  status: TaskStatus;
+}
+
 /** A task, from GET /anthologies/:anthologyId/tasks. */
 export interface Task {
   id: number;
   name: string;
+  note?: string | null;
   areaOfWork?: AreaOfWork | null;
   status: TaskStatus;
   /** Postgres date columns, returned as YYYY-MM-DD strings. */
@@ -215,6 +223,24 @@ export interface Task {
   dueBy: string;
   personInCharge: { id: number; firstName: string; lastName: string } | null;
   attachments: { id: number; fileName: string; fileUrl: string }[];
+  /** Not returned by the API yet; the panel shows them once it is. */
+  parentTask?: TaskReference | null;
+  subTasks?: TaskReference[];
+}
+
+/**
+ * What POST/PATCH /anthologies/:anthologyId/tasks accept. null clears a field,
+ * except name, status, timeFrame and dueBy, which the backend requires.
+ */
+export interface TaskBody {
+  name?: string;
+  note?: string | null;
+  areaOfWork?: AreaOfWork | null;
+  status?: TaskStatus;
+  personInChargeId?: number | null;
+  /** YYYY-MM-DD of the Monday starting the week. */
+  timeFrame?: string;
+  dueBy?: string;
 }
 
 /** Production metadata for an anthology, from GET /production-info/:anthologyId. */

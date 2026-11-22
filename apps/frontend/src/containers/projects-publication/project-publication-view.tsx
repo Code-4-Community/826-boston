@@ -193,7 +193,10 @@ const ProjectPublicationView: React.FC = () => {
 
         {activeTab === 'tasks' && (
           <div className="ppv-tab-content">
-            <TasksView anthologyId={anthology.id} />
+            <TasksView
+              anthologyId={anthology.id}
+              canEdit={permissions.canEditTasks}
+            />
           </div>
         )}
 
