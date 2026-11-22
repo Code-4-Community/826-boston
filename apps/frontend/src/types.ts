@@ -86,31 +86,34 @@ export enum AnthologyGenre {
 
 export enum SortOption {
   TITLE_ASC = 'title-asc',
+  TITLE_DESC = 'title-desc',
   AUTHOR_ASC = 'author-asc',
+  AUTHOR_DESC = 'author-desc',
   DATE_NEWEST = 'date-newest',
   DATE_OLDEST = 'date-oldest',
 }
 
 export interface FilterState {
-  sortBy: SortOption;
+  /** null means no sort is chosen. */
+  sortBy: SortOption | null;
+  /** yyyy-mm-dd, or '' when no bound is set. */
   pubDateStart: string;
   pubDateEnd: string;
-  pubLevels: AnthologyPubLevel[];
-  programs: AnthologyProgram[];
-  genres: AnthologyGenre[];
-  inventoryMin: string;
-  inventoryMax: string;
+  programs: string[];
+  /** Inventory location ids. */
+  locationIds: number[];
+  themes: string[];
+  genres: string[];
 }
 
 export const DEFAULT_FILTER_STATE: FilterState = {
-  sortBy: SortOption.TITLE_ASC,
+  sortBy: null,
   pubDateStart: '',
   pubDateEnd: '',
-  pubLevels: [],
   programs: [],
+  locationIds: [],
+  themes: [],
   genres: [],
-  inventoryMin: '',
-  inventoryMax: '',
 };
 
 /** Values match the backend's AnthologySortOption, so they're sent as-is. */
@@ -228,6 +231,12 @@ export interface ProductionInfo {
   printed_by?: string | null;
   foreword_author?: string | null;
   number_of_students?: number | null;
+}
+
+/** A place that holds copies of publications (e.g. a warehouse or office). */
+export interface Inventory {
+  id: number;
+  name: string;
 }
 
 export interface AnthologyInventoryLocation {

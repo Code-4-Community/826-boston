@@ -116,6 +116,12 @@
   opacity: 0.8;
 }
 
+.filter-modal-btn:disabled,
+.filter-modal-btn:disabled:hover {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .filter-modal-btn--clear {
   background: white;
   border: 1px solid var(--neutral-300);
@@ -181,80 +187,37 @@
   border-bottom: 0.5px solid var(--neutral-600);
 }
 
-/* ── Shared: Range Filter Row ────────────────────────────── */
-
-.filter-range-inputs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.filter-range-input {
-  border: 0.5px solid #858585;
-  border-radius: 8px;
-  padding: 4px 9px;
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--neutral-600);
-  width: 90px;
-  outline: none;
-  background: white;
-  /* Remove browser-default number spinners */
-  -moz-appearance: textfield;
-}
-
-.filter-range-input::-webkit-outer-spin-button,
-.filter-range-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.filter-range-input::placeholder {
-  color: #858585;
-}
-
-.filter-range-input:focus {
-  border-color: var(--neutral-600);
-}
-
-.filter-range-separator {
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--neutral-600);
-  flex-shrink: 0;
-}
-
-/* ── Tracker variant ("Sort and Filter Results") ─────────── */
+/* ── Results variant ("Sort and Filter Results"), shared by Tracker and Library ── */
 
 /* visible overflow so the picker dropdowns can extend past the modal's edge */
-.filter-modal--tracker {
+.filter-modal--results {
   max-width: 710px;
   overflow: visible;
 }
 
-.filter-modal--tracker .filter-modal-header {
+.filter-modal--results .filter-modal-header {
   align-items: center;
   padding: 36px 32px 0;
 }
 
-.filter-modal--tracker .filter-modal-title {
+.filter-modal--results .filter-modal-title {
   font-weight: 700;
   font-size: 18px;
   color: var(--black);
 }
 
-.filter-modal--tracker .filter-modal-close img {
+.filter-modal--results .filter-modal-close img {
   width: 24px;
   height: 24px;
 }
 
-.filter-modal--tracker .filter-modal-body {
+.filter-modal--results .filter-modal-body {
   padding: 24px 32px;
   gap: 32px;
   overflow: visible;
 }
 
-.filter-modal--tracker .filter-modal-section-title {
+.filter-modal--results .filter-modal-section-title {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 16px;
@@ -262,15 +225,15 @@
 }
 
 /* sort options render as pills instead of underlined tabs */
-.filter-modal--tracker .filter-tab-row {
+.filter-modal--results .filter-tab-row {
   padding: 0;
 }
 
-.filter-modal--tracker .filter-tab-options {
+.filter-modal--results .filter-tab-options {
   gap: 8px 12px;
 }
 
-.filter-modal--tracker .filter-tab-option {
+.filter-modal--results .filter-tab-option {
   background: var(--neutral-200);
   border: none;
   border-radius: 12px;
@@ -280,25 +243,25 @@
   transition: background-color 0.15s ease;
 }
 
-.filter-modal--tracker .filter-tab-option:hover {
+.filter-modal--results .filter-tab-option:hover {
   background: var(--neutral-300);
 }
 
-.filter-modal--tracker .filter-tab-option--active,
-.filter-modal--tracker .filter-tab-option--active:hover {
+.filter-modal--results .filter-tab-option--active,
+.filter-modal--results .filter-tab-option--active:hover {
   font-weight: 400;
   background: var(--accent-300);
   color: var(--neutral-600);
   box-shadow: inset 0 0 0 1px var(--accent-500);
 }
 
-.filter-modal--tracker .filter-modal-footer {
+.filter-modal--results .filter-modal-footer {
   gap: 10px;
   padding: 0 32px 36px;
   border-top: none;
 }
 
-.filter-modal--tracker .filter-modal-btn {
+.filter-modal--results .filter-modal-btn {
   height: 36px;
   font-family: var(--font-heading);
   font-size: 16px;
@@ -306,12 +269,12 @@
   padding: 8px 12px;
 }
 
-.filter-modal--tracker .filter-modal-btn--clear {
+.filter-modal--results .filter-modal-btn--clear {
   border-color: var(--black);
   color: var(--black);
 }
 
-.filter-modal--tracker .filter-modal-btn--apply {
+.filter-modal--results .filter-modal-btn--apply {
   background: var(--accent-600);
   border-color: var(--accent-600);
   padding: 8px 24px;
@@ -487,6 +450,312 @@
   font-family: var(--font-body);
   font-size: 14px;
   color: var(--neutral-400);
+}
+
+/* the dropdown anchors here, so it opens right under the search box even when
+   selected pills sit below it */
+.filter-select-field {
+  position: relative;
+}
+
+/* flipped above the search box when there is no room below (see dropdownPlacement.ts) */
+.filter-select-dropdown--up {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+/* ── Selected values as pills under the search box ───────── */
+
+.filter-select--pills {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* with pills the label lines up with the search box, not the middle of the stack */
+.filter-select-row--with-pills {
+  align-items: flex-start;
+}
+
+.filter-select-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+/* 3px + 1px border = the 4px padding Figma draws inside the stroke */
+.filter-select-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 11px;
+  border: 1px solid var(--accent-500);
+  border-radius: 12px;
+  background: var(--accent-400);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--black);
+  white-space: nowrap;
+}
+
+.filter-select-pill-remove {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.filter-select-pill-remove:hover {
+  opacity: 0.6;
+}
+
+.filter-select-pill-remove img {
+  display: block;
+  width: 19px;
+  height: 19px;
+}
+
+/* ── Date range (Publication Date) ───────────────────────── */
+
+.filter-date-row {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 8px 0;
+}
+
+/* same look as the form errors elsewhere (.field-error), lined up with the date boxes:
+   128px label + 17px gap */
+.filter-date-error {
+  margin: 0 0 0 145px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--error-red);
+}
+
+.filter-date-dash {
+  display: block;
+  flex-shrink: 0;
+  width: 8px;
+  height: 1px;
+}
+
+.filter-date-field {
+  position: relative;
+}
+
+/* 7px + 1px border = the 8px padding Figma draws inside the stroke */
+.filter-date-box {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  padding: 7px 15px;
+  background: white;
+}
+
+.filter-date-box:focus-within {
+  border-color: var(--neutral-600);
+}
+
+/* stays red while focused, like .field-input--error */
+.filter-date-box--error,
+.filter-date-box--error:focus-within {
+  border-color: var(--error-red);
+}
+
+.filter-date-input {
+  width: 94px;
+  min-width: 0;
+  border: none;
+  outline: none;
+  padding: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--black);
+}
+
+.filter-date-input::placeholder {
+  color: var(--neutral-400);
+}
+
+.filter-date-toggle {
+  display: flex;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.filter-date-toggle img {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.filter-date-toggle:hover {
+  opacity: 0.6;
+}
+
+.filter-date-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  background: white;
+}
+
+/* Figma: 49px gaps around a 51px "Dec 2025". The label box is widened to fit the
+   widest month ("May 2026", 54px) and the gaps trimmed so the header stays 213px wide. */
+.filter-date-popover-header {
+  display: flex;
+  align-items: center;
+  gap: 47px;
+}
+
+.filter-date-nav {
+  display: flex;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.filter-date-nav:hover {
+  opacity: 0.6;
+}
+
+.filter-date-nav img {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+/* a fixed width keeps the next-month arrow from shifting as the month name changes */
+.filter-date-month {
+  width: 55px;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--neutral-600);
+}
+
+.filter-date-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.filter-date-week {
+  display: flex;
+}
+
+.filter-date-weekday,
+.filter-date-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+.filter-date-weekday {
+  color: var(--neutral-500);
+}
+
+.filter-date-day {
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: var(--neutral-600);
+  cursor: pointer;
+}
+
+.filter-date-day:hover {
+  background: var(--neutral-150);
+}
+
+/* days from the neighbouring months */
+.filter-date-day--outside {
+  opacity: 0.5;
+}
+
+.filter-date-day--selected,
+.filter-date-day--selected:hover {
+  background: var(--accent-400);
+}
+
+/* ── Library variant (Figma "Filter/Sort Modal - FINAL") ─── */
+
+/* a flex column so the body's 32px gap separates Sort from Filter By Attribute;
+   it never shrinks, so on a short screen the modal scrolls instead of squeezing the
+   rows into the footer */
+.filter-modal--library .filter-modal-body {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* the chosen sort pill is the stronger orange here */
+.filter-modal--library .filter-tab-option--active,
+.filter-modal--library .filter-tab-option--active:hover {
+  background: var(--accent-400);
+  color: var(--black);
+}
+
+/* 7px + 1px border = the 8px padding Figma draws inside the stroke, which makes the
+   search box 40px tall */
+.filter-modal--library .filter-select-box {
+  padding: 7px 15px;
+}
+
+.filter-modal--library .filter-select-input {
+  color: var(--black);
+}
+
+/* Figma opens the list 6px below the search box */
+.filter-modal--library .filter-select-dropdown {
+  top: calc(100% + 6px);
+}
+
+.filter-modal--library .filter-select-dropdown--up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+/* one 9px gap between rows, whether a row is a search box or the date range */
+.filter-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.filter-rows > .filter-select-row + .filter-select-row {
+  margin-top: 0;
+}
+
+/* on short screens scroll the whole modal rather than cut it off; the dropdowns stay
+   inside it, which is fine because they scroll along with it */
+@media (max-height: 740px) {
+  .filter-modal--library {
+    overflow-y: auto;
+  }
 }
 
 @keyframes filterModalFadeIn {
