@@ -1,4 +1,4 @@
-import { IsNumber, IsEnum, IsDateString, IsOptional } from 'class-validator';
+import { IsNumber, IsEnum, IsDateString, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OmchaiRole } from '../omchai.entity';
 
@@ -19,7 +19,7 @@ export class CreateOmchaiDto {
   role: OmchaiRole;
 
   @ApiPropertyOptional({ description: 'Date that the user was assigned' })
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsDateString()
   datetimeAssigned?: Date;
 }

@@ -4,7 +4,7 @@ import './styles.css';
 import apiClient from '@api/apiClient';
 import SearchableMultiSelect from '@components/SearchableMultiSelect';
 import { PROGRAM_OPTIONS } from '@containers/archived-publications/filter-modal/constants';
-import { Anthology, AnthologyPubLevel, CreateAnthologyDto } from '../../types';
+import { Anthology, AnthologyPubLevel } from '../../types';
 import { PUBLICATION_LEVELS } from './constants';
 import Field from './Field';
 import CloseIcon from '../../assets/icons/close.svg';
@@ -62,19 +62,13 @@ export default function CreatePublicationModal({
     setError(null);
 
     try {
-      const createAnthologyBody: CreateAnthologyDto = {
+      const anthology = await apiClient.createAnthology({
         title: form.title,
         pub_level: form.publicationLevel as AnthologyPubLevel,
         owner_ids: form.owners,
-      };
-      // optional fields
-      if (form.programs.length > 0)
-        createAnthologyBody.programs = form.programs;
-      if (form.publicationDate) {
-        createAnthologyBody.publicationDate = form.publicationDate;
-      }
-
-      const anthology = await apiClient.createAnthology(createAnthologyBody);
+        programs: form.programs,
+        publicationDate: form.publicationDate || undefined,
+      });
 
       onCreated(anthology);
     } catch {
