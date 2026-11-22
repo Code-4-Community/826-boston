@@ -3,21 +3,21 @@ import TabFilterRow from './TabFilterRow';
 import { SORT_OPTIONS } from './constants';
 
 interface SortSectionProps {
-  sortBy: SortOption;
-  onChange: (value: SortOption) => void;
+  /** null means no sort is chosen. */
+  sortBy: SortOption | null;
+  onChange: (value: SortOption | null) => void;
 }
 
 export default function SortSection({ sortBy, onChange }: SortSectionProps) {
   return (
     <section className="filter-modal-section">
       <h3 className="filter-modal-section-title">Sort</h3>
-      {/* TabFilterRow is reused for Sort, Publication Level, Program, and Genre.
-          Sort uses allowDeselect=false so a sort order is always active. */}
+      {/* At most one sort at a time; clicking the chosen one again clears it. */}
       <TabFilterRow
         options={SORT_OPTIONS}
         selected={sortBy}
-        onChange={(value) => value && onChange(value)}
-        allowDeselect={false}
+        onChange={onChange}
+        allowDeselect={true}
       />
     </section>
   );

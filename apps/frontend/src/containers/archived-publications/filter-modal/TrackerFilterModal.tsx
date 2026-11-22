@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import apiClient from '../../../api/apiClient';
 import {
-  Anthology,
   TrackerFilterState,
   DEFAULT_TRACKER_FILTER_STATE,
 } from '../../../types';
@@ -11,6 +10,7 @@ import FilterModalFooter from './FilterModalFooter';
 import TabFilterRow from './TabFilterRow';
 import SearchableFilterSelect from './SearchableFilterSelect';
 import { TRACKER_SORT_OPTIONS } from './constants';
+import { collectDistinctValues } from './filterOptions';
 import CloseIcon from '../../../assets/icons/close.svg';
 import './filter-modal.css';
 
@@ -18,22 +18,6 @@ interface TrackerFilterModalProps {
   initialFilters: TrackerFilterState;
   onApply: (filters: TrackerFilterState) => void;
   onClose: () => void;
-}
-
-// every distinct program name across all publications, sorted A-Z
-function collectPrograms(anthologies: Anthology[]): string[] {
-  const programs = new Set<string>();
-  for (const anthology of anthologies) {
-    const values =
-      typeof anthology.programs === 'string'
-        ? anthology.programs.split(',')
-        : anthology.programs ?? [];
-    for (const value of values) {
-      const program = value.trim();
-      if (program) programs.add(program);
-    }
-  }
-  return [...programs].sort((a, b) => a.localeCompare(b));
 }
 
 export default function TrackerFilterModal({
@@ -61,10 +45,12 @@ export default function TrackerFilterModal({
 
   const programOptions = useMemo(
     () =>
-      collectPrograms(anthologiesQuery.data ?? []).map((program) => ({
-        value: program,
-        label: program,
-      })),
+      collectDistinctValues(anthologiesQuery.data ?? [], 'programs').map(
+        (program) => ({
+          value: program,
+          label: program,
+        }),
+      ),
     [anthologiesQuery.data],
   );
   const staffOptions = useMemo(
@@ -85,7 +71,7 @@ export default function TrackerFilterModal({
       aria-label="Sort and Filter Results"
     >
       <div
-        className="filter-modal filter-modal--tracker"
+        className="filter-modal filter-modal--results"
         onClick={(e) => e.stopPropagation()}
       >
         <FilterModalHeader

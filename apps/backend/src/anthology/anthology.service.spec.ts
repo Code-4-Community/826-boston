@@ -87,17 +87,16 @@ describe('AnthologyService', () => {
       mockQueryBuilder.getMany.mockResolvedValue([mockAnthology1]);
     });
 
-    it('no filters — no conditions, default title sort', async () => {
+    it('no filters, no sort — no conditions, natural (id) order', async () => {
       const result = await service.findWithFilterSort({});
 
       expect(result).toEqual([mockAnthology1]);
       expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('a');
       expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
-      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith(
-        'LOWER(a.title)',
-        'ASC',
-      );
-      expect(mockQueryBuilder.addOrderBy).toHaveBeenCalledWith('a.id', 'ASC');
+      // no sort field is imposed when none is chosen
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledTimes(1);
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('a.id', 'ASC');
+      expect(mockQueryBuilder.addOrderBy).not.toHaveBeenCalled();
     });
 
     it('pubDateRange — between the two dates', async () => {
@@ -107,7 +106,8 @@ describe('AnthologyService', () => {
 
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         'a.publishedDate BETWEEN :start AND :end',
-        { start: new Date('2020-01-01'), end: new Date('2021-01-01') },
+        // plain strings, so the server's timezone can't shift the day
+        { start: '2020-01-01', end: '2021-01-01' },
       );
     });
 
@@ -163,12 +163,37 @@ describe('AnthologyService', () => {
       );
     });
 
+    it('themes — overlap on the comma-separated column', async () => {
+      await service.findWithFilterSort({ themes: ['Identity', 'Culture'] });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        "string_to_array(NULLIF(a.themes, '[]'), ',') && :themes",
+        { themes: ['Identity', 'Culture'] },
+      );
+    });
+
+    it('locationIds — publications with copies at any of the locations', async () => {
+      await service.findWithFilterSort({ locationIds: [1, 5] });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        expect.stringContaining('h.inventory IN (:...locationIds)'),
+        { locationIds: [1, 5] },
+      );
+      // zero-copy holdings must not count as being in stock
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        expect.stringContaining('h."numCopies" > 0'),
+        expect.anything(),
+      );
+    });
+
     it('empty lists — add no conditions', async () => {
       await service.findWithFilterSort({
         pubLevels: [],
         genres: [],
         programs: [],
+        themes: [],
         staffIds: [],
+        locationIds: [],
       });
       expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
     });
@@ -179,8 +204,10 @@ describe('AnthologyService', () => {
         pubLevels: [AnthologyPubLevel.CHAPBOOK],
         genres: ['fiction'],
         programs: ['OB'],
+        themes: ['Identity'],
         search: 'moon',
         staffIds: [2],
+        locationIds: [3],
         sortBy: AnthologySortOption.DATE_RECENT,
       });
 
@@ -189,8 +216,10 @@ describe('AnthologyService', () => {
         'a.pubLevel IN (:...pubLevels)',
         'a.genres && :genres',
         'a.programs && :programs',
+        expect.stringContaining(':themes'),
         'a.title ILIKE :search',
         expect.stringContaining(':...staffIds'),
+        expect.stringContaining(':...locationIds'),
       ]);
     });
 
