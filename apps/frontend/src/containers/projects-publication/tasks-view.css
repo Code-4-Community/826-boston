@@ -158,15 +158,18 @@
 
 .tasks-board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 16px;
   align-items: start;
   margin-top: 32px;
+  overflow-x: auto;
 }
 
 .tasks-board-column {
   min-width: 0;
   min-height: max(210px, calc((100vh - 220px) / 2));
+  padding: 16px 16px 24px;
+  border-radius: 12px;
 }
 
 .tasks-board-column--drop-target {
@@ -179,10 +182,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 36px;
-  margin-bottom: 8px;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--neutral-200);
+  height: 22px;
+  margin-bottom: 10px;
+  padding: 0;
 }
 
 .tasks-board-column-title {
@@ -190,8 +192,9 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
 }
 
 .tasks-board-column-title img {
@@ -208,7 +211,7 @@
 }
 
 .tasks-board-column-title--complete {
-  color: #096c09;
+  color: #00996b;
 }
 
 .tasks-board-add {
@@ -223,23 +226,23 @@
 .tasks-board-cards {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-height: max(190px, calc((100vh - 260px) / 2));
 }
 
 .tasks-board-card {
   width: 100%;
-  min-height: 82px;
+  min-height: 83px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
   box-sizing: border-box;
-  padding: 12px;
-  border: 1px solid #d0d0d0;
+  padding: 12px 16px 12px 12px;
+  border: 1px solid var(--neutral-300);
   border-radius: 6px;
-  background: #fff;
-  color: #000;
+  background: var(--neutral-100);
+  color: var(--neutral-600);
   font-family: var(--font-body);
   text-align: left;
   cursor: pointer;
@@ -273,9 +276,11 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
-  font-size: 14px;
+  font-family: var(--font-heading);
+  font-size: 16px;
   font-weight: 600;
-  line-height: 18px;
+  line-height: 19px;
+  color: var(--neutral-600);
 }
 
 .tasks-board-card-footer {
@@ -287,12 +292,23 @@
 }
 
 .tasks-board-card-footer .tasks-person {
-  font-size: 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 19px;
+}
+
+.tasks-board-card-footer .tasks-avatar {
+  width: 21px;
+  height: 21px;
+  font-size: 14px;
+  line-height: 19px;
 }
 
 .tasks-board-card-footer .tasks-badge {
-  padding: 2px 10px 3px;
+  min-height: 26px;
+  padding: 4px 16px 6px;
   font-size: 12px;
+  line-height: 16px;
 }
 
 .tasks-filter-overlay {
