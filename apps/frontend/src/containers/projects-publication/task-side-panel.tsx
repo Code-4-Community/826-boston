@@ -416,6 +416,7 @@ interface Props {
   anthologyId: number;
   // null while a new task is being filled in
   task: Task | null;
+  initialStatus?: TaskStatus;
   // Owner, Manager and admins; everyone else sees the task read-only
   canEdit: boolean;
   onClose: () => void;
@@ -431,6 +432,7 @@ interface Props {
 const TaskSidePanel: React.FC<Props> = ({
   anthologyId,
   task,
+  initialStatus = TaskStatus.NOT_STARTED,
   canEdit,
   onClose,
   onSaved,
@@ -438,7 +440,10 @@ const TaskSidePanel: React.FC<Props> = ({
   onDeleted,
   onError,
 }) => {
-  const [draft, setDraft] = useState<Values>(EMPTY);
+  const [draft, setDraft] = useState<Values>({
+    ...EMPTY,
+    status: task?.status ?? initialStatus,
+  });
   const [members, setMembers] = useState<Person[]>([]);
   // Saves and uploads run one after another, so their responses can't land out
   // of order; `pending` counts those queued or in flight.
