@@ -166,6 +166,13 @@
 
 .tasks-board-column {
   min-width: 0;
+  min-height: max(210px, calc((100vh - 220px) / 2));
+}
+
+.tasks-board-column--drop-target {
+  border-radius: 6px;
+  outline: 2px solid var(--accent-500);
+  outline-offset: 4px;
 }
 
 .tasks-board-column-header {
@@ -217,6 +224,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: max(190px, calc((100vh - 260px) / 2));
 }
 
 .tasks-board-card {
@@ -240,6 +248,19 @@
 .tasks-board-card:hover {
   border-color: #b5b5b5;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tasks-board-card[draggable='true'] {
+  cursor: grab;
+}
+
+.tasks-board-card--dragging {
+  opacity: 0.55;
+  cursor: grabbing;
+}
+
+.tasks-board-column:has(.tasks-board-card--dragging) {
+  opacity: 1;
 }
 
 .tasks-board-card--overdue {

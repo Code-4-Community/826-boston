@@ -337,6 +337,83 @@ describe('TasksView', () => {
     });
   });
 
+  it('drags a task between board columns and updates it without a refresh', async () => {
+    mockApi.updateTask.mockResolvedValue(
+      makeTask({
+        id: 1,
+        name: 'Draft Check-Point',
+        status: TaskStatus.COMPLETE,
+      }),
+    );
+    await setup([makeTask({ id: 1, name: 'Draft Check-Point' })], true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Board view' }));
+    const card = screen.getByRole('button', { name: /Draft Check-Point/ });
+    const complete = screen.getByLabelText('Complete');
+    const data = {
+      getData: () => '1',
+      setData: vi.fn(),
+      effectAllowed: 'none',
+      dropEffect: 'none',
+    };
+
+    fireEvent.dragStart(card, { dataTransfer: data });
+    fireEvent.dragOver(complete, { dataTransfer: data });
+    await act(async () => {
+      fireEvent.drop(complete, { dataTransfer: data });
+    });
+
+    await waitFor(() =>
+      expect(mockApi.updateTask).toHaveBeenCalledWith(5, 1, {
+        status: TaskStatus.COMPLETE,
+      }),
+    );
+    expect(
+      complete.contains(
+        screen.getByRole('button', { name: /Draft Check-Point/ }),
+      ),
+    ).toBe(true);
+  });
+
+  it('only makes board cards draggable for users with edit rights', async () => {
+    await setup([makeTask({ id: 1, name: 'Draft Check-Point' })], false);
+    fireEvent.click(screen.getByRole('button', { name: 'Board view' }));
+    expect(
+      screen
+        .getByRole('button', { name: /Draft Check-Point/ })
+        .getAttribute('draggable'),
+    ).toBe('false');
+  });
+
+  it('rolls a dragged task back if the status update fails', async () => {
+    mockApi.updateTask.mockRejectedValue(serverError('Update failed'));
+    await setup([makeTask({ id: 1, name: 'Draft Check-Point' })], true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Board view' }));
+    const card = screen.getByRole('button', { name: /Draft Check-Point/ });
+    const complete = screen.getByLabelText('Complete');
+    const data = {
+      getData: () => '1',
+      setData: vi.fn(),
+      effectAllowed: 'none',
+      dropEffect: 'none',
+    };
+
+    fireEvent.dragStart(card, { dataTransfer: data });
+    await act(async () => {
+      fireEvent.drop(complete, { dataTransfer: data });
+    });
+
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      "Couldn't move the task",
+    );
+    expect(
+      screen
+        .getByLabelText('Not Started')
+        .contains(screen.getByRole('button', { name: /Draft Check-Point/ })),
+    ).toBe(true);
+  });
+
   it.each([
     [OmchaiRole.OWNER, true],
     [OmchaiRole.MANAGER, true],

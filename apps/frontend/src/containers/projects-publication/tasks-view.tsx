@@ -49,6 +49,9 @@ const TasksView: React.FC<Props> = ({ anthologyId, canEdit = false }) => {
     { taskId: number } | { draft: number; status: TaskStatus } | null
   >(null);
   const drafts = useRef(0);
+  const [draggingTaskId, setDraggingTaskId] = useState<number | null>(null);
+  const [dropStatus, setDropStatus] = useState<TaskStatus | null>(null);
+  const suppressCardClick = useRef(false);
   // A save that failed after its panel was already closed
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +64,28 @@ const TasksView: React.FC<Props> = ({ anthologyId, canEdit = false }) => {
 
   const openNew = (status: TaskStatus = TaskStatus.NOT_STARTED) =>
     open({ draft: ++drafts.current, status });
+
+  const moveTask = async (task: Task, status: TaskStatus) => {
+    if (!canEdit || task.status === status) return;
+    const previous = task;
+    setTasks((current) =>
+      current.map((item) => (item.id === task.id ? { ...item, status } : item)),
+    );
+    setError(null);
+    try {
+      const saved = await apiClient.updateTask(anthologyId, task.id, {
+        status,
+      });
+      setTasks((current) =>
+        current.map((item) => (item.id === saved.id ? saved : item)),
+      );
+    } catch {
+      setTasks((current) =>
+        current.map((item) => (item.id === previous.id ? previous : item)),
+      );
+      setError("Couldn't move the task. Please try again.");
+    }
+  };
 
   useEffect(() => {
     apiClient
@@ -334,9 +359,46 @@ const TasksView: React.FC<Props> = ({ anthologyId, canEdit = false }) => {
             );
             return (
               <section
-                className="tasks-board-column"
+                className={`tasks-board-column${
+                  dropStatus === column.status
+                    ? ' tasks-board-column--drop-target'
+                    : ''
+                }`}
                 key={column.status}
                 aria-label={column.label}
+                onDragEnter={(event) => {
+                  if (!canEdit) return;
+                  event.preventDefault();
+                  setDropStatus(column.status);
+                }}
+                onDragOver={(event) => {
+                  if (!canEdit) return;
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = 'move';
+                }}
+                onDragLeave={(event) => {
+                  if (
+                    event.currentTarget.contains(event.relatedTarget as Node)
+                  ) {
+                    return;
+                  }
+                  setDropStatus((current) =>
+                    current === column.status ? null : current,
+                  );
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (!canEdit) return;
+                  const taskId = Number(
+                    event.dataTransfer.getData('text/task-id') ||
+                      draggingTaskId,
+                  );
+                  const task = tasks.find((item) => item.id === taskId);
+                  if (task) void moveTask(task, column.status);
+                  suppressCardClick.current = true;
+                  setDraggingTaskId(null);
+                  setDropStatus(null);
+                }}
               >
                 <header className="tasks-board-column-header">
                   <span
@@ -366,8 +428,32 @@ const TasksView: React.FC<Props> = ({ anthologyId, canEdit = false }) => {
                         key={task.id}
                         className={`tasks-board-card${
                           overdue ? ' tasks-board-card--overdue' : ''
+                        }${
+                          draggingTaskId === task.id
+                            ? ' tasks-board-card--dragging'
+                            : ''
                         }`}
-                        onClick={() => open({ taskId: task.id })}
+                        draggable={canEdit}
+                        onDragStart={(event) => {
+                          suppressCardClick.current = false;
+                          setDraggingTaskId(task.id);
+                          event.dataTransfer.effectAllowed = 'move';
+                          event.dataTransfer.setData(
+                            'text/task-id',
+                            String(task.id),
+                          );
+                        }}
+                        onDragEnd={() => {
+                          setDraggingTaskId(null);
+                          setDropStatus(null);
+                          window.setTimeout(() => {
+                            suppressCardClick.current = false;
+                          }, 0);
+                        }}
+                        onClick={() => {
+                          if (suppressCardClick.current) return;
+                          open({ taskId: task.id });
+                        }}
                       >
                         <div className="tasks-board-card-name">
                           <span>{task.name}</span>
