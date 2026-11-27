@@ -282,8 +282,8 @@ export interface CreateAnthologyDto {
 }
 
 export interface CreateBatchOmchaiAssignmentsDto {
-  anthology_id: number;
-  datetime_assigned: string;
+  anthologyId: number;
+  datetimeAssigned: string;
   owners: number[];
   managers: number[];
   consulted: number[];
