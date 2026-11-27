@@ -1,76 +1,78 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import SearchIcon from '../assets/icons/search.svg';
+import SearchIcon from '../assets/icons/search-filter.svg';
 import CloseSmallIcon from '../assets/icons/close-small.svg';
+import CloseSmallDarkIcon from '../assets/icons/close-small-dark.svg';
 import CheckIcon from '../assets/icons/check.svg';
 import './SearchableMultiSelect.css';
 
-export interface MultiSelectOption<T extends string | number> {
-  value: T;
+type OptionValue = string | number;
+
+export interface MultiSelectOption<Value extends OptionValue> {
+  value: Value;
   label: string;
+  // If provided, an icon with this label is rendered next to the option
+  iconLabel?: string;
 }
 
-interface SearchableMultiSelectProps<T extends string | number> {
-  label: string;
-  options: MultiSelectOption<T>[];
-  selected: T[];
-  onChange: (values: T[]) => void;
+interface SearchableMultiSelectProps<Value extends OptionValue> {
+  options: MultiSelectOption<Value>[];
+  selected: Value[];
+  onChange: (values: Value[]) => void;
   placeholder: string;
-  /** Shows a circle with the option's first letter on each selected tag (used for staff). */
-  showAvatar?: boolean;
-  isLoading?: boolean;
-  /** When set, shown in the dropdown instead of the options (e.g. the options failed to load). */
-  errorMessage?: string;
+  // Whether the selected option should display as pills below the search box, or inside the search box
+  selectionDisplay: 'pills' | 'inline';
 }
 
-export default function SearchableMultiSelect<T extends string | number>({
-  label,
+export default function SearchableMultiSelect<Value extends OptionValue>({
   options,
   selected,
   onChange,
   placeholder,
-  showAvatar = false,
-  isLoading = false,
-  errorMessage,
-}: SearchableMultiSelectProps<T>) {
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  selectionDisplay,
+}: SearchableMultiSelectProps<Value>) {
+  const [searchText, setSearchText] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // outer container for the component
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // close the dropdown on a click outside it or on Escape
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isDropdownOpen) return;
 
+    // close the dropdown if the user clicks outside of it
     const handleMouseDown = (e: MouseEvent) => {
-      if (!wrapperRef.current?.contains(e.target as Node)) {
-        setIsOpen(false);
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
       }
     };
+
+    // close the dropdown if the user clicks escape
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        setIsOpen(false);
+        setIsDropdownOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('keydown', handleKeyDown);
+
     return () => {
       document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isDropdownOpen]);
 
   const filteredOptions = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
+    const normalized = searchText.trim().toLowerCase();
     if (!normalized) return options;
     return options.filter((opt) =>
       opt.label.toLowerCase().includes(normalized),
     );
-  }, [options, query]);
+  }, [options, searchText]);
 
   const selectedOptions = options.filter((opt) => selected.includes(opt.value));
 
-  const toggle = (value: T) => {
+  const toggleOption = (value: Value) => {
     onChange(
       selected.includes(value)
         ? selected.filter((v) => v !== value)
@@ -78,91 +80,108 @@ export default function SearchableMultiSelect<T extends string | number>({
     );
   };
 
-  const renderDropdownContent = () => {
-    if (errorMessage) {
-      return (
-        <div className="searchable-multi-select-message">{errorMessage}</div>
-      );
-    }
-    if (isLoading) {
-      return <div className="searchable-multi-select-message">Loading...</div>;
-    }
-    if (filteredOptions.length === 0) {
-      return (
-        <div className="searchable-multi-select-message">No results found</div>
-      );
-    }
-
-    return filteredOptions.map((opt) => {
-      const isSelected = selected.includes(opt.value);
-
-      return (
-        <button
-          key={opt.value}
-          type="button"
-          className={`searchable-multi-select-option${
-            isSelected ? ' searchable-multi-select-option--selected' : ''
-          }`}
-          onClick={() => toggle(opt.value)}
-          aria-pressed={isSelected}
-        >
-          <span className="searchable-multi-select-checkbox" aria-hidden="true">
-            {isSelected && <img src={CheckIcon} alt="" />}
-          </span>
-          {opt.label}
-        </button>
-      );
-    });
-  };
+  const showPills = selectionDisplay === 'pills';
 
   return (
-    <div className="searchable-multi-select" ref={wrapperRef}>
-      <div className="searchable-multi-select-box">
-        <div className="searchable-multi-select-tags">
-          {selectedOptions.map((opt) => (
-            <span key={opt.value} className="searchable-multi-select-tag">
-              {showAvatar && (
-                <span
-                  className="searchable-multi-select-avatar"
-                  aria-hidden="true"
-                >
-                  {opt.label.charAt(0).toUpperCase()}
+    <div className="searchable-multi-select" ref={containerRef}>
+      <div className="searchable-multi-select-field">
+        <div className="searchable-multi-select-box">
+          <div className="searchable-multi-select-tags">
+            {!showPills &&
+              selectedOptions.map((opt) => (
+                <span key={opt.value} className="searchable-multi-select-tag">
+                  {opt.iconLabel && (
+                    <span
+                      className="searchable-multi-select-option-icon"
+                      aria-hidden="true"
+                    >
+                      {opt.iconLabel}
+                    </span>
+                  )}
+                  {opt.label}
+                  <button
+                    type="button"
+                    className="searchable-multi-select-tag-remove"
+                    onClick={() => toggleOption(opt.value)}
+                    aria-label={`Remove ${opt.label}`}
+                  >
+                    <img src={CloseSmallIcon} alt="" />
+                  </button>
                 </span>
-              )}
+              ))}
+
+            <input
+              className="searchable-multi-select-input"
+              placeholder={
+                showPills || selectedOptions.length === 0 ? placeholder : ''
+              }
+              value={searchText}
+              onFocus={() => setIsDropdownOpen(true)}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setIsDropdownOpen(true);
+              }}
+            />
+          </div>
+          <img
+            src={SearchIcon}
+            alt=""
+            className="searchable-multi-select-search-icon"
+          />
+        </div>
+
+        {isDropdownOpen && (
+          <div className="searchable-multi-select-dropdown">
+            {filteredOptions.length === 0 ? (
+              <div className="searchable-multi-select-message">
+                No results found.
+              </div>
+            ) : (
+              filteredOptions.map((opt) => {
+                const isSelected = selected.includes(opt.value);
+
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`searchable-multi-select-option${
+                      isSelected
+                        ? ' searchable-multi-select-option--selected'
+                        : ''
+                    }`}
+                    onClick={() => toggleOption(opt.value)}
+                    aria-pressed={isSelected}
+                  >
+                    <span
+                      className="searchable-multi-select-checkbox"
+                      aria-hidden="true"
+                    >
+                      {isSelected && <img src={CheckIcon} alt="" />}
+                    </span>
+                    {opt.label}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        )}
+      </div>
+
+      {showPills && selectedOptions.length > 0 && (
+        <div className="searchable-multi-select-pills">
+          {selectedOptions.map((opt) => (
+            <span key={opt.value} className="searchable-multi-select-pill">
               {opt.label}
               <button
                 type="button"
-                className="searchable-multi-select-tag-remove"
-                onClick={() => toggle(opt.value)}
+                className="searchable-multi-select-pill-remove"
+                onClick={() => toggleOption(opt.value)}
                 aria-label={`Remove ${opt.label}`}
               >
-                <img src={CloseSmallIcon} alt="" />
+                <img src={CloseSmallDarkIcon} alt="" />
               </button>
             </span>
           ))}
-
-          <input
-            className="searchable-multi-select-input"
-            placeholder={selectedOptions.length === 0 ? placeholder : ''}
-            aria-label={label}
-            value={query}
-            onFocus={() => setIsOpen(true)}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setIsOpen(true);
-            }}
-          />
-        </div>
-        <img
-          src={SearchIcon}
-          alt=""
-          className="searchable-multi-select-search-icon"
-        />
-      </div>
-
-      {isOpen && (
-        <div className="searchable-multi-select-dropdown">
-          {renderDropdownContent()}
         </div>
       )}
     </div>

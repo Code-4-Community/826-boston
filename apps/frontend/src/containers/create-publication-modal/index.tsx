@@ -49,6 +49,7 @@ export default function CreatePublicationModal({
       (usersQuery.data ?? []).map((user) => ({
         value: user.id,
         label: `${user.firstName} ${user.lastName}`,
+        iconLabel: user.firstName.charAt(0).toUpperCase(),
       })),
     [usersQuery.data],
   );
@@ -120,11 +121,11 @@ export default function CreatePublicationModal({
 
           <Field label="Program">
             <SearchableMultiSelect
-              label="Program"
               options={programOptions}
               selected={form.programs}
               onChange={(values) => set('programs', values)}
               placeholder="Select a program"
+              selectionDisplay="pills"
             />
           </Field>
 
@@ -158,18 +159,11 @@ export default function CreatePublicationModal({
 
           <Field label="Owner" required>
             <SearchableMultiSelect
-              label="Owner"
               options={ownerOptions}
               selected={form.owners}
               onChange={(values) => set('owners', values)}
               placeholder="Select a user"
-              showAvatar
-              isLoading={usersQuery.isLoading}
-              errorMessage={
-                usersQuery.isError
-                  ? "Couldn't load users. Try again."
-                  : undefined
-              }
+              selectionDisplay="inline"
             />
           </Field>
 
