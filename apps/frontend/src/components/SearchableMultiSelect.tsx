@@ -10,7 +10,8 @@ type OptionValue = string | number;
 export interface MultiSelectOption<Value extends OptionValue> {
   value: Value;
   label: string;
-  // If provided, an icon with this label is rendered next to the option
+  // If provided, shown in a circle next to the option once it's selected
+  // The icon is only displayed if selectionDisplay is set to 'inline'
   iconLabel?: string;
 }
 
@@ -34,6 +35,8 @@ export default function SearchableMultiSelect<Value extends OptionValue>({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // outer container for the component
   const containerRef = useRef<HTMLDivElement>(null);
+  // ref to the search box input
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isDropdownOpen) return;
@@ -85,7 +88,14 @@ export default function SearchableMultiSelect<Value extends OptionValue>({
   return (
     <div className="searchable-multi-select" ref={containerRef}>
       <div className="searchable-multi-select-field">
-        <div className="searchable-multi-select-box">
+        {/* clicking anywhere in the search box starts a search */}
+        <div
+          className="searchable-multi-select-box"
+          onClick={() => {
+            inputRef.current?.focus();
+            setIsDropdownOpen(true);
+          }}
+        >
           <div className="searchable-multi-select-tags">
             {!showPills &&
               selectedOptions.map((opt) => (
@@ -102,7 +112,10 @@ export default function SearchableMultiSelect<Value extends OptionValue>({
                   <button
                     type="button"
                     className="searchable-multi-select-tag-remove"
-                    onClick={() => toggleOption(opt.value)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleOption(opt.value);
+                    }}
                     aria-label={`Remove ${opt.label}`}
                   >
                     <img src={CloseSmallIcon} alt="" />
@@ -111,6 +124,7 @@ export default function SearchableMultiSelect<Value extends OptionValue>({
               ))}
 
             <input
+              ref={inputRef}
               className="searchable-multi-select-input"
               placeholder={
                 showPills || selectedOptions.length === 0 ? placeholder : ''

@@ -79,6 +79,14 @@
   color: var(--black);
 }
 
+@supports (field-sizing: content) {
+  .searchable-multi-select-input {
+    field-sizing: content;
+    flex: 1 1 auto;
+    min-width: 2px;
+  }
+}
+
 .searchable-multi-select-input::placeholder {
   color: var(--neutral-400);
 }
