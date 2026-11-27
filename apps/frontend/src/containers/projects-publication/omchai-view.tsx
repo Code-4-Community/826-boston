@@ -79,19 +79,78 @@ const today = () => new Date().toISOString().slice(0, 10);
 const InfoIcon: React.FC = () => (
   <svg
     viewBox="0 0 24 24"
-    width="20"
-    height="20"
+    width="18"
+    height="18"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.75"
+    strokeWidth="2"
     strokeLinecap="round"
     aria-hidden="true"
   >
-    <circle cx="12" cy="12" r="9.5" />
-    <path d="M12 11v6" />
-    <path d="M12 7.5v.01" />
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 12v4" />
+    <path d="M12 8h.01" />
   </svg>
 );
+
+const TIP_WIDTH = 240;
+const TIP_GAP = 8;
+
+/**
+ * Info icon with a tooltip. The tooltip is fixed-positioned from the icon's
+ * on-screen spot so the scrolling page wrappers can't clip it and it sits
+ * above the sidebar. It opens to the left, or below when there's no room.
+ */
+const RoleInfo: React.FC<{
+  id: string;
+  label: string;
+  description: string;
+}> = ({ id, label, description }) => {
+  const iconRef = useRef<HTMLButtonElement>(null);
+  const [place, setPlace] = useState<React.CSSProperties>({});
+
+  const measure = () => {
+    const rect = iconRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setPlace(
+      rect.left >= TIP_WIDTH + TIP_GAP * 2
+        ? {
+            top: rect.top + rect.height / 2,
+            left: rect.left - TIP_GAP,
+            transform: 'translate(-100%, -50%)',
+          }
+        : { top: rect.bottom + TIP_GAP / 2, left: rect.left },
+    );
+  };
+
+  const below = place.transform === undefined;
+
+  return (
+    <span
+      className="omchai-info"
+      onMouseEnter={measure}
+      onFocusCapture={measure}
+    >
+      <button
+        ref={iconRef}
+        type="button"
+        className="omchai-info__icon"
+        aria-label={`About ${label}`}
+        aria-describedby={id}
+      >
+        <InfoIcon />
+      </button>
+      <span
+        id={id}
+        role="tooltip"
+        className={`omchai-info__tip${below ? ' omchai-info__tip--below' : ''}`}
+        style={place}
+      >
+        {description}
+      </span>
+    </span>
+  );
+};
 
 const Avatar: React.FC<{ name: string }> = ({ name }) => (
   <span className="omchai-avatar" aria-hidden="true">
@@ -301,23 +360,11 @@ const OmchaiView: React.FC<Props> = ({
           return (
             <div key={role} className="omchai-row">
               <dt className="omchai-row__label">
-                <span className="omchai-info">
-                  <button
-                    type="button"
-                    className="omchai-info__icon"
-                    aria-label={`About ${meta.label}`}
-                    aria-describedby={tooltipId}
-                  >
-                    <InfoIcon />
-                  </button>
-                  <span
-                    id={tooltipId}
-                    role="tooltip"
-                    className="omchai-info__tip"
-                  >
-                    {meta.description}
-                  </span>
-                </span>
+                <RoleInfo
+                  id={tooltipId}
+                  label={meta.label}
+                  description={meta.description}
+                />
                 {meta.label}
               </dt>
               <dd className="omchai-row__people">
