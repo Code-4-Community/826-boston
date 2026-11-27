@@ -32,7 +32,7 @@ export class UpdateAnthologyDto {
   @IsOptional()
   @ValidateIf((_, value) => value !== '')
   @IsDateString()
-  publicationDate?: string;
+  publishedDate?: string;
 
   @ApiPropertyOptional({
     description: 'Publication level of the anthology',

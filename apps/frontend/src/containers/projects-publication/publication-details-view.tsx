@@ -297,7 +297,7 @@ const PublicationDetailsView: React.FC<Props> = ({
                 ariaLabel="Publication Date"
                 value={dateValue}
                 disabled={!editable}
-                onChange={(iso) => saveImmediately('publicationDate', iso)}
+                onChange={(iso) => saveImmediately('publishedDate', iso)}
               />
             </td>
           </tr>

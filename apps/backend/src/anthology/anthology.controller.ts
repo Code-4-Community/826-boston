@@ -341,7 +341,7 @@ export class AnthologyController {
       createAnthologyDto.pubLevel,
       createAnthologyDto.ownerIds,
       createAnthologyDto.programs,
-      createAnthologyDto.publicationDate,
+      createAnthologyDto.publishedDate,
     );
   }
 

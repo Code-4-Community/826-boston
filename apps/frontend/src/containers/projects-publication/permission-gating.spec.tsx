@@ -37,7 +37,7 @@ const row = {
   storyId: 1,
   storyDraftId: 3,
   authorId: 5,
-  consent: false,
+  studentConsent: false,
   firstName: 'Jane',
   lastName: 'Doe',
   grade: 6,

@@ -278,7 +278,7 @@ export interface CreateAnthologyDto {
   pubLevel: AnthologyPubLevel;
   ownerIds: number[];
   programs?: string[];
-  publicationDate?: string;
+  publishedDate?: string;
 }
 
 export interface CreateBatchOmchaiAssignmentsDto {

@@ -54,7 +54,7 @@ describe('AnthologyController', () => {
       title: 'New Anthology',
       pubLevel: AnthologyPubLevel.CHAPBOOK,
       programs: ['Tutoring'],
-      publicationDate: '2026-06-01',
+      publishedDate: '2026-06-01',
       ownerIds: [3, 7],
     };
 
@@ -71,7 +71,7 @@ describe('AnthologyController', () => {
         dto.pubLevel,
         dto.ownerIds,
         dto.programs,
-        dto.publicationDate,
+        dto.publishedDate,
       );
       expect(result).toBe(created);
     });

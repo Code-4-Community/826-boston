@@ -178,20 +178,18 @@ export class AnthologyService {
       throw new NotFoundException('Anthology not found');
     }
 
-    const { publicationDate, ...rest } = updateAnthologyDto;
-    const attrs: Partial<Anthology> = { ...rest };
+    const { publishedDate, ...rest } = updateAnthologyDto;
+    const updated = Object.assign(anthology, rest);
 
     // An empty value clears the date (the column is nullable)
-    if (publicationDate !== undefined)
-      attrs.publishedDate = publicationDate
-        ? new Date(publicationDate)
+    if (publishedDate !== undefined)
+      updated.publishedDate = publishedDate
+        ? new Date(publishedDate)
         : (null as unknown as undefined);
 
-    const updated = Object.assign(anthology, attrs);
-
     if (
-      attrs.status !== undefined &&
-      attrs.status !== AnthologyStatus.NOT_STARTED
+      rest.status !== undefined &&
+      rest.status !== AnthologyStatus.NOT_STARTED
     ) {
       const missingFields: string[] = [];
       if (!updated.title?.trim()) missingFields.push('title');

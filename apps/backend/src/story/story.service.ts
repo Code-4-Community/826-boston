@@ -108,7 +108,7 @@ export class StoryService {
       storyId: story.id,
       storyDraftId: story.storyDraft?.id ?? null,
       authorId: story.author.id,
-      consent: story.storyDraft?.studentConsent ?? false,
+      studentConsent: story.storyDraft?.studentConsent ?? false,
       ...splitName(story.author.name),
       grade: story.author.grade ?? null,
       nameInBook: story.author.nameInBook ?? null,

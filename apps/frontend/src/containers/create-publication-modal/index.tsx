@@ -19,7 +19,7 @@ export interface PublicationFormState {
   title: string;
   programs: string[];
   publicationLevel: string;
-  publicationDate: string;
+  publishedDate: string;
   owners: number[];
 }
 
@@ -27,7 +27,7 @@ const INITIAL_FORM: PublicationFormState = {
   title: '',
   programs: [],
   publicationLevel: '',
-  publicationDate: '',
+  publishedDate: '',
   owners: [],
 };
 
@@ -68,7 +68,7 @@ export default function CreatePublicationModal({
         pubLevel: form.publicationLevel as AnthologyPubLevel,
         ownerIds: form.owners,
         programs: form.programs,
-        publicationDate: form.publicationDate || undefined,
+        publishedDate: form.publishedDate || undefined,
       });
 
       onCreated(anthology);
@@ -150,8 +150,8 @@ export default function CreatePublicationModal({
             <Field label="Publication Date">
               <DatePickerField
                 ariaLabel="Publication Date"
-                value={form.publicationDate}
-                onChange={(iso) => set('publicationDate', iso)}
+                value={form.publishedDate}
+                onChange={(iso) => set('publishedDate', iso)}
               />
             </Field>
           </div>

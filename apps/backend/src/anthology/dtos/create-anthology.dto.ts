@@ -23,7 +23,7 @@ export class CreateAnthologyDto {
   })
   @IsOptional()
   @IsDateString()
-  publicationDate?: string;
+  publishedDate?: string;
 
   @ApiProperty({
     description: 'Publication level of the anthology',
