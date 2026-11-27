@@ -4,9 +4,9 @@ export interface StorySeedItem {
   description?: string;
   studentBio?: string;
   theme?: string;
-  anthology_id: number;
-  author_id: number;
-  story_draft_id?: number;
+  anthologyId: number;
+  authorId: number;
+  storyDraftId?: number;
 }
 
 export const StoriesSeed: StorySeedItem[] = [
@@ -17,9 +17,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
     theme: 'Immigration and Belonging',
-    anthology_id: 1,
-    author_id: 1,
-    story_draft_id: 1,
+    anthologyId: 1,
+    authorId: 1,
+    storyDraftId: 1,
   },
   {
     title: 'Saturday Mornings',
@@ -27,9 +27,9 @@ export const StoriesSeed: StorySeedItem[] = [
       'A fictional account of a perfect Saturday morning, from the smell of breakfast to the last light of afternoon.',
     studentBio: 'Sylvestre is an 8th-grade student at Westbrook Middle School.',
     theme: 'Childhood and Joy',
-    anthology_id: 2,
-    author_id: 2,
-    story_draft_id: 2,
+    anthologyId: 2,
+    authorId: 2,
+    storyDraftId: 2,
   },
   {
     title: 'The River Remembers',
@@ -38,9 +38,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Marcus is a 10th-grade student with a passion for bilingual poetry.',
     theme: 'Heritage and Water',
-    anthology_id: 3,
-    author_id: 3,
-    story_draft_id: 3,
+    anthologyId: 3,
+    authorId: 3,
+    storyDraftId: 3,
   },
   {
     title: 'Borrowed Words',
@@ -49,8 +49,8 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Fatima is a 9th-grade student who has been writing since she was seven.',
     theme: 'Culture and Ownership',
-    anthology_id: 4,
-    author_id: 4,
+    anthologyId: 4,
+    authorId: 4,
   },
   {
     title: '3:17 AM',
@@ -58,8 +58,8 @@ export const StoriesSeed: StorySeedItem[] = [
       'Flash fiction about the strange clarity that comes at 3AM when the world is quiet and the mind is loudest.',
     studentBio: 'Diego is a 10th-grade YLAB member from Muñiz Academy.',
     theme: 'Insomnia and Clarity',
-    anthology_id: 5,
-    author_id: 5,
+    anthologyId: 5,
+    authorId: 5,
   },
   {
     title: 'The Strategic Seat',
@@ -68,8 +68,8 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Amara is an 11th-grade student who once survived a catastrophic seating incident.',
     theme: 'Social Dynamics',
-    anthology_id: 6,
-    author_id: 6,
+    anthologyId: 6,
+    authorId: 6,
   },
   {
     title: 'Dear Nobody',
@@ -77,9 +77,9 @@ export const StoriesSeed: StorySeedItem[] = [
       'A letter to the version of herself she had to leave behind when her grandmother passed away.',
     studentBio: 'Elena is a 9th-grade student at Eastfield Academy.',
     theme: 'Grief and Healing',
-    anthology_id: 7,
-    author_id: 7,
-    story_draft_id: 1,
+    anthologyId: 7,
+    authorId: 7,
+    storyDraftId: 1,
   },
   {
     title: 'After the Flood',
@@ -88,9 +88,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Jamal is a 12th-grade playwright and Youth Arts & Books Program alumnus.',
     theme: 'Community and Resilience',
-    anthology_id: 8,
-    author_id: 8,
-    story_draft_id: 2,
+    anthologyId: 8,
+    authorId: 8,
+    storyDraftId: 2,
   },
   {
     title: 'The Beat of Memory',
@@ -99,9 +99,9 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Abdullah expanded his writing practice from personal narrative to music criticism this year.',
     theme: 'Music and Identity',
-    anthology_id: 9,
-    author_id: 1,
-    story_draft_id: 3,
+    anthologyId: 9,
+    authorId: 1,
+    storyDraftId: 3,
   },
   {
     title: 'Weather Report: 2075',
@@ -110,7 +110,7 @@ export const StoriesSeed: StorySeedItem[] = [
     studentBio:
       'Sylvestre is fascinated by speculative fiction and climate futures.',
     theme: 'The Future and Prediction',
-    anthology_id: 10,
-    author_id: 2,
+    anthologyId: 10,
+    authorId: 2,
   },
 ];

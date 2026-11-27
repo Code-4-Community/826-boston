@@ -16,19 +16,19 @@ export async function seedTasks(dataSource: DataSource) {
 
   for (const task of TasksSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { id: task.anthology_id },
+      where: { id: task.anthologyId },
     });
 
     if (!anthology) {
       console.log(
-        `  - Anthology with id not found: "${task.anthology_id}", skipping task`,
+        `  - Anthology with id not found: "${task.anthologyId}", skipping task`,
       );
       continue;
     }
 
-    if (task.person_in_charge_id && !usersById.has(task.person_in_charge_id)) {
+    if (task.personInChargeId && !usersById.has(task.personInChargeId)) {
       console.log(
-        `  - User with id not found: id=${task.person_in_charge_id}, skipping task`,
+        `  - User with id not found: id=${task.personInChargeId}, skipping task`,
       );
       continue;
     }
@@ -43,7 +43,7 @@ export async function seedTasks(dataSource: DataSource) {
         note: task.note,
         areaOfWork: task.areaOfWork,
         status: task.status,
-        personInCharge: { id: task.person_in_charge_id },
+        personInCharge: { id: task.personInChargeId },
         timeFrame: task.timeFrame,
         dueBy: task.dueBy,
         anthology: { id: anthology.id },

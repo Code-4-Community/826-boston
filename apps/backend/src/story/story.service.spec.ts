@@ -15,8 +15,8 @@ export const storyExample = {
   studentBio:
     'Abdullah is a 9th-grade student at Riverside International High School. He came to Boston from Karachi, Pakistan in 2023.',
   theme: 'Immigration and Belonging',
-  anthology_id: 1,
-  author_id: 1,
+  anthologyId: 1,
+  authorId: 1,
   id: 1,
 } as unknown as Story;
 

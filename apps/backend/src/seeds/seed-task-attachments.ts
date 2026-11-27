@@ -11,12 +11,12 @@ export async function seedTaskAttachments(dataSource: DataSource) {
 
   for (const attachment of TaskAttachmentsSeed) {
     const task = await taskRepo.findOne({
-      where: { id: attachment.task_id },
+      where: { id: attachment.taskId },
     });
 
     if (!task) {
       console.log(
-        `  - Task with id ${attachment.task_id} not found, skipping attachment`,
+        `  - Task with id ${attachment.taskId} not found, skipping attachment`,
       );
       continue;
     }

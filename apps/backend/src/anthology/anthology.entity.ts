@@ -70,14 +70,12 @@ export class Anthology {
   status: AnthologyStatus;
 
   @Column({
-    name: 'pub_level',
     type: 'enum',
     enum: AnthologyPubLevel,
   })
   pubLevel: AnthologyPubLevel;
 
   @Column({
-    name: 'photo_url',
     nullable: true,
     default: '',
   })
@@ -90,7 +88,6 @@ export class Anthology {
   gradeLevel?: string;
 
   @Column({
-    name: 'shopify_url',
     nullable: true,
     default: '',
   })
@@ -103,7 +100,7 @@ export class Anthology {
   inventoryHoldings: Relation<InventoryHolding[]>;
 
   @OneToOne(() => ProductionInfo, (productionInfo) => productionInfo.anthology)
-  @JoinColumn({ name: 'production_info_id' })
+  @JoinColumn()
   productionInfo: Relation<ProductionInfo>;
 
   @OneToMany(() => Omchai, (omchai) => omchai.anthology)

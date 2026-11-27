@@ -14,20 +14,20 @@ export async function seedStories(dataSource: DataSource) {
 
   console.log('Seeding stories...');
 
-  for (const { anthology_id, author_id, ...data } of StoriesSeed) {
+  for (const { anthologyId, authorId, ...data } of StoriesSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { id: anthology_id },
+      where: { id: anthologyId },
     });
 
     if (!anthology) {
-      console.log(`  - Anthology not found: "${anthology_id}", skipping story`);
+      console.log(`  - Anthology not found: "${anthologyId}", skipping story`);
       continue;
     }
 
-    const author = await authorRepo.findOne({ where: { id: author_id } });
+    const author = await authorRepo.findOne({ where: { id: authorId } });
 
     if (!author) {
-      console.log(`  - Author not found: "${author_id}", skipping story`);
+      console.log(`  - Author not found: "${authorId}", skipping story`);
       continue;
     }
 
@@ -47,14 +47,14 @@ export async function seedStories(dataSource: DataSource) {
       console.log(`  ✓ Created story: ${data.title}`);
 
       // create draft if needed
-      if (data.story_draft_id) {
+      if (data.storyDraftId) {
         const draftExists = await draftRepo.findOne({
-          where: { id: data.story_draft_id },
+          where: { id: data.storyDraftId },
         });
 
         if (!draftExists) {
           const draftEntity = draftRepo.create({
-            id: data.story_draft_id,
+            id: data.storyDraftId,
             story: { id: storyEntity.id },
             docLink: 'http://docs.google.com',
             submissionRound: SubmissionRound.ONE,

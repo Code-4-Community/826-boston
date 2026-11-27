@@ -16,10 +16,10 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.STANDARD })
   role: Role;
 
-  @Column({ name: 'first_name' })
+  @Column()
   firstName: string;
 
-  @Column({ name: 'last_name', default: '' })
+  @Column({ default: '' })
   lastName: string;
 
   @Column({ default: '' })
