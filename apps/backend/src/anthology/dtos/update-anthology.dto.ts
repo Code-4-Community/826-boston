@@ -79,6 +79,11 @@ export class UpdateAnthologyDto {
   @IsString()
   isbn?: string;
 
+  @ApiPropertyOptional({ description: 'Grade level of the anthology' })
+  @IsOptional()
+  @IsString()
+  gradeLevel?: string;
+
   @ApiPropertyOptional({ description: 'Shopify URL for purchasing' })
   @IsOptional()
   @IsString()
