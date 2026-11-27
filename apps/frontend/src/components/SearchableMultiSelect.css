@@ -1,7 +1,10 @@
 .searchable-multi-select {
-  position: relative;
   flex: 1;
   min-width: 0;
+}
+
+.searchable-multi-select-field {
+  position: relative;
 }
 
 .searchable-multi-select-box {
@@ -11,7 +14,7 @@
   gap: 8px;
   border: 1px solid var(--neutral-300);
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 7px 15px;
   background: white;
 }
 
@@ -38,7 +41,7 @@
   white-space: nowrap;
 }
 
-.searchable-multi-select-avatar {
+.searchable-multi-select-option-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -73,7 +76,15 @@
   background: transparent;
   font-family: var(--font-body);
   font-size: 16px;
-  color: var(--neutral-600);
+  color: var(--black);
+}
+
+@supports (field-sizing: content) {
+  .searchable-multi-select-input {
+    field-sizing: content;
+    flex: 1 1 auto;
+    min-width: 2px;
+  }
 }
 
 .searchable-multi-select-input::placeholder {
@@ -89,7 +100,7 @@
 
 .searchable-multi-select-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
   z-index: 10;
@@ -147,4 +158,43 @@
   font-family: var(--font-body);
   font-size: 14px;
   color: var(--neutral-400);
+}
+
+.searchable-multi-select-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+.searchable-multi-select-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 11px;
+  border: 1px solid var(--accent-500);
+  border-radius: 12px;
+  background: var(--accent-400);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--black);
+  white-space: nowrap;
+}
+
+.searchable-multi-select-pill-remove {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.searchable-multi-select-pill-remove:hover {
+  opacity: 0.6;
+}
+
+.searchable-multi-select-pill-remove img {
+  display: block;
+  width: 19px;
+  height: 19px;
 }

@@ -296,230 +296,16 @@
   margin-top: 9px;
 }
 
+.filter-select-row:has(.searchable-multi-select-pills) {
+  align-items: flex-start;
+}
+
 .filter-select-label {
   font-family: var(--font-heading);
   font-size: 16px;
   color: var(--neutral-600);
   width: 128px;
   flex-shrink: 0;
-}
-
-.filter-select {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-}
-
-/* 7px + 1px border = the 8px padding Figma draws inside the stroke, which makes the
-   search box 40px tall */
-.filter-select-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border: 1px solid var(--neutral-300);
-  border-radius: 8px;
-  padding: 7px 15px;
-  background: white;
-}
-
-.filter-select-box:focus-within {
-  border-color: var(--neutral-600);
-}
-
-.filter-select-tags {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
-}
-
-.filter-select-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--black);
-  white-space: nowrap;
-}
-
-.filter-select-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border: 1px solid var(--accent-500);
-  border-radius: 999px;
-  background: var(--accent-400);
-  font-size: 10px;
-  color: var(--black);
-}
-
-.filter-select-tag-remove {
-  display: inline-flex;
-  margin-left: -1px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.filter-select-tag-remove:hover {
-  opacity: 0.6;
-}
-
-.filter-select-input {
-  flex: 1;
-  min-width: 80px;
-  border: none;
-  outline: none;
-  padding: 0;
-  background: transparent;
-  font-family: var(--font-body);
-  font-size: 16px;
-  color: var(--black);
-}
-
-.filter-select-input::placeholder {
-  color: var(--neutral-400);
-}
-
-.filter-select-search-icon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  color: var(--neutral-600);
-}
-
-/* Figma opens the list 6px from the search box */
-.filter-select-dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 10;
-  max-height: 220px;
-  overflow-y: auto;
-  border: 1px solid var(--neutral-300);
-  border-radius: 8px;
-  background: white;
-}
-
-.filter-select-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 8px;
-  border: none;
-  background: white;
-  text-align: left;
-  font-family: var(--font-body);
-  font-size: 16px;
-  color: var(--neutral-600);
-  cursor: pointer;
-}
-
-.filter-select-option:hover {
-  background: var(--neutral-150);
-}
-
-.filter-select-option--selected,
-.filter-select-option--selected:hover {
-  background: var(--accent-300);
-}
-
-.filter-select-checkbox {
-  position: relative;
-  width: 10px;
-  height: 10px;
-  flex-shrink: 0;
-  border: 1px solid var(--neutral-600);
-  border-radius: 1px;
-}
-
-/* the check icon spans the full 10px box, border included */
-.filter-select-checkbox img {
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 10px;
-  height: 10px;
-}
-
-.filter-select-message {
-  padding: 10px 8px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--neutral-400);
-}
-
-/* the dropdown anchors here, so it opens right under the search box even when
-   selected pills sit below it */
-.filter-select-field {
-  position: relative;
-}
-
-/* flipped above the search box when there is no room below (see dropdownPlacement.ts) */
-.filter-select-dropdown--up {
-  top: auto;
-  bottom: calc(100% + 6px);
-}
-
-/* ── Selected values as pills under the search box ───────── */
-
-.filter-select--pills {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* with pills the label lines up with the search box, not the middle of the stack */
-.filter-select-row--with-pills {
-  align-items: flex-start;
-}
-
-.filter-select-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-}
-
-/* 3px + 1px border = the 4px padding Figma draws inside the stroke */
-.filter-select-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 11px;
-  border: 1px solid var(--accent-500);
-  border-radius: 12px;
-  background: var(--accent-400);
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--black);
-  white-space: nowrap;
-}
-
-.filter-select-pill-remove {
-  display: inline-flex;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.filter-select-pill-remove:hover {
-  opacity: 0.6;
-}
-
-.filter-select-pill-remove img {
-  display: block;
-  width: 19px;
-  height: 19px;
 }
 
 /* ── Date range (Publication Date) ───────────────────────── */
@@ -567,12 +353,8 @@
   margin-top: 0;
 }
 
-/* on short screens scroll the whole modal rather than cut it off; the dropdowns stay
-   inside it, which is fine because they scroll along with it */
-@media (max-height: 740px) {
-  .filter-modal--library {
-    overflow-y: auto;
-  }
+.filter-modal--library {
+  overflow-y: auto;
 }
 
 @keyframes filterModalFadeIn {
