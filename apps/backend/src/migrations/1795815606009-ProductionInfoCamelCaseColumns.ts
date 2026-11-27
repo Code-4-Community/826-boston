@@ -7,64 +7,34 @@ export class ProductionInfoCamelCaseColumns1795815606009
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "design_files_link"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "design_files_link" TO "designFilesLink"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "cover_image_file_link"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "cover_image_file_link" TO "coverImageFileLink"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "binding_type"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "binding_type" TO "bindingType"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "printing_cost"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "printing_cost" TO "printingCost"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "print_run"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "print_run" TO "printRun"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "weight_in_grams"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "weight_in_grams" TO "weightInGrams"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "page_count"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "page_count" TO "pageCount"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "printed_by"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "printed_by" TO "printedBy"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "foreword_author"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "foreword_author" TO "forewordAuthor"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "number_of_students"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "designFilesLink" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "coverImageFileLink" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "bindingType" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "printingCost" double precision`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "printRun" integer`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "weightInGrams" double precision`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "pageCount" integer`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "printedBy" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "forewordAuthor" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "numberOfStudents" integer`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "number_of_students" TO "numberOfStudents"`,
     );
     await queryRunner.query(
       `ALTER TYPE "public"."anthologys_agecategories_enum" RENAME TO "anthologys_agecategories_enum_old"`,
@@ -106,64 +76,34 @@ export class ProductionInfoCamelCaseColumns1795815606009
       `ALTER TYPE "public"."anthologys_agecategories_enum_old" RENAME TO "anthologys_agecategories_enum"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "numberOfStudents"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "numberOfStudents" TO "number_of_students"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "forewordAuthor"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "forewordAuthor" TO "foreword_author"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "printedBy"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "printedBy" TO "printed_by"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "pageCount"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "pageCount" TO "page_count"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "weightInGrams"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "weightInGrams" TO "weight_in_grams"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "printRun"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "printRun" TO "print_run"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "printingCost"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "printingCost" TO "printing_cost"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "bindingType"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "bindingType" TO "binding_type"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "coverImageFileLink"`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "coverImageFileLink" TO "cover_image_file_link"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "productioninfos" DROP COLUMN "designFilesLink"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "number_of_students" integer`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "foreword_author" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "printed_by" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "page_count" integer`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "weight_in_grams" double precision`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "print_run" integer`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "printing_cost" double precision`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "binding_type" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "cover_image_file_link" character varying`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "productioninfos" ADD "design_files_link" character varying`,
+      `ALTER TABLE "productioninfos" RENAME COLUMN "designFilesLink" TO "design_files_link"`,
     );
   }
 }
