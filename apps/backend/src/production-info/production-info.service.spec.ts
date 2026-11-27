@@ -36,15 +36,15 @@ export const mockAnthology: Anthology = {
 
 export const mockProductionInfo: ProductionInfo = {
   id: 1,
-  design_files_link: 'http://example.com',
-  cover_image_file_link: '',
-  binding_type: '',
+  designFilesLink: 'http://example.com',
+  coverImageFileLink: '',
+  bindingType: '',
   dimensions: '',
-  printing_cost: 0,
-  print_run: 0,
-  weight_in_grams: 0,
-  page_count: 0,
-  printed_by: '',
+  printingCost: 0,
+  printRun: 0,
+  weightInGrams: 0,
+  pageCount: 0,
+  printedBy: '',
   anthology: { id: 1 } as Anthology,
 };
 
@@ -96,8 +96,8 @@ describe('ProductionInfoService', () => {
   describe('create', () => {
     it('should create a new production info', async () => {
       const dto: CreateProductionInfoDto = {
-        anthology_id: 1,
-        design_files_link: 'http://example.com',
+        anthologyId: 1,
+        designFilesLink: 'http://example.com',
       };
 
       mockAnthologyRepository.findOne.mockResolvedValue(mockAnthology);
@@ -111,7 +111,7 @@ describe('ProductionInfoService', () => {
         where: { id: 1 },
       });
       expect(productionInfoRepository.create).toHaveBeenCalledWith({
-        design_files_link: 'http://example.com',
+        designFilesLink: 'http://example.com',
       });
       expect(productionInfoRepository.save).toHaveBeenCalledWith(
         mockProductionInfo,
@@ -127,7 +127,7 @@ describe('ProductionInfoService', () => {
 
     it('should throw NotFoundException if anthology not found', async () => {
       const dto: CreateProductionInfoDto = {
-        anthology_id: 999,
+        anthologyId: 999,
       };
 
       mockAnthologyRepository.findOne.mockResolvedValue(null);
@@ -176,7 +176,7 @@ describe('ProductionInfoService', () => {
   describe('update', () => {
     it('should update production info', async () => {
       const dto: UpdateProductionInfoDto = {
-        design_files_link: 'http://updated.com',
+        designFilesLink: 'http://updated.com',
       };
       const updatedProductionInfo = { ...mockProductionInfo, ...dto };
 
@@ -203,8 +203,8 @@ describe('ProductionInfoService', () => {
       await expect(service.update(999, {})).rejects.toThrow(NotFoundException);
     });
 
-    it('should update anthology if anthology_id is provided', async () => {
-      const dto: UpdateProductionInfoDto = { anthology_id: 2 };
+    it('should update anthology if anthologyId is provided', async () => {
+      const dto: UpdateProductionInfoDto = { anthologyId: 2 };
       const newAnthology = { id: 2, title: 'New Anthology' } as Anthology;
 
       mockProductionInfoRepository.findOne.mockResolvedValue(

@@ -13,23 +13,23 @@ export async function seedInventoryHoldings(dataSource: DataSource) {
 
   for (const inventoryHolding of InventoryHoldingsSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { id: inventoryHolding.anthology_id },
+      where: { id: inventoryHolding.anthologyId },
     });
 
     if (!anthology) {
       console.log(
-        `  - Anthology with id ${inventoryHolding.anthology_id} not found, skipping holding`,
+        `  - Anthology with id ${inventoryHolding.anthologyId} not found, skipping holding`,
       );
       continue;
     }
 
     const inventory = await inventoryRepo.findOne({
-      where: { id: inventoryHolding.inventory_id },
+      where: { id: inventoryHolding.inventoryId },
     });
 
     if (!inventory) {
       console.log(
-        `  - Inventory with id ${inventoryHolding.inventory_id} not found, skipping holding`,
+        `  - Inventory with id ${inventoryHolding.inventoryId} not found, skipping holding`,
       );
       continue;
     }
@@ -43,7 +43,7 @@ export async function seedInventoryHoldings(dataSource: DataSource) {
 
     if (!exists) {
       // Assign the `anthology`/`inventory` relations rather than saving the
-      // seed item's `anthology_id`/`inventory_id` keys directly — those are not
+      // seed item's `anthologyId`/`inventoryId` keys directly — those are not
       // entity properties, so saving them raw leaves both foreign keys NULL.
       await holdingRepo.save(
         holdingRepo.create({

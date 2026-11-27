@@ -63,7 +63,7 @@ describe('ProductionInfoController', () => {
 
   describe('create', () => {
     it('should create a production info', async () => {
-      const dto: CreateProductionInfoDto = { anthology_id: 1 };
+      const dto: CreateProductionInfoDto = { anthologyId: 1 };
       mockService.create.mockResolvedValue(mockProductionInfo);
       withRoles({ 1: OmchaiRole.OWNER });
 
@@ -98,7 +98,7 @@ describe('ProductionInfoController', () => {
 
   describe('update', () => {
     it('should update production info', async () => {
-      const dto: UpdateProductionInfoDto = { design_files_link: 'updated' };
+      const dto: UpdateProductionInfoDto = { designFilesLink: 'updated' };
       mockService.update.mockResolvedValue({ ...mockProductionInfo, ...dto });
       anthologyRepo.findOne.mockResolvedValue({ id: 1 });
       withRoles({ 1: OmchaiRole.OWNER });
@@ -122,7 +122,7 @@ describe('ProductionInfoController', () => {
 
     it.each(ROLE_CASES)('create as %s → allowed %s', async (role, allowed) => {
       withRoles({ 1: role });
-      const call = controller.create({ anthology_id: 1 }, req);
+      const call = controller.create({ anthologyId: 1 }, req);
 
       if (allowed) {
         await call;
@@ -136,7 +136,7 @@ describe('ProductionInfoController', () => {
     it.each(ROLE_CASES)('update as %s → allowed %s', async (role, allowed) => {
       anthologyRepo.findOne.mockResolvedValue({ id: 1 });
       withRoles({ 1: role });
-      const call = controller.update(1, { printed_by: 'x' }, req);
+      const call = controller.update(1, { printedBy: 'x' }, req);
 
       if (allowed) {
         await call;
@@ -153,7 +153,7 @@ describe('ProductionInfoController', () => {
       withRoles({ 5: OmchaiRole.OWNER });
 
       await expect(
-        controller.update(5, { printed_by: 'x' }, req),
+        controller.update(5, { printedBy: 'x' }, req),
       ).rejects.toThrow(ForbiddenException);
       expect(anthologyRepo.findOne).toHaveBeenCalledWith({
         where: { productionInfo: { id: 5 } },
@@ -166,7 +166,7 @@ describe('ProductionInfoController', () => {
       withRoles({ 1: OmchaiRole.OWNER, 2: OmchaiRole.CONSULTED });
 
       await expect(
-        controller.update(1, { anthology_id: 2 }, req),
+        controller.update(1, { anthologyId: 2 }, req),
       ).rejects.toThrow(ForbiddenException);
       expect(mockService.update).not.toHaveBeenCalled();
     });
@@ -175,7 +175,7 @@ describe('ProductionInfoController', () => {
       anthologyRepo.findOne.mockResolvedValue({ id: 1 });
       withRoles({ 1: OmchaiRole.OWNER, 2: OmchaiRole.MANAGER });
 
-      await controller.update(1, { anthology_id: 2 }, req);
+      await controller.update(1, { anthologyId: 2 }, req);
 
       expect(mockService.update).toHaveBeenCalled();
     });
@@ -185,8 +185,8 @@ describe('ProductionInfoController', () => {
       anthologyRepo.findOne.mockResolvedValue({ id: 1 });
       withRoles({});
 
-      await controller.create({ anthology_id: 1 }, adminReq);
-      await controller.update(1, { printed_by: 'x' }, adminReq);
+      await controller.create({ anthologyId: 1 }, adminReq);
+      await controller.update(1, { printedBy: 'x' }, adminReq);
 
       expect(mockService.create).toHaveBeenCalled();
       expect(mockService.update).toHaveBeenCalled();

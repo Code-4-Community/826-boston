@@ -167,23 +167,18 @@ export interface Anthology {
   id: number;
   title: string;
   description: string;
-  published_year: number;
   programs?: string[] | string;
   inventory?: number;
   status: AnthologyStatus;
-  pub_level: AnthologyPubLevel;
-  photo_url?: string;
+  pubLevel: AnthologyPubLevel;
   photoUrl?: string;
   gradeLevel?: string;
   genres?: string[];
   themes?: string[];
   isbn?: string;
-  shopify_url?: string;
   shopifyUrl?: string;
   subtitle?: string;
   byline?: string;
-  /** camelCase fields as returned by the backend anthology endpoints. */
-  pubLevel?: AnthologyPubLevel;
   publishedDate?: string;
   sponsors?: string[];
   triggers?: string[];
@@ -246,17 +241,17 @@ export interface TaskBody {
 /** Production metadata for an anthology, from GET /production-info/:anthologyId. */
 export interface ProductionInfo {
   id: number;
-  design_files_link?: string | null;
-  cover_image_file_link?: string | null;
-  binding_type?: string | null;
+  designFilesLink?: string | null;
+  coverImageFileLink?: string | null;
+  bindingType?: string | null;
   dimensions?: string | null;
-  printing_cost?: number | null;
-  print_run?: number | null;
-  weight_in_grams?: number | null;
-  page_count?: number | null;
-  printed_by?: string | null;
-  foreword_author?: string | null;
-  number_of_students?: number | null;
+  printingCost?: number | null;
+  printRun?: number | null;
+  weightInGrams?: number | null;
+  pageCount?: number | null;
+  printedBy?: string | null;
+  forewordAuthor?: string | null;
+  numberOfStudents?: number | null;
 }
 
 /** A place that holds copies of publications (e.g. a warehouse or office). */
@@ -280,15 +275,15 @@ export interface AnthologyInventory {
 
 export interface CreateAnthologyDto {
   title: string;
-  pub_level: AnthologyPubLevel;
-  owner_ids: number[];
+  pubLevel: AnthologyPubLevel;
+  ownerIds: number[];
   programs?: string[];
-  publicationDate?: string;
+  publishedDate?: string;
 }
 
 export interface CreateBatchOmchaiAssignmentsDto {
-  anthology_id: number;
-  datetime_assigned: string;
+  anthologyId: number;
+  datetimeAssigned: string;
   owners: number[];
   managers: number[];
   consulted: number[];

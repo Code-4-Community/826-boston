@@ -161,7 +161,7 @@ export class StoryController {
             storyId: 1,
             storyDraftId: 3,
             authorId: 5,
-            consent: true,
+            studentConsent: true,
             firstName: 'John',
             lastName: 'Doe',
             grade: 6,

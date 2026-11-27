@@ -452,18 +452,9 @@
 .publication-card-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   width: 100%;
   gap: 8px;
-}
-
-.publication-card-modified {
-  font-family: var(--font-body);
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 1.36;
-  color: var(--neutral-400);
-  text-align: left;
 }
 
 @media (max-width: 1200px) {

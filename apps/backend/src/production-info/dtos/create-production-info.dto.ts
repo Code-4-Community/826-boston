@@ -4,22 +4,22 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateProductionInfoDto {
   @ApiProperty({ description: 'Anthology ID' })
   @IsInt()
-  anthology_id: number;
+  anthologyId: number;
 
   @ApiPropertyOptional({ description: 'Link to design files' })
   @IsOptional()
   @IsString()
-  design_files_link?: string;
+  designFilesLink?: string;
 
   @ApiPropertyOptional({ description: 'Link to cover image file' })
   @IsOptional()
   @IsString()
-  cover_image_file_link?: string;
+  coverImageFileLink?: string;
 
   @ApiPropertyOptional({ description: 'Binding type' })
   @IsOptional()
   @IsString()
-  binding_type?: string;
+  bindingType?: string;
 
   @ApiPropertyOptional({ description: 'Dimensions' })
   @IsOptional()
@@ -29,25 +29,25 @@ export class CreateProductionInfoDto {
   @ApiPropertyOptional({ description: 'Printing cost' })
   @IsOptional()
   @IsNumber()
-  printing_cost?: number;
+  printingCost?: number;
 
   @ApiPropertyOptional({ description: 'Print run count' })
   @IsOptional()
   @IsInt()
-  print_run?: number;
+  printRun?: number;
 
   @ApiPropertyOptional({ description: 'Weight in grams' })
   @IsOptional()
   @IsNumber()
-  weight_in_grams?: number;
+  weightInGrams?: number;
 
   @ApiPropertyOptional({ description: 'Page count' })
   @IsOptional()
   @IsInt()
-  page_count?: number;
+  pageCount?: number;
 
   @ApiPropertyOptional({ description: 'Printed by' })
   @IsOptional()
   @IsString()
-  printed_by?: string;
+  printedBy?: string;
 }

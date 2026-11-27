@@ -32,7 +32,7 @@ export class UpdateAnthologyDto {
   @IsOptional()
   @ValidateIf((_, value) => value !== '')
   @IsDateString()
-  publicationDate?: string;
+  publishedDate?: string;
 
   @ApiPropertyOptional({
     description: 'Publication level of the anthology',
@@ -41,7 +41,7 @@ export class UpdateAnthologyDto {
   })
   @IsOptional()
   @IsEnum(AnthologyPubLevel)
-  pub_level?: AnthologyPubLevel;
+  pubLevel?: AnthologyPubLevel;
 
   @ApiPropertyOptional({
     description: 'Programs associated with the anthology',
@@ -60,7 +60,7 @@ export class UpdateAnthologyDto {
   @ApiPropertyOptional({ description: 'URL to anthology photo' })
   @IsOptional()
   @IsString()
-  photo_url?: string;
+  photoUrl?: string;
 
   @ApiPropertyOptional({ description: 'Genre of the anthology' })
   @IsOptional()
@@ -82,7 +82,7 @@ export class UpdateAnthologyDto {
   @ApiPropertyOptional({ description: 'Shopify URL for purchasing' })
   @IsOptional()
   @IsString()
-  shopify_url?: string;
+  shopifyUrl?: string;
 
   // Not on the create DTO: new anthologies always start as NOT_STARTED.
   @ApiPropertyOptional({

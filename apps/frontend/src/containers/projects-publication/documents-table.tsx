@@ -119,11 +119,11 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
 
   const handleConsentToggle = async (row: StoryDocumentRow) => {
     if (!canEdit || row.storyDraftId === null) return;
-    const consent = !row.consent;
+    const consent = !row.studentConsent;
     const setConsent = (value: boolean) =>
       setDocuments((prev) =>
         prev.map((d) =>
-          d.storyId === row.storyId ? { ...d, consent: value } : d,
+          d.storyId === row.storyId ? { ...d, studentConsent: value } : d,
         ),
       );
 
@@ -138,7 +138,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
         await loadDocuments(page);
       }
     } catch {
-      setConsent(row.consent);
+      setConsent(row.studentConsent);
     }
   };
 
@@ -277,7 +277,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
                     )}
                     <input
                       type="checkbox"
-                      checked={row.consent}
+                      checked={row.studentConsent}
                       disabled={!canEdit || row.storyDraftId === null}
                       aria-label={`Consent for ${row.firstName} ${row.lastName}`}
                       onClick={(e) => e.stopPropagation()}
@@ -421,7 +421,7 @@ const DocumentsTable: React.FC<DocumentsTableProps> = ({
                 </div>
                 <div>
                   <dt>Consent on file</dt>
-                  <dd>{deleteRow.consent ? 'Yes' : 'No'}</dd>
+                  <dd>{deleteRow.studentConsent ? 'Yes' : 'No'}</dd>
                 </div>
                 <div>
                   <dt>Document</dt>

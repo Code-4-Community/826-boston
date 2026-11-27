@@ -306,7 +306,7 @@ const PublicationView: React.FC = () => {
   const productionDetails = [
     {
       label: 'Foreword Author',
-      value: productionInfo?.foreword_author || EMPTY,
+      value: productionInfo?.forewordAuthor || EMPTY,
     },
     {
       label: 'Age Category',
@@ -321,21 +321,21 @@ const PublicationView: React.FC = () => {
     { label: 'Pub Date', value: formatDate(anthology.publishedDate) },
     { label: 'ISBN', value: anthology.isbn || EMPTY },
     { label: 'Dimensions', value: productionInfo?.dimensions || EMPTY },
-    { label: 'Binding Type', value: productionInfo?.binding_type || EMPTY },
-    { label: 'Page Count', value: formatCount(productionInfo?.page_count) },
-    { label: 'Print Run', value: formatCount(productionInfo?.print_run) },
-    { label: 'Printed By', value: productionInfo?.printed_by || EMPTY },
+    { label: 'Binding Type', value: productionInfo?.bindingType || EMPTY },
+    { label: 'Page Count', value: formatCount(productionInfo?.pageCount) },
+    { label: 'Print Run', value: formatCount(productionInfo?.printRun) },
+    { label: 'Printed By', value: productionInfo?.printedBy || EMPTY },
     {
       label: 'Number of Students',
-      value: formatCount(productionInfo?.number_of_students),
+      value: formatCount(productionInfo?.numberOfStudents),
     },
     {
       label: 'Printing Cost',
-      value: formatCost(productionInfo?.printing_cost),
+      value: formatCost(productionInfo?.printingCost),
     },
     {
       label: 'Weight',
-      value: formatWeight(productionInfo?.weight_in_grams),
+      value: formatWeight(productionInfo?.weightInGrams),
     },
   ];
 
@@ -375,7 +375,7 @@ const PublicationView: React.FC = () => {
         <div className="publication-header">
           <div className="publication-image">
             <img
-              src={anthology.photo_url || anthology.photoUrl || imgFrame69}
+              src={anthology.photoUrl || imgFrame69}
               alt="Publication cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = imgFrame69;
@@ -469,7 +469,7 @@ const PublicationView: React.FC = () => {
         <div className="publication-actions">
           <a
             className="publication-action publication-action-primary"
-            href={anthology.shopify_url || undefined}
+            href={anthology.shopifyUrl || undefined}
             target="_blank"
             rel="noreferrer"
           >
@@ -484,7 +484,7 @@ const PublicationView: React.FC = () => {
           </a>
           <a
             className="publication-action publication-action-secondary"
-            href={productionInfo?.design_files_link ?? undefined}
+            href={productionInfo?.designFilesLink ?? undefined}
             target="_blank"
             rel="noreferrer"
           >
@@ -557,7 +557,7 @@ const PublicationView: React.FC = () => {
               ))}
               <a
                 className="filter-badge"
-                href={productionInfo?.design_files_link ?? undefined}
+                href={productionInfo?.designFilesLink ?? undefined}
                 target="_blank"
                 rel="noreferrer"
               >

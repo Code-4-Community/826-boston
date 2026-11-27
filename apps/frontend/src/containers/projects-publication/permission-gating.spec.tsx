@@ -37,7 +37,7 @@ const row = {
   storyId: 1,
   storyDraftId: 3,
   authorId: 5,
-  consent: false,
+  studentConsent: false,
   firstName: 'Jane',
   lastName: 'Doe',
   grade: 6,
@@ -57,7 +57,7 @@ beforeEach(() => {
   mockApi.updateAuthor.mockResolvedValue({});
   mockApi.getProductionInfo.mockResolvedValue({
     id: 1,
-    printed_by: 'Boston Press',
+    printedBy: 'Boston Press',
   });
 });
 

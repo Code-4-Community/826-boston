@@ -178,27 +178,18 @@ export class AnthologyService {
       throw new NotFoundException('Anthology not found');
     }
 
-    const { photo_url, shopify_url, pub_level, publicationDate, ...rest } =
-      updateAnthologyDto;
-    const attrs: Partial<Anthology> = { ...rest };
+    const { publishedDate, ...rest } = updateAnthologyDto;
+    const updated = Object.assign(anthology, rest);
 
-    // DTO fields use snake_case to match the create payload, but the entity's
-    // TS properties (and therefore what TypeORM actually persists) are camelCase.
-    // TODO: switch to consistent naming so we no longer need this block below
-    if (photo_url !== undefined) attrs.photoUrl = photo_url;
-    if (shopify_url !== undefined) attrs.shopifyUrl = shopify_url;
-    if (pub_level !== undefined) attrs.pubLevel = pub_level;
     // An empty value clears the date (the column is nullable)
-    if (publicationDate !== undefined)
-      attrs.publishedDate = publicationDate
-        ? new Date(publicationDate)
+    if (publishedDate !== undefined)
+      updated.publishedDate = publishedDate
+        ? new Date(publishedDate)
         : (null as unknown as undefined);
 
-    const updated = Object.assign(anthology, attrs);
-
     if (
-      attrs.status !== undefined &&
-      attrs.status !== AnthologyStatus.NOT_STARTED
+      rest.status !== undefined &&
+      rest.status !== AnthologyStatus.NOT_STARTED
     ) {
       const missingFields: string[] = [];
       if (!updated.title?.trim()) missingFields.push('title');

@@ -321,7 +321,6 @@ export default function ArchivedPublications({
                   <div className="publication-card-image">
                     <img
                       src={
-                        pub.photo_url ||
                         pub.photoUrl ||
                         '/src/assets/images/covers/booktemp.avif'
                       }
@@ -343,11 +342,6 @@ export default function ArchivedPublications({
                     <div className="publication-card-details">
                       <h3 className="publication-card-title">{pub.title}</h3>
                       <div className="publication-card-meta">
-                        <span className="publication-card-modified">
-                          {pub.published_year
-                            ? `Last modified ${pub.published_year}`
-                            : ''}
-                        </span>
                         <img
                           src={MenuDotsIcon}
                           alt=""

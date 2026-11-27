@@ -24,7 +24,7 @@ export class TaskAttachment {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'task_id' })
+  @JoinColumn()
   task: Relation<Task>;
 
   @CreateDateColumn()

@@ -16,28 +16,28 @@ export async function seedOmchais(dataSource: DataSource) {
 
   for (const omchai of OmchaiSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { id: omchai.anthology_id },
+      where: { id: omchai.anthologyId },
     });
 
     if (!anthology) {
       console.log(
-        `  - Anthology with id not found: "${omchai.anthology_id}", skipping omchai`,
+        `  - Anthology with id not found: "${omchai.anthologyId}", skipping omchai`,
       );
       continue;
     }
 
-    const user = usersById.get(omchai.user_id);
+    const user = usersById.get(omchai.userId);
 
     if (!user) {
       console.log(
-        `  - User with id not found: id=${omchai.user_id}, skipping omchai`,
+        `  - User with id not found: id=${omchai.userId}, skipping omchai`,
       );
       continue;
     }
 
     const exists = await omchaiRepo.findOne({
       where: {
-        user: { id: omchai.user_id },
+        user: { id: omchai.userId },
         anthology: { id: anthology.id },
         role: omchai.role,
       },
@@ -45,18 +45,18 @@ export async function seedOmchais(dataSource: DataSource) {
 
     if (!exists) {
       const entity = omchaiRepo.create({
-        user: { id: omchai.user_id },
+        user: { id: omchai.userId },
         anthology: { id: anthology.id },
         role: omchai.role,
         datetimeAssigned: omchai.datetimeAssigned,
       });
       await omchaiRepo.save(entity);
       console.log(
-        `  ✓ Created omchai: userId=${omchai.user_id}, anthology="${anthology.title}", role=${omchai.role}`,
+        `  ✓ Created omchai: userId=${omchai.userId}, anthology="${anthology.title}", role=${omchai.role}`,
       );
     } else {
       console.log(
-        `  - Omchai already exists: userId=${omchai.user_id}, anthology="${anthology.title}", role=${omchai.role}`,
+        `  - Omchai already exists: userId=${omchai.userId}, anthology="${anthology.title}", role=${omchai.role}`,
       );
     }
   }

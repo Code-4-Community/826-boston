@@ -36,7 +36,7 @@ export class Task {
   status: TaskStatus;
 
   @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'person_in_charge_id' })
+  @JoinColumn()
   personInCharge?: Relation<User> | null;
 
   @Column({ type: 'date' })
@@ -49,7 +49,7 @@ export class Task {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'anthology_id' })
+  @JoinColumn()
   anthology: Relation<Anthology>;
 
   @OneToMany(() => TaskAttachment, (attachment) => attachment.task)

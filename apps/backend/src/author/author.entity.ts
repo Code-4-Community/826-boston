@@ -15,11 +15,10 @@ export class Author {
   @Column()
   name: string;
 
-  @Column({ nullable: true, name: 'class_period' })
+  @Column({ nullable: true })
   classPeriod?: string;
 
   @Column({
-    name: 'name_in_book',
     nullable: true,
   })
   nameInBook: string;

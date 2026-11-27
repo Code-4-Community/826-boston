@@ -14,37 +14,37 @@ export class ProductionInfo {
   id: number;
 
   @Column({ nullable: true })
-  design_files_link?: string;
+  designFilesLink?: string;
 
   @Column({ nullable: true })
-  cover_image_file_link?: string;
+  coverImageFileLink?: string;
 
   @Column({ nullable: true })
-  binding_type?: string;
+  bindingType?: string;
 
   @Column({ nullable: true })
   dimensions?: string;
 
   @Column('float', { nullable: true })
-  printing_cost?: number;
+  printingCost?: number;
 
   @Column('int', { nullable: true })
-  print_run?: number;
+  printRun?: number;
 
   @Column('float', { nullable: true })
-  weight_in_grams?: number;
+  weightInGrams?: number;
 
   @Column('int', { nullable: true })
-  page_count?: number;
+  pageCount?: number;
 
   @Column({ nullable: true })
-  printed_by?: string;
+  printedBy?: string;
 
   @Column({ nullable: true })
-  foreword_author?: string;
+  forewordAuthor?: string;
 
   @Column('int', { nullable: true })
-  number_of_students?: number;
+  numberOfStudents?: number;
 
   @OneToOne(() => Anthology, (anthology) => anthology.productionInfo)
   anthology: Relation<Anthology>;

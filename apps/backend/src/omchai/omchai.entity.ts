@@ -31,16 +31,15 @@ export class Omchai {
 
   @Column({
     type: 'date',
-    name: 'datetime_assigned',
     default: () => 'CURRENT_DATE',
   })
   datetimeAssigned: Date;
 
   @ManyToOne(() => User, (user) => user.omchaiAssignments)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn()
   user: Relation<User>;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.omchaiAssignments)
-  @JoinColumn({ name: 'anthology_id' })
+  @JoinColumn()
   anthology: Relation<Anthology>;
 }

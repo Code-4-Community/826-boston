@@ -29,14 +29,14 @@ export class Story {
   theme?: string;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.stories)
-  @JoinColumn({ name: 'anthology_id' })
+  @JoinColumn()
   anthology: Relation<Anthology>;
 
   @ManyToOne(() => Author, (author) => author.stories)
-  @JoinColumn({ name: 'author_id' })
+  @JoinColumn()
   author: Relation<Author>;
 
   @OneToOne(() => StoryDraft, (storyDraft) => storyDraft.story)
-  @JoinColumn({ name: 'story_draft_id' })
+  @JoinColumn()
   storyDraft?: Relation<StoryDraft>;
 }

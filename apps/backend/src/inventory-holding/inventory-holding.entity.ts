@@ -15,13 +15,13 @@ export class InventoryHolding {
   id: number;
 
   @ManyToOne(() => Inventory, (inventory) => inventory.holdings)
-  @JoinColumn({ name: 'inventory_id' })
+  @JoinColumn()
   inventory: Relation<Inventory>;
 
   @ManyToOne(() => Anthology, (anthology) => anthology.inventoryHoldings)
-  @JoinColumn({ name: 'anthology_id' })
+  @JoinColumn()
   anthology: Relation<Anthology>;
 
-  @Column({ name: 'num_copies' })
+  @Column()
   numCopies: number;
 }

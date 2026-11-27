@@ -45,9 +45,9 @@ const ProductionInfoView: React.FC<Props> = ({
 
   const saveShopifyUrl = async (value: string) => {
     const updated = await apiClient.updateAnthology(anthologyId, {
-      shopify_url: value === '' ? null : value,
+      shopifyUrl: value === '' ? null : value,
     });
-    setShopifyUrl(updated.shopify_url || updated.shopifyUrl);
+    setShopifyUrl(updated.shopifyUrl);
   };
 
   const saveIsbn = async (value: string) => {
@@ -59,14 +59,14 @@ const ProductionInfoView: React.FC<Props> = ({
 
   const saveProductionInfoField = async (
     field:
-      | 'printed_by'
-      | 'binding_type'
+      | 'printedBy'
+      | 'bindingType'
       | 'dimensions'
-      | 'print_run'
-      | 'printing_cost',
+      | 'printRun'
+      | 'printingCost',
     rawValue: string,
   ) => {
-    const isNumeric = field === 'print_run' || field === 'printing_cost';
+    const isNumeric = field === 'printRun' || field === 'printingCost';
     const value =
       rawValue === '' ? null : isNumeric ? Number(rawValue) : rawValue;
 
@@ -75,7 +75,7 @@ const ProductionInfoView: React.FC<Props> = ({
           [field]: value,
         })
       : await apiClient.createProductionInfo({
-          anthology_id: anthologyId,
+          anthologyId,
           [field]: value,
         });
 
@@ -102,14 +102,14 @@ const ProductionInfoView: React.FC<Props> = ({
     {
       label: 'Printer',
       placeholder: 'Add printer.',
-      value: productionInfo?.printed_by ?? null,
-      onSave: (value) => saveProductionInfoField('printed_by', value),
+      value: productionInfo?.printedBy ?? null,
+      onSave: (value) => saveProductionInfoField('printedBy', value),
     },
     {
       label: 'Binding Type',
       placeholder: 'Add binding type.',
-      value: productionInfo?.binding_type ?? null,
-      onSave: (value) => saveProductionInfoField('binding_type', value),
+      value: productionInfo?.bindingType ?? null,
+      onSave: (value) => saveProductionInfoField('bindingType', value),
     },
     {
       label: 'Book Dimensions',
@@ -120,19 +120,19 @@ const ProductionInfoView: React.FC<Props> = ({
     {
       label: '# of Copies Printed',
       placeholder: 'Add # of copies.',
-      value: productionInfo?.print_run ?? null,
+      value: productionInfo?.printRun ?? null,
       type: 'number',
       requireNonNegative: true,
-      onSave: (value) => saveProductionInfoField('print_run', value),
+      onSave: (value) => saveProductionInfoField('printRun', value),
     },
     {
       label: 'Total Printing Cost',
       placeholder: 'Add printing cost.',
-      value: productionInfo?.printing_cost ?? null,
+      value: productionInfo?.printingCost ?? null,
       type: 'number',
       requireNonNegative: true,
       format: (value) => `$${Number(value).toFixed(2)}`,
-      onSave: (value) => saveProductionInfoField('printing_cost', value),
+      onSave: (value) => saveProductionInfoField('printingCost', value),
     },
     {
       label: 'ISBN',

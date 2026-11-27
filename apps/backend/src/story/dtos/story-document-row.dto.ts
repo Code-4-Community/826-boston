@@ -2,7 +2,7 @@ export interface StoryDocumentRow {
   storyId: number;
   storyDraftId: number | null;
   authorId: number;
-  consent: boolean;
+  studentConsent: boolean;
   firstName: string;
   lastName: string;
   grade: number | null;
