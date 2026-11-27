@@ -119,12 +119,12 @@ export default function CreatePublicationModal({
             />
           </Field>
 
-          <Field label="Program">
+          <Field label="Program(s)">
             <SearchableMultiSelect
               options={programOptions}
               selected={form.programs}
               onChange={(values) => set('programs', values)}
-              placeholder="Select a program"
+              placeholder="Select program(s)"
               selectionDisplay="pills"
             />
           </Field>
@@ -157,12 +157,12 @@ export default function CreatePublicationModal({
             </Field>
           </div>
 
-          <Field label="Owner" required>
+          <Field label="Owner(s)" required>
             <SearchableMultiSelect
               options={ownerOptions}
               selected={form.owners}
               onChange={(values) => set('owners', values)}
-              placeholder="Select a user"
+              placeholder="Select owner(s)"
               selectionDisplay="inline"
             />
           </Field>
