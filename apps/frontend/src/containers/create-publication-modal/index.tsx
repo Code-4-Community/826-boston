@@ -65,8 +65,8 @@ export default function CreatePublicationModal({
     try {
       const anthology = await apiClient.createAnthology({
         title: form.title,
-        pub_level: form.publicationLevel as AnthologyPubLevel,
-        owner_ids: form.owners,
+        pubLevel: form.publicationLevel as AnthologyPubLevel,
+        ownerIds: form.owners,
         programs: form.programs,
         publicationDate: form.publicationDate || undefined,
       });

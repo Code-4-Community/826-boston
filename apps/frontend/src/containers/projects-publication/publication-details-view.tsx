@@ -161,11 +161,8 @@ const PublicationDetailsView: React.FC<Props> = ({
     <div className="publication-details">
       <div className="publication-details__main">
         <div className="publication-details__cover">
-          {values.photo_url || values.photoUrl ? (
-            <img
-              src={values.photo_url || values.photoUrl}
-              alt="Publication cover"
-            />
+          {values.photoUrl ? (
+            <img src={values.photoUrl} alt="Publication cover" />
           ) : (
             <div
               className="publication-details__cover-placeholder"
@@ -278,10 +275,10 @@ const PublicationDetailsView: React.FC<Props> = ({
               <select
                 className="publication-details__control"
                 aria-label="Publication Level"
-                value={values.pubLevel ?? values.pub_level ?? ''}
+                value={values.pubLevel ?? ''}
                 disabled={!editable}
                 onChange={(event) =>
-                  saveImmediately('pub_level', event.target.value)
+                  saveImmediately('pubLevel', event.target.value)
                 }
               >
                 {PUB_LEVELS.map(([value, label]) => (

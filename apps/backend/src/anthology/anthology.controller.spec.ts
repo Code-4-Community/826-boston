@@ -52,10 +52,10 @@ describe('AnthologyController', () => {
   describe('createAnthology', () => {
     const dto: CreateAnthologyDto = {
       title: 'New Anthology',
-      pub_level: AnthologyPubLevel.CHAPBOOK,
+      pubLevel: AnthologyPubLevel.CHAPBOOK,
       programs: ['Tutoring'],
       publicationDate: '2026-06-01',
-      owner_ids: [3, 7],
+      ownerIds: [3, 7],
     };
 
     // The service takes positional arguments, so a dropped or reordered one
@@ -68,8 +68,8 @@ describe('AnthologyController', () => {
 
       expect(service.create).toHaveBeenCalledWith(
         dto.title,
-        dto.pub_level,
-        dto.owner_ids,
+        dto.pubLevel,
+        dto.ownerIds,
         dto.programs,
         dto.publicationDate,
       );

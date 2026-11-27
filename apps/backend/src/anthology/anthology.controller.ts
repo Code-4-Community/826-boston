@@ -338,8 +338,8 @@ export class AnthologyController {
   ): Promise<Anthology> {
     return this.anthologyService.create(
       createAnthologyDto.title,
-      createAnthologyDto.pub_level,
-      createAnthologyDto.owner_ids,
+      createAnthologyDto.pubLevel,
+      createAnthologyDto.ownerIds,
       createAnthologyDto.programs,
       createAnthologyDto.publicationDate,
     );
@@ -467,6 +467,6 @@ export class AnthologyController {
       key,
       file.mimetype,
     );
-    return this.anthologyService.update(id, { photo_url: url });
+    return this.anthologyService.update(id, { photoUrl: url });
   }
 }

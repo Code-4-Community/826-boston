@@ -79,33 +79,6 @@ export interface StoryDocumentsFilters {
 const defaultBaseUrl =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
-/** Backend returns camelCase (`photoUrl`, `shopifyUrl`); UI expects the snake_case
- *  variants in several places, so both keys are populated on the returned object. */
-function normalizeAnthology(raw: unknown): Anthology {
-  if (!raw || typeof raw !== 'object') {
-    return raw as Anthology;
-  }
-  const o = raw as Record<string, unknown>;
-  const photoUrl =
-    (typeof o.photo_url === 'string' ? o.photo_url : undefined) ??
-    (typeof o.photoUrl === 'string' ? o.photoUrl : undefined);
-  const shopifyUrl =
-    (typeof o.shopify_url === 'string' ? o.shopify_url : undefined) ??
-    (typeof o.shopifyUrl === 'string' ? o.shopifyUrl : undefined);
-  return {
-    ...(o as unknown as Anthology),
-    photo_url: photoUrl,
-    photoUrl: photoUrl,
-    shopify_url: shopifyUrl,
-    shopifyUrl: shopifyUrl,
-  };
-}
-
-function normalizeAnthologies(raw: unknown): Anthology[] {
-  if (!Array.isArray(raw)) return [];
-  return raw.map(normalizeAnthology);
-}
-
 export class ApiClient {
   private axiosInstance: AxiosInstance;
 
@@ -126,8 +99,7 @@ export class ApiClient {
   }
 
   public async getAnthologies(): Promise<Anthology[]> {
-    const data = await this.get('/api/anthologies');
-    return normalizeAnthologies(data);
+    return this.get('/api/anthologies') as Promise<Anthology[]>;
   }
 
   /** Every inventory location, regardless of what it holds. */
@@ -136,8 +108,7 @@ export class ApiClient {
   }
 
   public async getAnthology(id: string | number): Promise<Anthology> {
-    const data = await this.get(`/api/anthologies/${id}`);
-    return normalizeAnthology(data);
+    return this.get(`/api/anthologies/${id}`) as Promise<Anthology>;
   }
 
   /**
@@ -239,15 +210,15 @@ export class ApiClient {
   public async filterSortAnthologies(
     body: FilterSortAnthologyBody,
   ): Promise<Anthology[]> {
-    const data = await this.post('/api/anthologies/filter-sort', body);
-    return normalizeAnthologies(data);
+    return this.post('/api/anthologies/filter-sort', body) as Promise<
+      Anthology[]
+    >;
   }
 
   public async getTrackerAnthologies(
     body: TrackerAnthologyBody,
   ): Promise<Anthology[]> {
-    const data = await this.post('/api/anthologies/tracker', body);
-    return normalizeAnthologies(data);
+    return this.post('/api/anthologies/tracker', body) as Promise<Anthology[]>;
   }
 
   public async getAuthors(): Promise<Author[]> {
@@ -283,8 +254,7 @@ export class ApiClient {
     id: number,
     body: Nullable<Record<string, unknown>>,
   ): Promise<Anthology> {
-    const data = await this.patch(`/api/anthologies/${id}`, body);
-    return normalizeAnthology(data);
+    return this.patch(`/api/anthologies/${id}`, body) as Promise<Anthology>;
   }
 
   public async getStoryDrafts(anthologyId: number, inManuscript?: boolean) {
@@ -377,13 +347,11 @@ export class ApiClient {
     anthologyId: number,
     file: File,
   ): Promise<Anthology> {
-    return normalizeAnthology(
-      await this.uploadFile(
-        'patch',
-        `/api/anthologies/${anthologyId}/cover-image`,
-        file,
-      ),
-    );
+    return this.uploadFile(
+      'patch',
+      `/api/anthologies/${anthologyId}/cover-image`,
+      file,
+    ) as Promise<Anthology>;
   }
 
   private async getAuthHeaders(): Promise<Record<string, string>> {

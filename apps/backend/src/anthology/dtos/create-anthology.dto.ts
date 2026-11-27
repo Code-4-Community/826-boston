@@ -31,7 +31,7 @@ export class CreateAnthologyDto {
     example: AnthologyPubLevel.ZINE,
   })
   @IsEnum(AnthologyPubLevel)
-  pub_level: AnthologyPubLevel;
+  pubLevel: AnthologyPubLevel;
 
   @ApiPropertyOptional({
     description: 'Programs associated with the anthology',
@@ -50,5 +50,5 @@ export class CreateAnthologyDto {
   @ArrayNotEmpty()
   @ArrayUnique()
   @IsInt({ each: true })
-  owner_ids: number[];
+  ownerIds: number[];
 }

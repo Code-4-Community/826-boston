@@ -204,7 +204,7 @@ const ProjectPublicationView: React.FC = () => {
           <div className="ppv-tab-content">
             <ProductionInfoView
               anthologyId={anthology.id}
-              shopifyUrl={anthology.shopify_url || anthology.shopifyUrl}
+              shopifyUrl={anthology.shopifyUrl}
               isbn={anthology.isbn}
               canEdit={permissions.canEditProduction}
             />

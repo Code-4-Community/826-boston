@@ -375,7 +375,7 @@ const PublicationView: React.FC = () => {
         <div className="publication-header">
           <div className="publication-image">
             <img
-              src={anthology.photo_url || anthology.photoUrl || imgFrame69}
+              src={anthology.photoUrl || imgFrame69}
               alt="Publication cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = imgFrame69;
@@ -469,7 +469,7 @@ const PublicationView: React.FC = () => {
         <div className="publication-actions">
           <a
             className="publication-action publication-action-primary"
-            href={anthology.shopify_url || undefined}
+            href={anthology.shopifyUrl || undefined}
             target="_blank"
             rel="noreferrer"
           >

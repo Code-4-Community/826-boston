@@ -45,9 +45,9 @@ const ProductionInfoView: React.FC<Props> = ({
 
   const saveShopifyUrl = async (value: string) => {
     const updated = await apiClient.updateAnthology(anthologyId, {
-      shopify_url: value === '' ? null : value,
+      shopifyUrl: value === '' ? null : value,
     });
-    setShopifyUrl(updated.shopify_url || updated.shopifyUrl);
+    setShopifyUrl(updated.shopifyUrl);
   };
 
   const saveIsbn = async (value: string) => {

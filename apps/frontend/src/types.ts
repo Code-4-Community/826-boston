@@ -167,23 +167,18 @@ export interface Anthology {
   id: number;
   title: string;
   description: string;
-  published_year: number;
   programs?: string[] | string;
   inventory?: number;
   status: AnthologyStatus;
-  pub_level: AnthologyPubLevel;
-  photo_url?: string;
+  pubLevel: AnthologyPubLevel;
   photoUrl?: string;
   gradeLevel?: string;
   genres?: string[];
   themes?: string[];
   isbn?: string;
-  shopify_url?: string;
   shopifyUrl?: string;
   subtitle?: string;
   byline?: string;
-  /** camelCase fields as returned by the backend anthology endpoints. */
-  pubLevel?: AnthologyPubLevel;
   publishedDate?: string;
   sponsors?: string[];
   triggers?: string[];
@@ -280,8 +275,8 @@ export interface AnthologyInventory {
 
 export interface CreateAnthologyDto {
   title: string;
-  pub_level: AnthologyPubLevel;
-  owner_ids: number[];
+  pubLevel: AnthologyPubLevel;
+  ownerIds: number[];
   programs?: string[];
   publicationDate?: string;
 }

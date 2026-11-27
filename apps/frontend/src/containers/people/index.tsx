@@ -170,7 +170,7 @@ const ProjectCard: React.FC<{ assignment: OmchaiEntry }> = ({ assignment }) => {
     <article className="people-project-card">
       <img
         className="people-project-card__image"
-        src={project.photoUrl || project.photo_url || ProfilePlaceholder}
+        src={project.photoUrl || ProfilePlaceholder}
         alt=""
       />
       <div className="people-project-card__info">
