@@ -45,15 +45,15 @@ export class ProductionInfoController {
     schema: {
       example: {
         id: 1,
-        design_files_link: 'https://cdn.example.com/designs/cover.pdf',
-        cover_image_file_link: 'https://cdn.example.com/images/cover.jpg',
-        binding_type: 'Hardcover',
+        designFilesLink: 'https://cdn.example.com/designs/cover.pdf',
+        coverImageFileLink: 'https://cdn.example.com/images/cover.jpg',
+        bindingType: 'Hardcover',
         dimensions: '8.5 x 11 in',
-        printing_cost: 250.5,
-        print_run: 1000,
-        weight_in_grams: 720,
-        page_count: 120,
-        printed_by: 'Boston Press',
+        printingCost: 250.5,
+        printRun: 1000,
+        weightInGrams: 720,
+        pageCount: 120,
+        printedBy: 'Boston Press',
       },
     },
   })
@@ -74,7 +74,7 @@ export class ProductionInfoController {
   ): Promise<ProductionInfo> {
     await this.omchaiService.assertCan(
       req.user,
-      createProductionInfoDto.anthology_id,
+      createProductionInfoDto.anthologyId,
       [OmchaiAction.EDIT_PRODUCTION],
     );
     return this.productionInfoService.create(createProductionInfoDto);
@@ -91,15 +91,15 @@ export class ProductionInfoController {
       example: [
         {
           id: 1,
-          design_files_link: 'https://cdn.example.com/designs/cover.pdf',
-          cover_image_file_link: 'https://cdn.example.com/images/cover.jpg',
-          binding_type: 'Hardcover',
+          designFilesLink: 'https://cdn.example.com/designs/cover.pdf',
+          coverImageFileLink: 'https://cdn.example.com/images/cover.jpg',
+          bindingType: 'Hardcover',
           dimensions: '8.5 x 11 in',
-          printing_cost: 250.5,
-          print_run: 1000,
-          weight_in_grams: 720,
-          page_count: 120,
-          printed_by: 'Boston Press',
+          printingCost: 250.5,
+          printRun: 1000,
+          weightInGrams: 720,
+          pageCount: 120,
+          printedBy: 'Boston Press',
         },
       ],
     },
@@ -119,15 +119,15 @@ export class ProductionInfoController {
     schema: {
       example: {
         id: 1,
-        design_files_link: 'https://cdn.example.com/designs/cover.pdf',
-        cover_image_file_link: 'https://cdn.example.com/images/cover.jpg',
-        binding_type: 'Hardcover',
+        designFilesLink: 'https://cdn.example.com/designs/cover.pdf',
+        coverImageFileLink: 'https://cdn.example.com/images/cover.jpg',
+        bindingType: 'Hardcover',
         dimensions: '8.5 x 11 in',
-        printing_cost: 250.5,
-        print_run: 1000,
-        weight_in_grams: 720,
-        page_count: 120,
-        printed_by: 'Boston Press',
+        printingCost: 250.5,
+        printRun: 1000,
+        weightInGrams: 720,
+        pageCount: 120,
+        printedBy: 'Boston Press',
       },
     },
   })
@@ -159,15 +159,15 @@ export class ProductionInfoController {
     schema: {
       example: {
         id: 1,
-        design_files_link: 'https://cdn.example.com/designs/cover-v2.pdf',
-        cover_image_file_link: 'https://cdn.example.com/images/cover-v2.jpg',
-        binding_type: 'Paperback',
+        designFilesLink: 'https://cdn.example.com/designs/cover-v2.pdf',
+        coverImageFileLink: 'https://cdn.example.com/images/cover-v2.jpg',
+        bindingType: 'Paperback',
         dimensions: '6 x 9 in',
-        printing_cost: 180.25,
-        print_run: 500,
-        weight_in_grams: 410,
-        page_count: 96,
-        printed_by: 'Regional Printing',
+        printingCost: 180.25,
+        printRun: 500,
+        weightInGrams: 410,
+        pageCount: 96,
+        printedBy: 'Regional Printing',
       },
     },
   })
@@ -206,7 +206,7 @@ export class ProductionInfoController {
       OmchaiAction.EDIT_PRODUCTION,
     ]);
     // Moving the record to another anthology also needs rights there.
-    const target = updateProductionInfoDto.anthology_id;
+    const target = updateProductionInfoDto.anthologyId;
     if (target !== undefined && target !== anthologyId) {
       await this.omchaiService.assertCan(req.user, target, [
         OmchaiAction.EDIT_PRODUCTION,

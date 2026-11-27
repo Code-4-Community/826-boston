@@ -57,7 +57,7 @@ beforeEach(() => {
   mockApi.updateAuthor.mockResolvedValue({});
   mockApi.getProductionInfo.mockResolvedValue({
     id: 1,
-    printed_by: 'Boston Press',
+    printedBy: 'Boston Press',
   });
 });
 

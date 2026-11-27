@@ -264,7 +264,7 @@ export class ApiClient {
   }
 
   public async createProductionInfo(
-    body: Nullable<Omit<ProductionInfo, 'id'>> & { anthology_id: number },
+    body: Nullable<Omit<ProductionInfo, 'id'>> & { anthologyId: number },
   ): Promise<ProductionInfo> {
     return this.post('/api/production-info', body) as Promise<ProductionInfo>;
   }

@@ -18,16 +18,14 @@ export class ProductionInfoService {
   async create(
     createProductionInfoDto: CreateProductionInfoDto,
   ): Promise<ProductionInfo> {
-    const { anthology_id, ...productionInfoFields } = createProductionInfoDto;
+    const { anthologyId, ...productionInfoFields } = createProductionInfoDto;
 
     const anthology = await this.anthologyRepository.findOne({
-      where: { id: anthology_id },
+      where: { id: anthologyId },
     });
 
     if (!anthology) {
-      throw new NotFoundException(
-        `Anthology with ID ${anthology_id} not found`,
-      );
+      throw new NotFoundException(`Anthology with ID ${anthologyId} not found`);
     }
 
     const productionInfo = await this.productionInfoRepository.save(
@@ -74,16 +72,16 @@ export class ProductionInfoService {
       throw new NotFoundException(`Production info with ID ${id} not found`);
     }
 
-    const { anthology_id, ...productionInfoFields } = updateProductionInfoDto;
+    const { anthologyId, ...productionInfoFields } = updateProductionInfoDto;
 
-    if (anthology_id) {
+    if (anthologyId) {
       const newAnthology = await this.anthologyRepository.findOne({
-        where: { id: anthology_id },
+        where: { id: anthologyId },
       });
 
       if (!newAnthology) {
         throw new NotFoundException(
-          `Anthology with ID ${anthology_id} not found`,
+          `Anthology with ID ${anthologyId} not found`,
         );
       }
 

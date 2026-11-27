@@ -27,17 +27,17 @@ export async function seedAnthologies(dataSource: DataSource) {
 
   console.log('Seeding production info...');
 
-  // Anthology ids are generated in AnthologiesSeed order, so `anthology_id`
+  // Anthology ids are generated in AnthologiesSeed order, so `anthologyId`
   // matches the id of the anthology each row belongs to.
-  for (const { anthology_id, ...piData } of ProductionInfoSeed) {
+  for (const { anthologyId, ...piData } of ProductionInfoSeed) {
     const anthology = await anthologyRepo.findOne({
-      where: { id: anthology_id },
+      where: { id: anthologyId },
       relations: ['productionInfo'],
     });
 
     if (!anthology) {
       console.log(
-        `  - Anthology ${anthology_id} not found, skipping production info`,
+        `  - Anthology ${anthologyId} not found, skipping production info`,
       );
       continue;
     }
